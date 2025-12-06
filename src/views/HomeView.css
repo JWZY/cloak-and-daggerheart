@@ -1,0 +1,83 @@
+.home-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ios-background);
+}
+
+.view-header {
+  padding: 20px 24px 16px;
+  background: var(--ios-background);
+}
+
+.view-header h1 {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.view-subtitle {
+  font-size: 15px;
+  color: var(--ios-gray);
+  font-weight: 400;
+}
+
+.view-content {
+  flex: 1;
+  padding: 0 24px 24px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.card-emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: var(--ios-gray);
+}
+
+.sheet-content-example {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sheet-text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ios-button {
+  background: var(--ios-blue);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  touch-action: manipulation;
+}
+
+.ios-button:active {
+  opacity: 0.7;
+}
+

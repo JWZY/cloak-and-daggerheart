@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* iOS-native colors */
+  --ios-blue: #007AFF;
+  --ios-gray: #8E8E93;
+  --ios-gray-2: #AEAEB2;
+  --ios-gray-3: #C7C7CC;
+  --ios-gray-4: #D1D1D6;
+  --ios-gray-5: #E5E5EA;
+  --ios-gray-6: #F2F2F7;
+  --ios-background: #000000;
+  --ios-surface: #1C1C1E;
+  --ios-separator: rgba(84, 84, 88, 0.65);
+  
+  /* iOS-native spring animations */
+  --spring-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --spring-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: var(--ios-background);
+  color: white;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  /* Prevent iOS bounce effect on body */
+  overscroll-behavior: none;
+  /* Disable text selection for native feel */
+  user-select: none;
+  -webkit-user-select: none;
+  /* Disable tap highlight */
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* iOS-style scrolling */
+.ios-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Hide scrollbars but keep functionality */
+.ios-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* iOS-style button press effect */
+@keyframes ios-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.ios-button-press:active {
+  animation: ios-press 0.15s ease-out;
+  opacity: 0.6;
+}
+
+/* Prevent double-tap zoom */
+button, a {
+  touch-action: manipulation;
+}
+

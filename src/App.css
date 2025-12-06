@@ -1,0 +1,44 @@
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--ios-background);
+  position: relative;
+}
+
+.safe-area-top {
+  height: env(safe-area-inset-top);
+  background: var(--ios-background);
+  position: relative;
+  z-index: 1;
+}
+
+.safe-area-bottom {
+  height: env(safe-area-inset-bottom);
+  background: var(--ios-surface);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.view-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: calc(68px + env(safe-area-inset-bottom));
+}
+
+.view-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
