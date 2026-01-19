@@ -11,10 +11,8 @@
   --ios-gray-4: #D1D1D6;
   --ios-gray-5: #E5E5EA;
   --ios-gray-6: #F2F2F7;
-  --ios-background: #000000;
-  --ios-surface: #1C1C1E;
-  --ios-separator: rgba(84, 84, 88, 0.65);
-  
+  --ios-separator: #C6C6C8;
+
   /* iOS-native spring animations */
   --spring-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --spring-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -28,10 +26,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: var(--ios-background);
-  color: white;
+  background-color: var(--ios-gray-6);
+  color: #1c1c1e;
   overflow: hidden;
   position: fixed;
   width: 100%;
@@ -59,8 +62,19 @@ body {
 }
 
 /* Hide scrollbars but keep functionality */
-.ios-scroll::-webkit-scrollbar {
+::-webkit-scrollbar {
   display: none;
+}
+
+/* Allow text selection in textareas */
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+input {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 /* iOS-style button press effect */
@@ -80,3 +94,11 @@ button, a {
   touch-action: manipulation;
 }
 
+/* Vaul drawer overrides */
+[vaul-drawer] {
+  touch-action: none;
+}
+
+[vaul-drawer-content] {
+  max-height: 90vh;
+}

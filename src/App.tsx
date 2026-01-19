@@ -1,105 +1,104 @@
 import { useState } from 'react'
-import { motion, AnimatePresence, PanInfo } from 'framer-motion'
-import { Drawer } from 'vaul'
-import HomeView from './views/HomeView'
-import ExploreView from './views/ExploreView'
-import ProfileView from './views/ProfileView'
-import TabBar from './components/TabBar'
-import './App.css'
+import { AnimatePresence, motion } from 'framer-motion'
+import { HomeView } from './views/HomeView'
+import { CreateCharacter } from './views/CreateCharacter'
+import { CharacterSheet } from './views/CharacterSheet'
+import { useCharacterStore } from './stores/characterStore'
+import type { Character } from './types/character'
 
-// iOS-native spring configuration
-const spring = {
-  type: "spring",
-  stiffness: 300,
-  damping: 30,
-  mass: 0.8
-}
-
-const views = ['home', 'explore', 'profile'] as const
-type View = typeof views[number]
+type AppView = 'home' | 'create' | 'sheet'
 
 function App() {
-  const [currentView, setCurrentView] = useState<View>('home')
-  const [direction, setDirection] = useState(0)
+  const [currentView, setCurrentView] = useState<AppView>('home')
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
+  const { setCurrentCharacter } = useCharacterStore()
 
-  const viewIndex = views.indexOf(currentView)
+  const handleCreateNew = () => {
+    setCurrentView('create')
+  }
 
-  const handleSwipe = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 50
-    const velocity = info.velocity.x
-    const offset = info.offset.x
+  const handleSelectCharacter = (character: Character) => {
+    setSelectedCharacter(character)
+    setCurrentCharacter(character.id)
+    setCurrentView('sheet')
+  }
 
-    if (Math.abs(velocity) > 500 || Math.abs(offset) > threshold) {
-      if (offset > 0 && viewIndex > 0) {
-        // Swipe right - go to previous view
-        setDirection(-1)
-        setCurrentView(views[viewIndex - 1])
-      } else if (offset < 0 && viewIndex < views.length - 1) {
-        // Swipe left - go to next view
-        setDirection(1)
-        setCurrentView(views[viewIndex + 1])
-      }
+  const handleCreateComplete = (characterId: string) => {
+    const character = useCharacterStore.getState().characters.find(c => c.id === characterId)
+    if (character) {
+      setSelectedCharacter(character)
+      setCurrentView('sheet')
     }
   }
 
-  const handleTabChange = (view: View) => {
-    const newIndex = views.indexOf(view)
-    setDirection(newIndex > viewIndex ? 1 : -1)
-    setCurrentView(view)
+  const handleBack = () => {
+    setSelectedCharacter(null)
+    setCurrentCharacter(null)
+    setCurrentView('home')
   }
 
-  const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? '100%' : '-100%',
-      opacity: 0.5
-    }),
-    center: {
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      x: direction > 0 ? '-100%' : '100%',
-      opacity: 0.5
-    })
-  }
+  // Refresh character data when viewing sheet
+  const currentCharacter = selectedCharacter
+    ? useCharacterStore.getState().characters.find(c => c.id === selectedCharacter.id) || selectedCharacter
+    : null
 
   return (
-    <div className="app">
-      {/* Safe area top spacer for iOS notch */}
-      <div className="safe-area-top" />
-      
-      {/* Swipeable view container */}
-      <div className="view-container">
-        <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-          <motion.div
-            key={currentView}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={spring}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={handleSwipe}
-            className="view-wrapper"
-          >
-            {currentView === 'home' && <HomeView />}
-            {currentView === 'explore' && <ExploreView />}
-            {currentView === 'profile' && <ProfileView />}
-          </motion.div>
+    <div className="h-screen w-screen overflow-hidden bg-ios-gray-light font-ios">
+      {/* Safe area top */}
+      <div className="h-[env(safe-area-inset-top)] bg-white" />
+
+      <div className="h-[calc(100vh-env(safe-area-inset-top)-env(safe-area-inset-bottom))]">
+        <AnimatePresence mode="wait">
+          {currentView === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="h-full"
+            >
+              <HomeView
+                onCreateNew={handleCreateNew}
+                onSelectCharacter={handleSelectCharacter}
+              />
+            </motion.div>
+          )}
+
+          {currentView === 'create' && (
+            <motion.div
+              key="create"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="h-full"
+            >
+              <CreateCharacter
+                onComplete={handleCreateComplete}
+                onCancel={handleBack}
+              />
+            </motion.div>
+          )}
+
+          {currentView === 'sheet' && currentCharacter && (
+            <motion.div
+              key="sheet"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="h-full"
+            >
+              <CharacterSheet character={currentCharacter} onBack={handleBack} />
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
-      {/* iOS-style tab bar */}
-      <TabBar currentView={currentView} onViewChange={handleTabChange} />
-      
-      {/* Safe area bottom spacer for iOS home indicator */}
-      <div className="safe-area-bottom" />
+      {/* Safe area bottom */}
+      <div className="h-[env(safe-area-inset-bottom)] bg-white" />
     </div>
   )
 }
 
 export default App
-
