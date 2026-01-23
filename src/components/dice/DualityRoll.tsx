@@ -15,15 +15,15 @@ export function DualityRoll({ roll, compact = false }: DualityRollProps) {
   }
 
   const getResultColor = () => {
-    if (roll.result === 'critical') return 'text-amber-600'
-    if (roll.result === 'hope') return 'text-blue-600'
-    return 'text-red-600'
+    if (roll.result === 'critical') return 'text-amber-300'
+    if (roll.result === 'hope') return 'text-blue-300'
+    return 'text-red-300'
   }
 
   const getBgColor = () => {
-    if (roll.result === 'critical') return 'bg-amber-50 border-amber-200'
-    if (roll.result === 'hope') return 'bg-blue-50 border-blue-200'
-    return 'bg-red-50 border-red-200'
+    if (roll.result === 'critical') return 'bg-amber-500/20 border-amber-400/30'
+    if (roll.result === 'hope') return 'bg-blue-500/20 border-blue-400/30'
+    return 'bg-red-500/20 border-red-400/30'
   }
 
   if (compact) {
@@ -38,25 +38,25 @@ export function DualityRoll({ roll, compact = false }: DualityRollProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`p-4 rounded-2xl border-2 ${getBgColor()}`}
+      className={`p-4 rounded-2xl border-2 glass ${getBgColor()}`}
     >
       <div className="flex items-center justify-center gap-4 mb-3">
         <div className="flex flex-col items-center">
-          <span className="text-xs text-gray-500 mb-1">Hope</span>
+          <span className="text-xs text-white/50 mb-1">Hope</span>
           <div className="w-12 h-12 rounded-lg bg-blue-500 text-white flex items-center justify-center text-xl font-bold">
             {roll.hopeDie}
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-xs text-gray-500 mb-1">Fear</span>
+          <span className="text-xs text-white/50 mb-1">Fear</span>
           <div className="w-12 h-12 rounded-lg bg-red-500 text-white flex items-center justify-center text-xl font-bold">
             {roll.fearDie}
           </div>
         </div>
         {roll.modifier !== 0 && (
           <div className="flex flex-col items-center">
-            <span className="text-xs text-gray-500 mb-1">Mod</span>
-            <div className="w-12 h-12 rounded-lg bg-gray-200 text-gray-700 flex items-center justify-center text-xl font-bold">
+            <span className="text-xs text-white/50 mb-1">Mod</span>
+            <div className="w-12 h-12 rounded-lg bg-white/20 text-white flex items-center justify-center text-xl font-bold">
               {roll.modifier > 0 ? `+${roll.modifier}` : roll.modifier}
             </div>
           </div>

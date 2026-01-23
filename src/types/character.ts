@@ -63,6 +63,50 @@ export interface ClassData {
   connections: { question: string }[]
 }
 
+// Equipment types
+export interface Weapon {
+  name: string
+  primary_or_secondary: 'Primary' | 'Secondary'
+  tier: string
+  physical_or_magical: 'Physical' | 'Magical'
+  trait: string // Agility, Strength, Finesse, Instinct, Presence, Knowledge
+  range: string
+  damage: string
+  burden: string
+  feat_name?: string
+  feat_text?: string
+}
+
+export interface Armor {
+  name: string
+  tier: string
+  base_thresholds: string // "major / severe" format
+  base_score: string
+  feat_name?: string
+  feat_text?: string
+}
+
+export interface Consumable {
+  roll: string
+  name: string
+  description: string
+  quantity?: number
+}
+
+export interface Item {
+  roll: string
+  name: string
+  description: string
+}
+
+export interface Equipment {
+  primaryWeapon: Weapon | null
+  secondaryWeapon: Weapon | null
+  armor: Armor | null
+  items: Item[]
+  consumables: Consumable[]
+}
+
 export type TraitName = 'agility' | 'strength' | 'finesse' | 'instinct' | 'presence' | 'knowledge'
 
 export interface Traits {
@@ -83,13 +127,17 @@ export interface Character {
   subclass: 'School of Knowledge' | 'School of War'
   traits: Traits
   hp: { current: number; max: number }
-  armor: { current: number; max: number }
+  armorSlots: { current: number; max: number }
   hope: number
   stress: { current: number; max: number }
   evasion: number
   proficiency: number
   domainCards: DomainCard[]
+  equipment: Equipment
+  gold: number
   notes: string
+  backgroundAnswers: string[]
+  connectionAnswers: string[]
   createdAt: number
 }
 

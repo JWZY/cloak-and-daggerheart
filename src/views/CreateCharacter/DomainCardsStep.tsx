@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Card } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Sheet } from '../../components/ui/Sheet'
+import { Markdown } from '../../components/ui/Markdown'
 import { wizardLevel1Cards, getWizardCardCount } from '../../data/srd'
 import type { DomainCard, WizardSubclass } from '../../types/character'
 
@@ -95,7 +96,9 @@ export function DomainCardsStep({
                   i
                 </motion.button>
               </div>
-              <p className="text-sm text-gray-600 line-clamp-2">{card.text}</p>
+              <p className="text-sm text-gray-600 line-clamp-2">
+                <Markdown>{card.text}</Markdown>
+              </p>
             </Card>
           )
         })}
@@ -142,7 +145,9 @@ export function DomainCardsStep({
               )}
             </div>
 
-            <p className="text-gray-700 whitespace-pre-wrap">{detailCard.text}</p>
+            <div className="text-gray-700">
+              <Markdown>{detailCard.text}</Markdown>
+            </div>
 
             <Button
               onClick={() => {

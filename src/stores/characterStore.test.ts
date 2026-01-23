@@ -153,8 +153,8 @@ describe('updateHP', () => {
   })
 })
 
-describe('updateArmor', () => {
-  it('clamps armor at 0 minimum', () => {
+describe('updateArmorSlots', () => {
+  it('clamps armor slots at 0 minimum', () => {
     const store = useCharacterStore.getState()
     store.startDraft()
     store.updateDraft({
@@ -167,13 +167,13 @@ describe('updateArmor', () => {
     })
     const id = store.finalizeDraft()!
 
-    store.updateArmor(id, -10)
+    store.updateArmorSlots(id, -10)
 
     const character = store.getCurrentCharacter()
-    expect(character!.armor.current).toBe(0)
+    expect(character!.armorSlots.current).toBe(0)
   })
 
-  it('clamps armor at max', () => {
+  it('clamps armor slots at max', () => {
     const store = useCharacterStore.getState()
     store.startDraft()
     store.updateDraft({
@@ -186,10 +186,10 @@ describe('updateArmor', () => {
     })
     const id = store.finalizeDraft()!
 
-    store.updateArmor(id, 100)
+    store.updateArmorSlots(id, 100)
 
     const character = store.getCurrentCharacter()
-    expect(character!.armor.current).toBe(character!.armor.max)
+    expect(character!.armorSlots.current).toBe(character!.armorSlots.max)
   })
 })
 

@@ -13,6 +13,8 @@ interface SummaryStepProps {
   onNameChange: (name: string) => void
   onComplete: () => void
   onBack: () => void
+  isEditing?: boolean
+  initialName?: string
 }
 
 export function SummaryStep({
@@ -24,8 +26,10 @@ export function SummaryStep({
   onNameChange,
   onComplete,
   onBack,
+  isEditing = false,
+  initialName = '',
 }: SummaryStepProps) {
-  const [name, setName] = useState('')
+  const [name, setName] = useState(initialName)
 
   const handleNameChange = (value: string) => {
     setName(value)
@@ -202,7 +206,7 @@ export function SummaryStep({
           disabled={!name.trim()}
           className="flex-1"
         >
-          Create Character
+          {isEditing ? 'Save Changes' : 'Create Character'}
         </Button>
       </div>
     </div>

@@ -5,28 +5,33 @@ import { CommunityStep } from './CommunityStep'
 import { SubclassStep } from './SubclassStep'
 import { DomainCardsStep } from './DomainCardsStep'
 import { TraitsStep } from './TraitsStep'
+import { EquipmentStep } from './EquipmentStep'
 import { SummaryStep } from './SummaryStep'
 import { useCharacterStore } from '../../stores/characterStore'
-import type { Ancestry, Community, DomainCard, Traits, WizardSubclass } from '../../types/character'
+import type { Ancestry, Community, DomainCard, Traits, WizardSubclass, Equipment } from '../../types/character'
 
-type Step = 'ancestry' | 'community' | 'subclass' | 'cards' | 'traits' | 'summary'
+type Step = 'ancestry' | 'community' | 'subclass' | 'cards' | 'traits' | 'equipment' | 'summary'
 
-const STEPS: Step[] = ['ancestry', 'community', 'subclass', 'cards', 'traits', 'summary']
+const STEPS: Step[] = ['ancestry', 'community', 'subclass', 'cards', 'traits', 'equipment', 'summary']
 
 interface CreateCharacterProps {
   onComplete: (characterId: string) => void
   onCancel: () => void
+  isEditing?: boolean
 }
 
-export function CreateCharacter({ onComplete, onCancel }: CreateCharacterProps) {
+export function CreateCharacter({ onComplete, onCancel, isEditing = false }: CreateCharacterProps) {
   const [currentStep, setCurrentStep] = useState<Step>('ancestry')
   const { draftCharacter, startDraft, updateDraft, finalizeDraft, clearDraft } =
     useCharacterStore()
 
   useEffect(() => {
-    startDraft()
+    // Only start fresh draft if not editing (editing mode already initialized the draft)
+    if (!isEditing) {
+      startDraft()
+    }
     return () => clearDraft()
-  }, [startDraft, clearDraft])
+  }, [startDraft, clearDraft, isEditing])
 
   const currentIndex = STEPS.indexOf(currentStep)
   const progress = ((currentIndex + 1) / STEPS.length) * 100
@@ -92,7 +97,7 @@ export function CreateCharacter({ onComplete, onCancel }: CreateCharacterProps) 
           >
             Cancel
           </button>
-          <span className="font-semibold">Create Character</span>
+          <span className="font-semibold">{isEditing ? 'Edit Character' : 'Create Character'}</span>
           <span className="w-14" />
         </div>
         {/* Progress bar */}
@@ -161,6 +166,14 @@ export function CreateCharacter({ onComplete, onCancel }: CreateCharacterProps) 
                 onBack={goBackWithDirection}
               />
             )}
+            {currentStep === 'equipment' && (
+              <EquipmentStep
+                equipment={draftCharacter?.equipment}
+                onSelect={(equipment: Partial<Equipment>) => updateDraft({ equipment })}
+                onNext={goNextWithDirection}
+                onBack={goBackWithDirection}
+              />
+            )}
             {currentStep === 'summary' &&
               draftCharacter?.ancestry &&
               draftCharacter?.community &&
@@ -176,6 +189,8 @@ export function CreateCharacter({ onComplete, onCancel }: CreateCharacterProps) 
                   onNameChange={(name: string) => updateDraft({ name })}
                   onComplete={handleComplete}
                   onBack={goBackWithDirection}
+                  isEditing={isEditing}
+                  initialName={draftCharacter.name}
                 />
               )}
           </motion.div>

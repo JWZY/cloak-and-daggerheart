@@ -31,6 +31,16 @@ const TRAIT_DESCRIPTIONS: Record<TraitName, string> = {
 // Available values to assign: -1, 0, 0, +1, +1, +2
 const AVAILABLE_VALUES = [-1, 0, 0, 1, 1, 2]
 
+// Suggested traits for Wizard: -1 Agility, 0 Strength, 0 Finesse, +1 Instinct, +1 Presence, +2 Knowledge
+const SUGGESTED_TRAITS: Traits = {
+  agility: -1,
+  strength: 0,
+  finesse: 0,
+  instinct: 1,
+  presence: 1,
+  knowledge: 2,
+}
+
 export function TraitsStep({ traits, onSelect, onNext, onBack }: TraitsStepProps) {
   const [assignments, setAssignments] = useState<Record<TraitName, number | null>>({
     agility: traits?.agility ?? null,
@@ -95,6 +105,11 @@ export function TraitsStep({ traits, onSelect, onNext, onBack }: TraitsStepProps
     }
   }
 
+  const applySuggested = () => {
+    setAssignments(SUGGESTED_TRAITS)
+    setAvailablePool([]) // All values used
+  }
+
   const formatValue = (v: number | null) => {
     if (v === null) return '—'
     if (v > 0) return `+${v}`
@@ -121,7 +136,18 @@ export function TraitsStep({ traits, onSelect, onNext, onBack }: TraitsStepProps
 
       {/* Available pool */}
       <div className="mb-4 p-3 bg-ios-gray-light rounded-xl">
-        <span className="text-sm text-gray-600">Available: </span>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">Available: </span>
+          {availablePool.length > 0 && (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={applySuggested}
+              className="text-xs text-ios-blue font-medium"
+            >
+              Use Suggested
+            </motion.button>
+          )}
+        </div>
         <div className="flex gap-2 mt-2 flex-wrap">
           {[-1, 0, 1, 2].map((v) =>
             poolDisplay[v] ? (

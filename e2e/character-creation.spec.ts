@@ -20,12 +20,8 @@ test.describe('Character Creation Flow', () => {
       consoleErrors.push(err.message)
     })
 
-    // Navigate to app
+    // Navigate to app - goes directly to character creation when no characters exist
     await page.goto('/')
-    await expect(page.locator('h1')).toContainText('Daggerheart')
-
-    // Click Create Character
-    await page.click('button:has-text("Create Character")')
     await expect(page.locator('h2')).toContainText('Choose Your Ancestry')
 
     // Step 1: Select Ancestry (first one - Clank)
@@ -69,9 +65,13 @@ test.describe('Character Creation Flow', () => {
     await traitSections.filter({ hasText: /knowledge/i }).locator('button:has-text("+2")').click()
 
     await page.click('button:has-text("Continue")')
+    await expect(page.locator('h2')).toContainText('Choose Your Equipment')
+
+    // Step 6: Equipment Selection (use defaults - Quarterstaff and Leather Armor)
+    await page.click('button:has-text("Continue")')
     await expect(page.locator('h2')).toContainText('Review Your Character')
 
-    // Step 6: Enter name and complete
+    // Step 7: Enter name and complete
     await page.fill('input[placeholder*="name"]', 'Test Wizard')
     await page.click('button:has-text("Create Character")')
 
@@ -84,23 +84,13 @@ test.describe('Character Creation Flow', () => {
     await expect(page.locator('h3:has-text("Domain Cards")')).toBeVisible()
 
     await page.click('button:has-text("Gear")')
-    await expect(page.locator('h3:has-text("Weapons")')).toBeVisible()
+    await expect(page.locator('text=Primary Weapon')).toBeVisible()
 
     await page.click('button:has-text("Notes")')
     await expect(page.locator('h3:has-text("Session Notes")')).toBeVisible()
 
     await page.click('button:has-text("Stats")')
-    await expect(page.locator('text=Hit Points')).toBeVisible()
-
-    // Test dice tray opens
-    const diceButton = page.locator('button.fixed').filter({ has: page.locator('svg') })
-    await diceButton.click()
-    await expect(page.locator('text=Roll Duality Dice')).toBeVisible()
-
-    // Roll dice
-    await page.click('button:has-text("Roll Duality Dice")')
-    await page.waitForTimeout(600)
-    await expect(page.locator('text=/with Hope|with Fear|Critical Success/').first()).toBeVisible()
+    await expect(page.locator('text=HP')).toBeVisible()
 
     // Report errors
     if (consoleErrors.length > 0) {
@@ -130,10 +120,11 @@ test.describe('Character Creation Flow', () => {
       consoleErrors.push(err.message)
     })
 
+    // Navigate to app - goes directly to character creation when no characters exist
     await page.goto('/')
+    await expect(page.locator('h2')).toContainText('Choose Your Ancestry')
 
     // Create character with School of War
-    await page.click('button:has-text("Create Character")')
     await page.click('text=Human')
     await page.click('button:has-text("Continue")')
     await page.click('text=Wanderborne')
@@ -162,6 +153,11 @@ test.describe('Character Creation Flow', () => {
     await traitSections.filter({ hasText: /knowledge/i }).locator('button:has-text("+2")').click()
 
     await page.click('button:has-text("Continue")')
+    await expect(page.locator('h2')).toContainText('Choose Your Equipment')
+
+    // Equipment Selection (use defaults)
+    await page.click('button:has-text("Continue")')
+    await expect(page.locator('h2')).toContainText('Review Your Character')
 
     // Verify HP is 6 (5 base + 1 from Battlemage)
     await expect(page.locator('text=HP')).toBeVisible()

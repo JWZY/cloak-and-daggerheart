@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Dice5, Plus, Minus } from 'lucide-react'
 import { Sheet } from '../ui/Sheet'
 import { Button } from '../ui/Button'
 import { DualityRoll } from './DualityRoll'
@@ -43,49 +44,32 @@ export function DiceTray() {
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-ios-blue text-white shadow-lg flex items-center justify-center z-30"
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full glass bg-white/20 text-white shadow-lg flex items-center justify-center z-30"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="2" y="2" width="20" height="20" rx="2" />
-          <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-          <circle cx="16" cy="8" r="1.5" fill="currentColor" />
-          <circle cx="8" cy="16" r="1.5" fill="currentColor" />
-          <circle cx="16" cy="16" r="1.5" fill="currentColor" />
-          <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-        </svg>
+        <Dice5 size={24} />
       </motion.button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen} title="Dice Tray">
         <div className="space-y-6">
           {/* Modifier control */}
           <div className="flex items-center justify-center gap-4">
-            <span className="text-gray-600">Modifier:</span>
+            <span className="text-white/70">Modifier:</span>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => adjustModifier(-1)}
-              className="w-10 h-10 rounded-full bg-ios-gray-light text-gray-700 text-xl font-bold"
+              className="w-10 h-10 rounded-full glass text-white flex items-center justify-center"
             >
-              -
+              <Minus size={18} strokeWidth={2.5} />
             </motion.button>
-            <span className="text-2xl font-bold w-12 text-center">
+            <span className="text-2xl font-bold text-white w-12 text-center">
               {modifier >= 0 ? `+${modifier}` : modifier}
             </span>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => adjustModifier(1)}
-              className="w-10 h-10 rounded-full bg-ios-gray-light text-gray-700 text-xl font-bold"
+              className="w-10 h-10 rounded-full glass text-white flex items-center justify-center"
             >
-              +
+              <Plus size={18} strokeWidth={2.5} />
             </motion.button>
           </div>
 
@@ -93,6 +77,7 @@ export function DiceTray() {
           <Button
             onClick={handleRoll}
             disabled={isRolling}
+            variant="glass-primary"
             size="lg"
             className="w-full"
           >
@@ -109,7 +94,7 @@ export function DiceTray() {
           {/* Roll history */}
           {rollHistory.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Recent Rolls</h3>
+              <h3 className="text-sm font-medium text-white/50 mb-2">Recent Rolls</h3>
               <div className="space-y-2">
                 {rollHistory.slice(0, 5).map((roll) => (
                   <DualityRoll key={roll.id} roll={roll} compact />

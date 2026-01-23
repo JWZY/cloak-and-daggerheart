@@ -1,23 +1,27 @@
 import { motion } from 'framer-motion'
+import { Plus, Minus } from 'lucide-react'
 
 interface SlotDisplayProps {
   current: number
   max: number
   onChange: (value: number) => void
   label: string
-  color: 'red' | 'blue' | 'purple' | 'gray'
 }
 
-function SlotDisplay({ current, max, onChange, label, color }: SlotDisplayProps) {
-  const colorStyles = {
-    red: { filled: 'bg-red-500 border-red-600', empty: 'border-red-300' },
-    blue: { filled: 'bg-blue-500 border-blue-600', empty: 'border-blue-300' },
-    purple: { filled: 'bg-purple-500 border-purple-600', empty: 'border-purple-300' },
-    gray: { filled: 'bg-gray-500 border-gray-600', empty: 'border-gray-300' },
-  }
+// Liquid Glass slot style
+const slotBaseStyle = `
+  w-10 h-10 rounded-full transition-all
+  bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_50%,rgba(0,0,0,0.01)_100%)]
+  shadow-[inset_0_1px_1px_rgba(255,255,255,0.375),inset_0_1.5px_3px_rgba(255,255,255,0.09),inset_0_-1px_1px_rgba(0,0,0,0.1),inset_0_-1.5px_3px_rgba(0,0,0,0.05)]
+`.trim().replace(/\s+/g, ' ')
 
-  const styles = colorStyles[color]
+const slotFilledStyle = `
+  w-10 h-10 rounded-full transition-all
+  bg-white/90
+  shadow-[inset_0_1px_2px_rgba(255,255,255,0.8),0_2px_8px_rgba(255,255,255,0.3)]
+`.trim().replace(/\s+/g, ' ')
 
+function SlotDisplay({ current, max, onChange, label }: SlotDisplayProps) {
   const handleTap = (index: number) => {
     // Toggle: if tapping the last filled slot, unfill it; otherwise fill up to that slot
     if (index < current) {
@@ -29,16 +33,15 @@ function SlotDisplay({ current, max, onChange, label, color }: SlotDisplayProps)
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-gray-600">{label}</span>
-      <div className="flex gap-1.5 flex-wrap">
+      <span className="text-xs uppercase tracking-wide text-white/40">{label}</span>
+      <div className="flex gap-2 flex-wrap">
         {Array.from({ length: max }).map((_, i) => (
           <motion.button
             key={i}
-            whileTap={{ scale: 0.85 }}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
             onClick={() => handleTap(i)}
-            className={`w-7 h-7 rounded-full border-2 transition-colors ${
-              i < current ? styles.filled : `bg-white ${styles.empty}`
-            }`}
+            className={i < current ? slotFilledStyle : slotBaseStyle}
           />
         ))}
       </div>
@@ -75,37 +78,37 @@ export function StatBlock({
           current={hp.current}
           max={hp.max}
           onChange={onHPChange}
-          label={`Hit Points (${hp.current}/${hp.max})`}
-          color="red"
+          label={`HP ${hp.current}/${hp.max}`}
         />
         <SlotDisplay
           current={armor.current}
           max={armor.max}
           onChange={onArmorChange}
-          label={`Armor (${armor.current}/${armor.max})`}
-          color="gray"
+          label={`Armor ${armor.current}/${armor.max}`}
         />
       </div>
 
       {/* Hope counter */}
-      <div className="flex items-center justify-between bg-blue-50 rounded-xl p-3">
-        <span className="text-sm font-medium text-blue-700">Hope</span>
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between pt-4 border-t border-white/10">
+        <span className="text-xs uppercase tracking-wide text-white/40">Hope</span>
+        <div className="flex items-center gap-4">
           <motion.button
             whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
             onClick={() => onHopeChange(Math.max(0, hope - 1))}
             disabled={hope <= 0}
-            className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center disabled:opacity-40"
+            className="lg-button w-10 h-10 disabled:opacity-30"
           >
-            -
+            <Minus size={18} strokeWidth={2.5} />
           </motion.button>
-          <span className="text-xl font-bold text-blue-700 w-8 text-center">{hope}</span>
+          <span className="text-2xl font-semibold text-white w-8 text-center">{hope}</span>
           <motion.button
             whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
             onClick={() => onHopeChange(hope + 1)}
-            className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center"
+            className="lg-button w-10 h-10"
           >
-            +
+            <Plus size={18} strokeWidth={2.5} />
           </motion.button>
         </div>
       </div>
@@ -115,8 +118,7 @@ export function StatBlock({
         current={stress.current}
         max={stress.max}
         onChange={onStressChange}
-        label={`Stress (${stress.current}/${stress.max})`}
-        color="purple"
+        label={`Stress ${stress.current}/${stress.max}`}
       />
     </div>
   )

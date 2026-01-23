@@ -6,81 +6,110 @@ import { wizard } from '../../data/srd'
 interface NotesTabProps {
   character: Character
   onNotesChange: (notes: string) => void
+  onBackgroundAnswerChange: (index: number, answer: string) => void
+  onConnectionAnswerChange: (index: number, answer: string) => void
 }
 
-export function NotesTab({ character, onNotesChange }: NotesTabProps) {
+export function NotesTab({
+  character,
+  onNotesChange,
+  onBackgroundAnswerChange,
+  onConnectionAnswerChange,
+}: NotesTabProps) {
   const [notes, setNotes] = useState(character.notes)
+  const [backgroundAnswers, setBackgroundAnswers] = useState(
+    character.backgroundAnswers || wizard.backgrounds.map(() => '')
+  )
+  const [connectionAnswers, setConnectionAnswers] = useState(
+    character.connectionAnswers || wizard.connections.map(() => '')
+  )
 
   useEffect(() => {
     setNotes(character.notes)
   }, [character.notes])
 
-  const handleChange = (value: string) => {
+  useEffect(() => {
+    setBackgroundAnswers(character.backgroundAnswers || wizard.backgrounds.map(() => ''))
+  }, [character.backgroundAnswers])
+
+  useEffect(() => {
+    setConnectionAnswers(character.connectionAnswers || wizard.connections.map(() => ''))
+  }, [character.connectionAnswers])
+
+  const handleNotesChange = (value: string) => {
     setNotes(value)
     onNotesChange(value)
+  }
+
+  const handleBackgroundChange = (index: number, value: string) => {
+    const newAnswers = [...backgroundAnswers]
+    newAnswers[index] = value
+    setBackgroundAnswers(newAnswers)
+    onBackgroundAnswerChange(index, value)
+  }
+
+  const handleConnectionChange = (index: number, value: string) => {
+    const newAnswers = [...connectionAnswers]
+    newAnswers[index] = value
+    setConnectionAnswers(newAnswers)
+    onConnectionAnswerChange(index, value)
   }
 
   return (
     <div className="space-y-4 pb-24">
       {/* Session Notes */}
-      <Card padding="md">
-        <h3 className="font-semibold text-gray-900 mb-3">Session Notes</h3>
+      <Card variant="glass" padding="md">
+        <h3 className="text-xs uppercase tracking-wide text-white/40 mb-4">Session Notes</h3>
         <textarea
           value={notes}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleNotesChange(e.target.value)}
           placeholder="Write your session notes here..."
-          className="w-full h-48 p-3 rounded-xl border border-ios-separator focus:outline-none focus:ring-2 focus:ring-ios-blue resize-none text-gray-700"
+          className="w-full h-48 p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none text-white placeholder-white/30"
         />
       </Card>
 
       {/* Background Questions */}
-      <Card padding="md">
-        <h3 className="font-semibold text-gray-900 mb-3">Background Questions</h3>
-        <p className="text-sm text-gray-500 mb-3">
+      <Card variant="glass" padding="md">
+        <h3 className="text-xs uppercase tracking-wide text-white/40 mb-4">Background Questions</h3>
+        <p className="text-sm text-white/50 mb-4">
           Answer these to flesh out your character's backstory:
         </p>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {wizard.backgrounds.map((bg, i) => (
-            <div key={i} className="p-3 bg-ios-gray-light rounded-xl">
-              <p className="text-sm text-gray-700">{bg.question}</p>
+            <div key={i} className="space-y-2">
+              <p className="text-sm font-medium text-white">{bg.question}</p>
+              <textarea
+                value={backgroundAnswers[i] || ''}
+                onChange={(e) => handleBackgroundChange(i, e.target.value)}
+                placeholder="Your answer..."
+                className="w-full h-20 p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none text-white text-sm placeholder-white/30"
+              />
             </div>
           ))}
         </div>
       </Card>
 
       {/* Connection Questions */}
-      <Card padding="md">
-        <h3 className="font-semibold text-gray-900 mb-3">Party Connections</h3>
-        <p className="text-sm text-gray-500 mb-3">
+      <Card variant="glass" padding="md">
+        <h3 className="text-xs uppercase tracking-wide text-white/40 mb-4">Party Connections</h3>
+        <p className="text-sm text-white/50 mb-4">
           Ask these to another party member:
         </p>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {wizard.connections.map((conn, i) => (
-            <div key={i} className="p-3 bg-ios-gray-light rounded-xl">
-              <p className="text-sm text-gray-700">{conn.question}</p>
+            <div key={i} className="space-y-2">
+              <p className="text-sm font-medium text-white">{conn.question}</p>
+              <textarea
+                value={connectionAnswers[i] || ''}
+                onChange={(e) => handleConnectionChange(i, e.target.value)}
+                placeholder="Your answer..."
+                className="w-full h-20 p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none text-white text-sm placeholder-white/30"
+              />
             </div>
           ))}
         </div>
       </Card>
 
-      {/* Quick Reference */}
-      <Card padding="md">
-        <h3 className="font-semibold text-gray-900 mb-3">Quick Reference</h3>
-        <div className="space-y-2 text-sm">
-          <div className="p-2 bg-blue-50 rounded-lg">
-            <span className="font-medium text-blue-800">Roll with Hope:</span>
-            <span className="text-blue-700 ml-2">Hope die {'>'} Fear die</span>
-          </div>
-          <div className="p-2 bg-red-50 rounded-lg">
-            <span className="font-medium text-red-800">Roll with Fear:</span>
-            <span className="text-red-700 ml-2">Fear die {'>'} Hope die</span>
-          </div>
-          <div className="p-2 bg-amber-50 rounded-lg">
-            <span className="font-medium text-amber-800">Critical:</span>
-            <span className="text-amber-700 ml-2">Hope die = Fear die</span>
-          </div>
-        </div>
-      </Card>
     </div>
   )
 }
