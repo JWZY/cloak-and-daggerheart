@@ -6,6 +6,7 @@ const CARD_WIDTH = 360
 const CARD_HEIGHT = 504
 
 // Domain colors from Daggerheart
+// eslint-disable-next-line react-refresh/only-export-components
 export const DOMAIN_COLORS: Record<string, string> = {
   Arcana: '#4e345b',    // Deep purple
   Blade: '#8b2635',     // Deep red

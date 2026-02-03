@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Counter } from '../components/ui/Counter'
@@ -7,10 +7,252 @@ import { Markdown } from '../components/ui/Markdown'
 import { DomainCard } from '../components/character/DomainCard'
 import { wizard, ancestries, communities, wizardLevel1Cards, schoolOfKnowledge, leatherArmor } from '../data/srd'
 
+// Helper to convert hex to RGB string
+function hexToRgb(hex: string): string {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if (result) {
+    return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+  }
+  return '255, 255, 255'
+}
+
+// Helper to convert RGB string to hex
+function rgbToHex(rgb: string): string {
+  const parts = rgb.split(',').map(p => parseInt(p.trim()))
+  if (parts.length === 3) {
+    return '#' + parts.map(p => p.toString(16).padStart(2, '0')).join('')
+  }
+  return '#ffffff'
+}
+
+// Default values for all glass parameters
+const DEFAULT_GLASS_PARAMS = {
+  // Colors
+  specColor: '255, 255, 255',
+  shadowColor: '0, 0, 0',
+  // Specular highlight
+  specPrimary: 0.375,
+  specSecondary: 0.09,
+  // Shadow
+  shadowPrimary: 0.1,
+  shadowSecondary: 0.05,
+  // Drop shadow
+  dropShadow: 0.25,
+  // Blur & saturation
+  blur: 2,
+  saturate: 150,
+  // Gradient opacities
+  gradTop: 0.05,
+  gradMid: 0.02,
+  gradBottom: 0.01,
+}
+
+// Preset configurations
+const GLASS_PRESETS = {
+  default: {
+    name: 'Default',
+    params: { ...DEFAULT_GLASS_PARAMS },
+  },
+  warm: {
+    name: 'Warm',
+    params: {
+      ...DEFAULT_GLASS_PARAMS,
+      specColor: '219, 197, 147', // #DBC593
+      shadowColor: '27, 9, 0',    // #1B0900
+    },
+  },
+  ice: {
+    name: 'Ice',
+    params: {
+      ...DEFAULT_GLASS_PARAMS,
+      specColor: '200, 230, 255', // light blue
+      shadowColor: '20, 40, 80',  // dark blue
+      blur: 3,
+      saturate: 180,
+    },
+  },
+  neon: {
+    name: 'Neon',
+    params: {
+      ...DEFAULT_GLASS_PARAMS,
+      specColor: '255, 100, 255', // magenta
+      shadowColor: '50, 0, 80',   // purple
+      specPrimary: 0.5,
+      specSecondary: 0.15,
+    },
+  },
+}
+
+type GlassPreset = keyof typeof GLASS_PRESETS
+
+// Background presets
+type BackgroundPreset = 'purple' | 'dark' | 'blue' | 'green' | 'warm' | 'neutral' | 'image-forest' | 'image-abstract'
+
+const BACKGROUND_PRESETS: Record<BackgroundPreset, { name: string; className: string; style?: React.CSSProperties }> = {
+  purple: {
+    name: 'Purple',
+    className: 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900',
+  },
+  dark: {
+    name: 'Dark',
+    className: 'bg-gradient-to-br from-gray-900 via-gray-800 to-black',
+  },
+  blue: {
+    name: 'Blue',
+    className: 'bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900',
+  },
+  green: {
+    name: 'Green',
+    className: 'bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900',
+  },
+  warm: {
+    name: 'Warm',
+    className: 'bg-gradient-to-br from-amber-950 via-orange-950 to-stone-950',
+  },
+  neutral: {
+    name: 'Neutral',
+    className: 'bg-gradient-to-br from-stone-800 via-stone-700 to-stone-900',
+  },
+  'image-forest': {
+    name: 'Forest',
+    className: '',
+    style: {
+      backgroundImage: 'url("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    },
+  },
+  'image-abstract': {
+    name: 'Abstract',
+    className: '',
+    style: {
+      backgroundImage: 'url("https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1200&q=80")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    },
+  },
+}
+
+// Slider component for controls
+function Slider({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step = 0.01,
+  unit = ''
+}: {
+  label: string
+  value: number
+  onChange: (v: number) => void
+  min: number
+  max: number
+  step?: number
+  unit?: string
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-xs">
+        <span className="text-white/50">{label}</span>
+        <span className="text-white/70 font-mono">{value.toFixed(step < 1 ? 2 : 0)}{unit}</span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer
+          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3
+          [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer
+          [&::-webkit-slider-thumb]:shadow-md"
+      />
+    </div>
+  )
+}
+
+// Color picker component
+function ColorPicker({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string // RGB string like "255, 255, 255"
+  onChange: (v: string) => void
+}) {
+  const hexValue = rgbToHex(value)
+
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-white/50">{label}</span>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={hexValue}
+          onChange={(e) => onChange(hexToRgb(e.target.value))}
+          className="w-8 h-6 rounded cursor-pointer border border-white/20 bg-transparent"
+        />
+        <span className="text-xs text-white/40 font-mono w-16">{hexValue}</span>
+      </div>
+    </div>
+  )
+}
+
 export function ComponentsLibrary() {
   const [counterValue, setCounterValue] = useState(3)
   const [slotValue, setSlotValue] = useState(2)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [bgPreset, setBgPreset] = useState<BackgroundPreset>('purple')
+  const [showControls, setShowControls] = useState(true)
+  const [activePreset, setActivePreset] = useState<GlassPreset>('default')
+
+  // Glass parameters state
+  const [glassParams, setGlassParams] = useState(DEFAULT_GLASS_PARAMS)
+
+  // Update a single parameter
+  const updateParam = <K extends keyof typeof DEFAULT_GLASS_PARAMS>(
+    key: K,
+    value: typeof DEFAULT_GLASS_PARAMS[K]
+  ) => {
+    setGlassParams(prev => ({ ...prev, [key]: value }))
+    setActivePreset('default') // Clear preset when manually editing
+  }
+
+  // Apply a preset
+  const applyPreset = (preset: GlassPreset) => {
+    setGlassParams(GLASS_PRESETS[preset].params)
+    setActivePreset(preset)
+  }
+
+  // Apply CSS custom properties
+  useEffect(() => {
+    const root = document.documentElement
+    root.style.setProperty('--lg-spec-color', glassParams.specColor)
+    root.style.setProperty('--lg-shadow-color', glassParams.shadowColor)
+    root.style.setProperty('--lg-spec-primary', glassParams.specPrimary.toString())
+    root.style.setProperty('--lg-spec-secondary', glassParams.specSecondary.toString())
+    root.style.setProperty('--lg-shadow-primary', glassParams.shadowPrimary.toString())
+    root.style.setProperty('--lg-shadow-secondary', glassParams.shadowSecondary.toString())
+    root.style.setProperty('--lg-drop-shadow', glassParams.dropShadow.toString())
+    root.style.setProperty('--lg-blur', `${glassParams.blur}px`)
+    root.style.setProperty('--lg-saturate', `${glassParams.saturate}%`)
+    root.style.setProperty('--lg-grad-top', glassParams.gradTop.toString())
+    root.style.setProperty('--lg-grad-mid', glassParams.gradMid.toString())
+    root.style.setProperty('--lg-grad-bottom', glassParams.gradBottom.toString())
+
+    return () => {
+      // Clean up on unmount
+      const props = [
+        '--lg-spec-color', '--lg-shadow-color', '--lg-spec-primary', '--lg-spec-secondary',
+        '--lg-shadow-primary', '--lg-shadow-secondary', '--lg-drop-shadow', '--lg-blur',
+        '--lg-saturate', '--lg-grad-top', '--lg-grad-mid', '--lg-grad-bottom'
+      ]
+      props.forEach(prop => root.style.removeProperty(prop))
+    }
+  }, [glassParams])
 
   // Get real data samples
   const sampleAncestry = ancestries.find(a => a.name === 'Elf') || ancestries[0]
@@ -30,13 +272,201 @@ export function ComponentsLibrary() {
 
   const formatTrait = (value: number) => (value > 0 ? `+${value}` : value.toString())
 
+  const bgConfig = BACKGROUND_PRESETS[bgPreset]
+
   return (
-    <div className="min-h-screen h-screen overflow-auto bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6 pb-24">
+    <div
+      className={`min-h-screen h-screen overflow-auto p-6 pb-24 ${bgConfig.className}`}
+      style={bgConfig.style}
+    >
+      {/* Floating Controls Panel */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          onClick={() => setShowControls(!showControls)}
+          className="lg-button mb-2"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+
+        {showControls && (
+          <div className="glass-strong rounded-2xl p-4 w-72 space-y-4 max-h-[85vh] overflow-y-auto">
+            <h3 className="text-xs uppercase tracking-wide text-white/40">Liquid Glass Controls</h3>
+
+            {/* Presets */}
+            <div className="space-y-2">
+              <span className="text-xs text-white/50">Presets</span>
+              <div className="grid grid-cols-4 gap-1">
+                {(Object.keys(GLASS_PRESETS) as GlassPreset[]).map((preset) => (
+                  <button
+                    key={preset}
+                    onClick={() => applyPreset(preset)}
+                    className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      activePreset === preset
+                        ? 'bg-white/20 text-white'
+                        : 'bg-white/5 text-white/50 hover:bg-white/10'
+                    }`}
+                  >
+                    {GLASS_PRESETS[preset].name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Colors */}
+            <div className="space-y-3 pt-2 border-t border-white/10">
+              <span className="text-xs text-white/50 uppercase tracking-wide">Colors</span>
+              <ColorPicker
+                label="Specular"
+                value={glassParams.specColor}
+                onChange={(v) => updateParam('specColor', v)}
+              />
+              <ColorPicker
+                label="Shadow"
+                value={glassParams.shadowColor}
+                onChange={(v) => updateParam('shadowColor', v)}
+              />
+            </div>
+
+            {/* Specular Highlight */}
+            <div className="space-y-3 pt-2 border-t border-white/10">
+              <span className="text-xs text-white/50 uppercase tracking-wide">Specular Highlight</span>
+              <Slider
+                label="Primary"
+                value={glassParams.specPrimary}
+                onChange={(v) => updateParam('specPrimary', v)}
+                min={0}
+                max={1}
+              />
+              <Slider
+                label="Secondary"
+                value={glassParams.specSecondary}
+                onChange={(v) => updateParam('specSecondary', v)}
+                min={0}
+                max={0.5}
+              />
+            </div>
+
+            {/* Shadow */}
+            <div className="space-y-3 pt-2 border-t border-white/10">
+              <span className="text-xs text-white/50 uppercase tracking-wide">Shadow</span>
+              <Slider
+                label="Primary"
+                value={glassParams.shadowPrimary}
+                onChange={(v) => updateParam('shadowPrimary', v)}
+                min={0}
+                max={0.5}
+              />
+              <Slider
+                label="Secondary"
+                value={glassParams.shadowSecondary}
+                onChange={(v) => updateParam('shadowSecondary', v)}
+                min={0}
+                max={0.3}
+              />
+              <Slider
+                label="Drop Shadow"
+                value={glassParams.dropShadow}
+                onChange={(v) => updateParam('dropShadow', v)}
+                min={0}
+                max={1}
+              />
+            </div>
+
+            {/* Effects */}
+            <div className="space-y-3 pt-2 border-t border-white/10">
+              <span className="text-xs text-white/50 uppercase tracking-wide">Effects</span>
+              <Slider
+                label="Blur"
+                value={glassParams.blur}
+                onChange={(v) => updateParam('blur', v)}
+                min={0}
+                max={20}
+                step={1}
+                unit="px"
+              />
+              <Slider
+                label="Saturation"
+                value={glassParams.saturate}
+                onChange={(v) => updateParam('saturate', v)}
+                min={100}
+                max={300}
+                step={10}
+                unit="%"
+              />
+            </div>
+
+            {/* Gradient */}
+            <div className="space-y-3 pt-2 border-t border-white/10">
+              <span className="text-xs text-white/50 uppercase tracking-wide">Gradient</span>
+              <Slider
+                label="Top"
+                value={glassParams.gradTop}
+                onChange={(v) => updateParam('gradTop', v)}
+                min={0}
+                max={0.2}
+              />
+              <Slider
+                label="Middle"
+                value={glassParams.gradMid}
+                onChange={(v) => updateParam('gradMid', v)}
+                min={0}
+                max={0.1}
+              />
+              <Slider
+                label="Bottom"
+                value={glassParams.gradBottom}
+                onChange={(v) => updateParam('gradBottom', v)}
+                min={0}
+                max={0.1}
+              />
+            </div>
+
+            {/* Background Presets */}
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <span className="text-xs text-white/50 uppercase tracking-wide">Background</span>
+              <div className="grid grid-cols-4 gap-2">
+                {(Object.keys(BACKGROUND_PRESETS) as BackgroundPreset[]).map((preset) => (
+                  <button
+                    key={preset}
+                    onClick={() => setBgPreset(preset)}
+                    title={BACKGROUND_PRESETS[preset].name}
+                    className={`aspect-square rounded-lg transition-all ${
+                      bgPreset === preset
+                        ? 'ring-2 ring-white ring-offset-2 ring-offset-transparent'
+                        : ''
+                    } ${BACKGROUND_PRESETS[preset].className || 'bg-gray-500'}`}
+                    style={BACKGROUND_PRESETS[preset].style ? {
+                      ...BACKGROUND_PRESETS[preset].style,
+                      backgroundSize: 'cover',
+                    } : undefined}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-white/30">{BACKGROUND_PRESETS[bgPreset].name}</span>
+            </div>
+
+            {/* Reset Button */}
+            <button
+              onClick={() => applyPreset('default')}
+              className="w-full py-2 rounded-lg bg-white/5 text-white/50 text-xs hover:bg-white/10 transition-colors"
+            >
+              Reset to Default
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="max-w-2xl mx-auto space-y-12">
         {/* Header */}
         <header className="text-center pt-8">
           <h1 className="text-3xl font-bold text-white mb-2">Liquid Glass</h1>
           <p className="text-white/50">Design System Components</p>
+          <p className="text-xs text-white/30 mt-2">
+            {activePreset !== 'default' ? `${GLASS_PRESETS[activePreset].name} preset` : 'Custom settings'} on {BACKGROUND_PRESETS[bgPreset].name} background
+          </p>
         </header>
 
         {/* ============ DESIGN PHILOSOPHY ============ */}

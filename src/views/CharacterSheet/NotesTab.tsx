@@ -64,7 +64,7 @@ export function NotesTab({
           value={notes}
           onChange={(e) => handleNotesChange(e.target.value)}
           placeholder="Write your session notes here..."
-          className="w-full h-48 p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none text-white placeholder-white/30"
+          className="glass-input-flat h-48 resize-none"
         />
       </Card>
 
@@ -82,7 +82,7 @@ export function NotesTab({
                 value={backgroundAnswers[i] || ''}
                 onChange={(e) => handleBackgroundChange(i, e.target.value)}
                 placeholder="Your answer..."
-                className="w-full h-20 p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none text-white text-sm placeholder-white/30"
+                className="glass-input-flat h-20 text-sm resize-none"
               />
             </div>
           ))}
@@ -103,7 +103,7 @@ export function NotesTab({
                 value={connectionAnswers[i] || ''}
                 onChange={(e) => handleConnectionChange(i, e.target.value)}
                 placeholder="Your answer..."
-                className="w-full h-20 p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none text-white text-sm placeholder-white/30"
+                className="glass-input-flat h-20 text-sm resize-none"
               />
             </div>
           ))}

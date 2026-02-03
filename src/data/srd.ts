@@ -23,6 +23,12 @@ import type {
   Consumable
 } from '../types/character'
 
+// Re-export armor functions from core for backwards compatibility
+export { getArmorScore, parseThresholds } from '../core/character/armor'
+
+// Re-export wizard rules from core for backwards compatibility
+export { getWizardCardCount } from '../core/rules/wizard'
+
 // Type assertions for imported JSON
 export const ancestries = ancestriesData as Ancestry[]
 export const communities = communitiesData as Community[]
@@ -75,19 +81,3 @@ export function getSubclass(name: 'School of Knowledge' | 'School of War'): Subc
   return name === 'School of Knowledge' ? schoolOfKnowledge : schoolOfWar
 }
 
-// Get number of domain cards a wizard can have based on subclass
-export function getWizardCardCount(subclass: 'School of Knowledge' | 'School of War'): number {
-  // School of Knowledge gets "Prepared" foundation which grants an extra card
-  return subclass === 'School of Knowledge' ? 3 : 2
-}
-
-// Parse damage thresholds from armor string (e.g., "6 / 13" -> { major: 6, severe: 13 })
-export function parseThresholds(thresholdString: string): { major: number; severe: number } {
-  const parts = thresholdString.split('/').map(s => parseInt(s.trim(), 10))
-  return { major: parts[0], severe: parts[1] }
-}
-
-// Get armor score (max armor slots)
-export function getArmorScore(armor: Armor): number {
-  return parseInt(armor.base_score, 10)
-}

@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Rows3, Square, Settings2 } from 'lucide-react'
 import { OfficialCard, DOMAIN_COLORS } from '../components/cards/OfficialCard'
+import { SubclassCard } from '../components/cards/SubclassCard'
 import { CardHand } from '../components/cards/CardHand'
 import { Card } from '../components/ui/Card'
 
-type DisplayMode = 'individual' | 'rail'
+type DisplayMode = 'individual' | 'rail' | 'subclass'
 type CardTier = 'Foundation' | 'Specialization' | 'Mastery'
 
 interface SampleCard {
@@ -84,7 +85,7 @@ export function CardDesignLab({ onBack }: CardDesignLabProps) {
   const selectedCard = SAMPLE_CARDS[selectedCardIndex]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 overflow-y-scroll" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Header */}
       <div className="glass-strong px-4 py-4">
         <div className="flex items-center gap-4">
@@ -139,6 +140,16 @@ export function CardDesignLab({ onBack }: CardDesignLabProps) {
                 <Rows3 size={16} />
                 Rail
               </button>
+              <button
+                onClick={() => setDisplayMode('subclass')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  displayMode === 'subclass'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/50 hover:text-white'
+                }`}
+              >
+                Subclass
+              </button>
             </div>
 
             {/* Scale Slider (Individual mode only) */}
@@ -178,7 +189,7 @@ export function CardDesignLab({ onBack }: CardDesignLabProps) {
       )}
 
       {/* Main Content */}
-      <div className="p-4">
+      <div className="p-4 pb-24">
         {displayMode === 'individual' ? (
           /* Individual Card View */
           <div className="flex flex-col items-center gap-8">
@@ -251,6 +262,74 @@ export function CardDesignLab({ onBack }: CardDesignLabProps) {
                 ))}
               </div>
             </Card>
+          </div>
+        ) : displayMode === 'subclass' ? (
+          /* Subclass Card View */
+          <div className="flex flex-col items-center gap-8">
+            <h2 className="text-xl font-semibold text-white/80">Subclass Cards (Official Style)</h2>
+
+            {/* School of Knowledge */}
+            <div className="flex justify-center">
+              <SubclassCard
+                title="School of Knowledge"
+                subtitle="Air · Earth · Fire · Lightning · Water"
+                className="Wizard"
+                domainColor="#4e345b"
+                artworkSrc={`${import.meta.env.BASE_URL || '/'}images/cards/subclass/school-of-knowledge.webp`}
+                scale={cardScale}
+              >
+                <p className="mb-3">
+                  <strong>Evasion:</strong> When you would mark Hit Points due to a physical attack, you may mark a Stress instead to reduce the damage by your Proficiency.
+                </p>
+                <p className="mb-3">
+                  <strong>Spellcast Trait:</strong> Knowledge
+                </p>
+                <p>
+                  <strong>Arcane Specialties:</strong> Illusion, Divination, Enchantment
+                </p>
+              </SubclassCard>
+            </div>
+
+            {/* School of War */}
+            <div className="flex justify-center">
+              <SubclassCard
+                title="School of War"
+                subtitle="Combat Magic Specialist"
+                className="Wizard"
+                domainColor="#8b2942"
+                artworkSrc={`${import.meta.env.BASE_URL || '/'}images/cards/subclass/school-of-war.webp`}
+                scale={cardScale}
+              >
+                <p className="mb-3">
+                  <strong>Battle Magic:</strong> When you cast a spell that deals damage, you may spend a Hope to add your Proficiency to the damage dealt.
+                </p>
+                <p className="mb-3">
+                  <strong>Spellcast Trait:</strong> Strength or Agility
+                </p>
+                <p>
+                  <strong>Arcane Specialties:</strong> Evocation, Transmutation, Abjuration
+                </p>
+              </SubclassCard>
+            </div>
+
+            {/* Elemental Origin */}
+            <div className="flex justify-center">
+              <SubclassCard
+                title="Elemental Origin"
+                subtitle="Air · Earth · Fire · Lightning · Water"
+                className="Sorcerer"
+                domainColor="#2d5a4a"
+                artworkSrc={`${import.meta.env.BASE_URL || '/'}images/cards/subclass/elemental-origin.webp`}
+                scale={cardScale}
+              >
+                <p className="mb-3">
+                  <strong>Elemental Affinity:</strong> Choose an element when you take this subclass. You gain resistance to damage of that type and your spells of that element deal +1 damage.
+                </p>
+                <p>
+                  <strong>Elemental Surge:</strong> Once per session, you may unleash a burst of your element, affecting all creatures within close range.
+                </p>
+              </SubclassCard>
+            </div>
           </div>
         ) : (
           /* Rail View */

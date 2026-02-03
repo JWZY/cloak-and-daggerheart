@@ -1,17 +1,14 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Character, DiceRoll, Ancestry, Community, DomainCard, Traits, WizardSubclass, Equipment, Weapon, Armor, Item, Consumable } from '../types/character'
-import { wizard, leatherArmor, quarterstaff, getArmorScore } from '../data/srd'
+import type { Character, DiceRoll, WizardSubclass, Equipment, Weapon, Armor, Item, Consumable } from '../types/character'
+import { wizard, leatherArmor, quarterstaff } from '../data/srd'
+import { calculateWizardMaxHP, clampHP } from '../core/character/hp'
+import { getArmorScore, clampArmorSlots } from '../core/character/armor'
+import { migrateCharacter as coreMigrateCharacter, getDefaultEquipment as coreGetDefaultEquipment } from '../core/character/migration'
+import { isDraftComplete, type DraftCharacter } from '../core/character/validation'
 
-interface DraftCharacter {
-  name?: string
-  ancestry?: Ancestry
-  community?: Community
-  subclass?: WizardSubclass
-  domainCards?: DomainCard[]
-  traits?: Traits
-  equipment?: Partial<Equipment>
-}
+// Re-export DraftCharacter type for consumers
+export type { DraftCharacter }
 
 interface CharacterStore {
   // State
@@ -61,53 +58,14 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 9)
 }
 
-// Default equipment for new characters
+// Default equipment using SRD items
 function getDefaultEquipment(): Equipment {
-  return {
-    primaryWeapon: quarterstaff,
-    secondaryWeapon: null,
-    armor: leatherArmor,
-    items: [],
-    consumables: [],
-  }
+  return coreGetDefaultEquipment(leatherArmor, quarterstaff)
 }
 
-// Migrate old character data to new format
-interface LegacyCharacter extends Omit<Character, 'armorSlots'> {
-  armor?: { current: number; max: number }
-  armorSlots?: { current: number; max: number }
-}
-
-function migrateCharacter(char: Character | LegacyCharacter): Character {
-  const c = char as LegacyCharacter
-  let migrated = { ...c } as Character
-
-  // If character has old 'armor' field instead of 'armorSlots', migrate it
-  if ('armor' in c && c.armor && !('armorSlots' in c)) {
-    migrated = {
-      ...migrated,
-      armorSlots: c.armor,
-    } as Character
-  }
-
-  // Ensure equipment exists
-  if (!migrated.equipment) {
-    migrated = {
-      ...migrated,
-      equipment: getDefaultEquipment(),
-      gold: migrated.gold || 0,
-    }
-  }
-
-  // Fix proficiency for level 1 characters (was incorrectly set to 2)
-  if (migrated.proficiency === 2) {
-    migrated = {
-      ...migrated,
-      proficiency: 1,
-    }
-  }
-
-  return migrated
+// Migrate character using core migration logic
+function migrateCharacter(char: Character): Character {
+  return coreMigrateCharacter(char, getDefaultEquipment())
 }
 
 export const useCharacterStore = create<CharacterStore>()(
@@ -144,27 +102,20 @@ export const useCharacterStore = create<CharacterStore>()(
 
       finalizeDraft: () => {
         const { draftCharacter, editingCharacterId, characters } = get()
-        if (
-          !draftCharacter?.name ||
-          !draftCharacter?.ancestry ||
-          !draftCharacter?.community ||
-          !draftCharacter?.subclass ||
-          !draftCharacter?.domainCards ||
-          !draftCharacter?.traits
-        ) {
+        if (!isDraftComplete(draftCharacter)) {
           return null
         }
 
-        const equipment = draftCharacter.equipment || getDefaultEquipment()
+        const equipment = (draftCharacter.equipment || getDefaultEquipment()) as Equipment
 
         // If editing an existing character, update it
         if (editingCharacterId) {
           const existingCharacter = characters.find(c => c.id === editingCharacterId)
           if (!existingCharacter) return null
 
-          // Calculate max HP: Wizard base (5) + 1 if School of War (Battlemage)
+          // Calculate max HP using core logic
           const baseHP = parseInt(wizard.hp)
-          const maxHP = draftCharacter.subclass === 'School of War' ? baseHP + 1 : baseHP
+          const maxHP = calculateWizardMaxHP(baseHP, draftCharacter.subclass)
 
           // Calculate armor slots from equipped armor
           const armorSlots = equipment.armor ? getArmorScore(equipment.armor) : 3
@@ -198,9 +149,9 @@ export const useCharacterStore = create<CharacterStore>()(
         // Creating a new character
         const id = generateId()
 
-        // Calculate max HP: Wizard base (5) + 1 if School of War (Battlemage)
+        // Calculate max HP using core logic
         const baseHP = parseInt(wizard.hp)
-        const maxHP = draftCharacter.subclass === 'School of War' ? baseHP + 1 : baseHP
+        const maxHP = calculateWizardMaxHP(baseHP, draftCharacter.subclass)
 
         // Calculate armor slots from equipped armor
         const armorSlots = equipment.armor ? getArmorScore(equipment.armor) : 3
@@ -267,7 +218,7 @@ export const useCharacterStore = create<CharacterStore>()(
       updateHP: (id, current) =>
         set((state) => ({
           characters: state.characters.map((c) =>
-            c.id === id ? { ...c, hp: { ...c.hp, current: Math.max(0, Math.min(current, c.hp.max)) } } : c
+            c.id === id ? { ...c, hp: { ...c.hp, current: clampHP(current, c.hp.max) } } : c
           ),
         })),
 
@@ -276,7 +227,7 @@ export const useCharacterStore = create<CharacterStore>()(
           characters: state.characters.map((c) => {
             if (c.id !== id) return c
             const char = migrateCharacter(c)
-            return { ...char, armorSlots: { ...char.armorSlots, current: Math.max(0, Math.min(current, char.armorSlots.max)) } }
+            return { ...char, armorSlots: { ...char.armorSlots, current: clampArmorSlots(current, char.armorSlots.max) } }
           }),
         })),
 
@@ -350,11 +301,11 @@ export const useCharacterStore = create<CharacterStore>()(
           characters: state.characters.map((c) => {
             if (c.id !== id) return c
             const char = migrateCharacter(c)
-            const armorSlots = armor ? getArmorScore(armor) : 3
+            const armorSlotsMax = armor ? getArmorScore(armor) : 3
             return {
               ...char,
               equipment: { ...char.equipment, armor },
-              armorSlots: { current: Math.min(char.armorSlots.current, armorSlots), max: armorSlots },
+              armorSlots: { current: clampArmorSlots(char.armorSlots.current, armorSlotsMax), max: armorSlotsMax },
             }
           }),
         })),

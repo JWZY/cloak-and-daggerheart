@@ -1,0 +1,98 @@
+{
+  "app": {
+    "title": "Cloak & Daggerheart"
+  },
+  "character": {
+    "creation": {
+      "chooseAncestry": "Choose Your Ancestry",
+      "chooseCommunity": "Choose Your Community",
+      "chooseSubclass": "Choose Your Subclass",
+      "selectDomainCards": "Select Domain Cards",
+      "assignTraits": "Assign Your Traits",
+      "traitInstructions": "Distribute these values among your six traits: -1, 0, 0, +1, +1, +2",
+      "chooseEquipment": "Choose Your Equipment",
+      "reviewCharacter": "Review Your Character",
+      "nameYourCharacter": "Name Your Character",
+      "useSuggested": "Use Suggested",
+      "available": "Available",
+      "allAssigned": "All assigned!"
+    },
+    "sheet": {
+      "hp": "HP",
+      "armor": "Armor",
+      "hope": "Hope",
+      "stress": "Stress",
+      "evasion": "Evasion",
+      "proficiency": "Proficiency"
+    },
+    "tabs": {
+      "stats": "Stats",
+      "cards": "Cards",
+      "gear": "Gear",
+      "notes": "Notes"
+    }
+  },
+  "equipment": {
+    "activeWeapons": "Active Weapons",
+    "activeArmor": "Active Armor",
+    "primary": "Primary",
+    "secondary": "Secondary",
+    "equipped": "Equipped",
+    "items": "Items",
+    "consumables": "Consumables",
+    "gold": "Gold",
+    "tapToSelect": "Tap to select",
+    "noItems": "No items",
+    "noConsumables": "No consumables",
+    "trait": "Trait",
+    "range": "Range",
+    "damage": "Damage",
+    "feature": "Feature",
+    "armorScore": "Armor Score",
+    "thresholds": "Thresholds"
+  },
+  "traits": {
+    "agility": "Agility",
+    "strength": "Strength",
+    "finesse": "Finesse",
+    "instinct": "Instinct",
+    "presence": "Presence",
+    "knowledge": "Knowledge",
+    "descriptions": {
+      "agility": "Moving quickly and avoiding danger",
+      "strength": "Physical power and endurance",
+      "finesse": "Precision and delicate manipulation",
+      "instinct": "Gut feelings and awareness",
+      "presence": "Social influence and charisma",
+      "knowledge": "Learning, memory, and reasoning"
+    }
+  },
+  "dice": {
+    "roll": "Roll",
+    "hope": "Hope",
+    "fear": "Fear",
+    "critical": "Critical!",
+    "modifier": "Modifier",
+    "total": "Total"
+  },
+  "buttons": {
+    "continue": "Continue",
+    "back": "Back",
+    "create": "Create",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "add": "Add",
+    "remove": "Remove",
+    "edit": "Edit"
+  },
+  "cards": {
+    "domainCards": "Domain Cards",
+    "used": "Used",
+    "recall": "Recall"
+  },
+  "notes": {
+    "sessionNotes": "Session Notes",
+    "placeholder": "Add notes about your character, session events, or anything else..."
+  }
+}

@@ -38,10 +38,12 @@
   /* Specular Highlight (top edge) */
   --lg-spec-primary: 0.375;
   --lg-spec-secondary: 0.09;
+  --lg-spec-color: 255, 255, 255; /* RGB values for specular - can be overridden */
 
   /* Bottom Shadow (depth) */
   --lg-shadow-primary: 0.1;
   --lg-shadow-secondary: 0.05;
+  --lg-shadow-color: 0, 0, 0; /* RGB values for shadow - can be overridden */
 
   /* Drop Shadow (elevation) */
   --lg-drop-shadow: 0.25;
@@ -156,60 +158,60 @@ button, a {
 .glass {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, var(--lg-grad-top)) 0%,
-    rgba(255, 255, 255, var(--lg-grad-mid)) 50%,
-    rgba(0, 0, 0, var(--lg-grad-bottom)) 100%
+    rgba(var(--lg-spec-color), var(--lg-grad-top)) 0%,
+    rgba(var(--lg-spec-color), var(--lg-grad-mid)) 50%,
+    rgba(var(--lg-shadow-color), var(--lg-grad-bottom)) 100%
   );
   backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   box-shadow:
     /* Specular highlight - top edge */
-    inset 0 1px 1px rgba(255, 255, 255, var(--lg-spec-primary)),
-    inset 0 1.5px 3px rgba(255, 255, 255, var(--lg-spec-secondary)),
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
     /* Bottom shadow - depth */
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
     /* Drop shadow - elevation */
-    0 4px 16px rgba(0, 0, 0, var(--lg-drop-shadow));
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
 }
 
 /* Stronger glass variant - more visible on complex backgrounds */
 .glass-strong {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.03) 50%,
-    rgba(0, 0, 0, 0.02) 100%
+    rgba(var(--lg-spec-color), 0.08) 0%,
+    rgba(var(--lg-spec-color), 0.03) 50%,
+    rgba(var(--lg-shadow-color), 0.02) 100%
   );
   backdrop-filter: blur(4px) saturate(160%);
   -webkit-backdrop-filter: blur(4px) saturate(160%);
   box-shadow:
     /* Enhanced specular highlight */
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 2px 4px rgba(255, 255, 255, 0.12),
+    inset 0 1px 1px rgba(var(--lg-spec-color), 0.45),
+    inset 0 2px 4px rgba(var(--lg-spec-color), 0.12),
     /* Bottom shadow */
-    inset 0 -1px 1px rgba(0, 0, 0, 0.12),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), 0.12),
+    inset 0 -2px 4px rgba(var(--lg-shadow-color), 0.06),
     /* Stronger drop shadow */
-    0 6px 20px rgba(0, 0, 0, 0.3);
+    0 6px 20px rgba(var(--lg-shadow-color), 0.3);
 }
 
 /* Dark glass variant */
 .glass-dark {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(0, 0, 0, 0.02) 50%,
-    rgba(0, 0, 0, 0.05) 100%
+    rgba(var(--lg-spec-color), 0.03) 0%,
+    rgba(var(--lg-shadow-color), 0.02) 50%,
+    rgba(var(--lg-shadow-color), 0.05) 100%
   );
   backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.2),
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.05),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.15),
-    inset 0 -1.5px 3px rgba(0, 0, 0, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.3);
+    inset 0 1px 1px rgba(var(--lg-spec-color), 0.2),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), 0.05),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), 0.15),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), 0.08),
+    0 4px 16px rgba(var(--lg-shadow-color), 0.3);
 }
 
 /* Interactive glass - hover state enhancement */
@@ -220,11 +222,11 @@ button, a {
 .glass-interactive:hover {
   transform: translateY(-1px);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.12),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 6px 20px rgba(0, 0, 0, 0.3);
+    inset 0 1px 1px rgba(var(--lg-spec-color), 0.45),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), 0.12),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 6px 20px rgba(var(--lg-shadow-color), 0.3);
 }
 
 .glass-interactive:active {
@@ -244,29 +246,29 @@ button, a {
   transition: transform var(--lg-transition-fast), box-shadow var(--lg-transition-fast);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, var(--lg-grad-top)) 0%,
-    rgba(255, 255, 255, var(--lg-grad-mid)) 50%,
-    rgba(0, 0, 0, var(--lg-grad-bottom)) 100%
+    rgba(var(--lg-spec-color), var(--lg-grad-top)) 0%,
+    rgba(var(--lg-spec-color), var(--lg-grad-mid)) 50%,
+    rgba(var(--lg-shadow-color), var(--lg-grad-bottom)) 100%
   );
   backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, var(--lg-spec-primary)),
-    inset 0 1.5px 3px rgba(255, 255, 255, var(--lg-spec-secondary)),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 4px 16px rgba(0, 0, 0, var(--lg-drop-shadow));
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
   color: var(--lg-icon-default);
 }
 
 .lg-button:hover {
   transform: scale(1.05);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.12),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 6px 20px rgba(0, 0, 0, 0.3);
+    inset 0 1px 1px rgba(var(--lg-spec-color), 0.45),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), 0.12),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 6px 20px rgba(var(--lg-shadow-color), 0.3);
   color: var(--lg-icon-hover);
 }
 
@@ -290,18 +292,18 @@ button, a {
   padding: 0 0.5rem;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, var(--lg-grad-top)) 0%,
-    rgba(255, 255, 255, var(--lg-grad-mid)) 50%,
-    rgba(0, 0, 0, var(--lg-grad-bottom)) 100%
+    rgba(var(--lg-spec-color), var(--lg-grad-top)) 0%,
+    rgba(var(--lg-spec-color), var(--lg-grad-mid)) 50%,
+    rgba(var(--lg-shadow-color), var(--lg-grad-bottom)) 100%
   );
   backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, var(--lg-spec-primary)),
-    inset 0 1.5px 3px rgba(255, 255, 255, var(--lg-spec-secondary)),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 4px 16px rgba(0, 0, 0, var(--lg-drop-shadow));
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
 }
 
 /* Liquid Glass Card */
@@ -310,18 +312,18 @@ button, a {
   padding: 1rem;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, var(--lg-grad-top)) 0%,
-    rgba(255, 255, 255, var(--lg-grad-mid)) 50%,
-    rgba(0, 0, 0, var(--lg-grad-bottom)) 100%
+    rgba(var(--lg-spec-color), var(--lg-grad-top)) 0%,
+    rgba(var(--lg-spec-color), var(--lg-grad-mid)) 50%,
+    rgba(var(--lg-shadow-color), var(--lg-grad-bottom)) 100%
   );
   backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, var(--lg-spec-primary)),
-    inset 0 1.5px 3px rgba(255, 255, 255, var(--lg-spec-secondary)),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 4px 16px rgba(0, 0, 0, var(--lg-drop-shadow));
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
 }
 
 .lg-card-interactive {
@@ -332,11 +334,11 @@ button, a {
 .lg-card-interactive:hover {
   transform: translateY(-2px);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.12),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 8px 24px rgba(0, 0, 0, 0.3);
+    inset 0 1px 1px rgba(var(--lg-spec-color), 0.45),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), 0.12),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 8px 24px rgba(var(--lg-shadow-color), 0.3);
 }
 
 .lg-card-interactive:active {
@@ -355,18 +357,18 @@ button, a {
   transition: box-shadow var(--lg-transition-fast);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, var(--lg-grad-top)) 0%,
-    rgba(255, 255, 255, var(--lg-grad-mid)) 50%,
-    rgba(0, 0, 0, var(--lg-grad-bottom)) 100%
+    rgba(var(--lg-spec-color), var(--lg-grad-top)) 0%,
+    rgba(var(--lg-spec-color), var(--lg-grad-mid)) 50%,
+    rgba(var(--lg-shadow-color), var(--lg-grad-bottom)) 100%
   );
   backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate));
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, var(--lg-spec-primary)),
-    inset 0 1.5px 3px rgba(255, 255, 255, var(--lg-spec-secondary)),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 4px 16px rgba(0, 0, 0, var(--lg-drop-shadow));
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
 }
 
 .lg-input::placeholder {
@@ -375,11 +377,11 @@ button, a {
 
 .lg-input:focus {
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.12),
-    inset 0 -1px 1px rgba(0, 0, 0, var(--lg-shadow-primary)),
-    inset 0 -1.5px 3px rgba(0, 0, 0, var(--lg-shadow-secondary)),
-    0 6px 20px rgba(0, 0, 0, 0.3);
+    inset 0 1px 1px rgba(var(--lg-spec-color), 0.45),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), 0.12),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 6px 20px rgba(var(--lg-shadow-color), 0.3);
 }
 
 /* Glass text utilities */
@@ -419,4 +421,89 @@ button, a {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Selection glow ring for glass cards */
+.glass-selected {
+  @apply ring-2 ring-white/30;
+  box-shadow:
+    /* Keep glass effects */
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    /* Selection glow */
+    0 0 20px rgba(255, 255, 255, 0.15),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
+}
+
+/* Glass selection variants with colored glow */
+.glass-selected-purple {
+  @apply ring-2 ring-purple-400/40;
+  box-shadow:
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 0 20px rgba(168, 85, 247, 0.25),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
+}
+
+.glass-selected-red {
+  @apply ring-2 ring-red-400/40;
+  box-shadow:
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    inset 0 -1.5px 3px rgba(var(--lg-shadow-color), var(--lg-shadow-secondary)),
+    0 0 20px rgba(239, 68, 68, 0.25),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
+}
+
+/* Glass counter pill */
+.glass-counter {
+  @apply glass rounded-full px-4 py-2 text-sm font-medium text-white inline-flex items-center gap-2;
+}
+
+/* ==========================================================================
+   Flat/Nested Variants
+   For elements inside glass containers - no shadow, just subtle borders
+   ========================================================================== */
+
+/* Flat glass variant - for nested elements inside glass containers */
+.glass-flat {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--lg-card-radius);
+  /* NO backdrop-filter, NO box-shadow */
+}
+
+.glass-flat-sm {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  /* NO backdrop-filter, NO box-shadow */
+}
+
+/* Flat input style - consistent with session notes textarea */
+.glass-input-flat {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 1rem;
+  color: white;
+  outline: none;
+  transition: border-color var(--lg-transition-fast), box-shadow var(--lg-transition-fast);
+  /* NO backdrop-filter, NO drop shadow */
+}
+
+.glass-input-flat::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.glass-input-flat:focus {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }

@@ -1,24 +1,17 @@
+// Re-export duality roll logic from core
+// This file maintained for backwards compatibility
+
 import type { DiceRoll } from '../../types/character'
+import { determineDualityResult as coreDetermineDualityResult } from '../../core/dice/duality'
 
+/**
+ * Wrapper that returns DiceRoll type for store compatibility
+ */
 export function determineDualityResult(hopeDie: number, fearDie: number, modifier: number): DiceRoll {
-  const total = hopeDie + fearDie + modifier
-
-  let result: 'hope' | 'fear' | 'critical'
-  if (hopeDie === fearDie) {
-    result = 'critical'
-  } else if (hopeDie > fearDie) {
-    result = 'hope'
-  } else {
-    result = 'fear'
-  }
-
+  const result = coreDetermineDualityResult(hopeDie, fearDie, modifier)
   return {
     id: '',
-    hopeDie,
-    fearDie,
-    modifier,
-    total,
-    result,
+    ...result,
     timestamp: 0,
   }
 }

@@ -13,7 +13,7 @@ type Tab = 'stats' | 'cards' | 'inventory' | 'notes'
 
 interface CharacterSheetProps {
   character: Character
-  onEdit: () => void
+  onEdit: (context?: { activeTab?: Tab }) => void
 }
 
 const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
@@ -152,7 +152,7 @@ export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
       <div className="fixed bottom-6 right-4 left-4 flex justify-end gap-3 z-30">
         <motion.button
           whileTap={{ scale: 0.95 }}
-          onClick={onEdit}
+          onClick={() => onEdit({ activeTab })}
           className="w-14 h-14 rounded-full glass bg-white/20 text-white shadow-lg flex items-center justify-center"
         >
           <Pencil size={22} />

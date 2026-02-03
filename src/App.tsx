@@ -4,22 +4,35 @@ import { CreateCharacter } from './views/CreateCharacter'
 import { CharacterSheet } from './views/CharacterSheet'
 import { ComponentsLibrary } from './views/ComponentsLibrary'
 import { CardDesignLab } from './views/CardDesignLab'
+import { PickerDesignLab } from './views/PickerDesignLab'
 import { useCharacterStore } from './stores/characterStore'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { THEME_CONFIGS } from './contexts/themeConfig'
 import { useMouseGlow } from './hooks/useMouseGlow'
 import { KnowledgeWisps } from './components/effects/KnowledgeWisps'
 import type { WizardSubclass } from './types/character'
+import type { Step } from './components/ui/Breadcrumbs'
+
+// Map character sheet tabs to create/edit steps
+type Tab = 'stats' | 'cards' | 'inventory' | 'notes'
+const TAB_TO_STEP_MAP: Record<Tab, Step> = {
+  stats: 'ancestry',
+  cards: 'cards',
+  inventory: 'equipment',
+  notes: 'summary',
+}
 
 function App() {
   // Check for query params to show dev tools
   const searchParams = new URLSearchParams(window.location.search)
   const showComponentsLibrary = searchParams.has('components')
   const showCardDesignLab = searchParams.has('cards') || searchParams.has('designlab')
+  const showPickerDesignLab = searchParams.has('pickers')
   // Enable cursor-following glow effect on glass elements
   useMouseGlow()
 
   const [isEditing, setIsEditing] = useState(false)
+  const [editEntryStep, setEditEntryStep] = useState<Step | null>(null)
   const { characters, setCurrentCharacter, currentCharacterId, startDraftFromCharacter, getCurrentCharacter } = useCharacterStore()
 
   // Get the current character from the store (getCurrentCharacter applies migration)
@@ -40,15 +53,21 @@ function App() {
     setIsEditing(false)
   }
 
-  const handleEdit = () => {
+  const handleEdit = (context?: { activeTab?: Tab }) => {
     if (currentCharacter) {
       startDraftFromCharacter(currentCharacter)
+      // Map the active tab to the appropriate entry step
+      const entryStep = context?.activeTab
+        ? TAB_TO_STEP_MAP[context.activeTab]
+        : 'ancestry'
+      setEditEntryStep(entryStep)
       setIsEditing(true)
     }
   }
 
   const handleCancelEdit = () => {
     setIsEditing(false)
+    setEditEntryStep(null)
   }
 
   // Get the background class based on current character's subclass
@@ -69,6 +88,11 @@ function App() {
     return <CardDesignLab onBack={() => window.location.href = window.location.pathname} />
   }
 
+  // Show picker design lab if ?pickers is in URL
+  if (showPickerDesignLab) {
+    return <PickerDesignLab onBack={() => window.location.href = window.location.pathname} />
+  }
+
   return (
     <ThemeProvider subclass={showCreateFlow ? null : (currentCharacter?.subclass as WizardSubclass | null)}>
       <div className={`h-screen w-screen overflow-hidden font-ios ${getBackgroundClass()}`}>
@@ -81,20 +105,21 @@ function App() {
         <div className="h-[env(safe-area-inset-top)]" />
 
         <div className="h-[calc(100vh-env(safe-area-inset-top)-env(safe-area-inset-bottom))]">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             {showCreateFlow ? (
               <motion.div
                 key={isEditing ? 'edit' : 'create'}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, x: '-100%' }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 className="h-full"
               >
                 <CreateCharacter
                   onComplete={handleCreateComplete}
                   onCancel={isEditing ? handleCancelEdit : () => {}}
                   isEditing={isEditing}
+                  entryStep={editEntryStep}
                 />
               </motion.div>
             ) : currentCharacter ? (

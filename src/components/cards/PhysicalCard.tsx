@@ -177,11 +177,11 @@ export function SubclassCard({
 }: SubclassCardProps) {
   const subclassConfig = {
     'School of Knowledge': {
-      image: '/images/cards/school-of-knowledge.avif',
+      image: '/images/cards/domains/school-of-knowledge.avif',
       color: 'rgba(99, 102, 241, 0.7)', // Indigo
     },
     'School of War': {
-      image: '/images/cards/school-of-war.avif',
+      image: '/images/cards/domains/school-of-war.avif',
       color: 'rgba(239, 68, 68, 0.7)', // Red
     },
   }

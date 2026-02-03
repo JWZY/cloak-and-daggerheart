@@ -1,84 +1,133 @@
-import { Card } from '../../components/ui/Card'
-import { Button } from '../../components/ui/Button'
+import { motion } from 'framer-motion'
+import { SubclassCard } from '../../components/cards/SubclassCard'
 import { schoolOfKnowledge, schoolOfWar, wizard } from '../../data/srd'
 import type { WizardSubclass } from '../../types/character'
 
 interface SubclassStepProps {
   selected: WizardSubclass | undefined
   onSelect: (subclass: WizardSubclass) => void
-  onNext: () => void
-  onBack: () => void
 }
 
-export function SubclassStep({ selected, onSelect, onNext, onBack }: SubclassStepProps) {
+// Helper to get subclass image path
+function getSubclassImage(subclassName: string): string {
+  const basePath = import.meta.env.BASE_URL || '/'
+  const slug = subclassName.toLowerCase().replace(/\s+/g, '-')
+  return `${basePath}images/cards/subclass/${slug}.webp`
+}
+
+export function SubclassStep({ selected, onSelect }: SubclassStepProps) {
   const subclasses = [
     {
       data: schoolOfKnowledge,
       highlight: 'Extra domain card, doubled Experience bonus',
+      domainColor: '#4e345b', // Deep purple
+      subtitle: 'Arcane Scholar',
     },
     {
       data: schoolOfWar,
       highlight: 'Extra HP slot, bonus magic damage on Fear rolls',
+      domainColor: '#8b2942', // Deep red
+      subtitle: 'Battle Mage',
     },
   ]
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-900">Choose Your School</h2>
-        <p className="text-gray-600 text-sm mt-1">
-          As a Wizard, you follow one of two magical schools.
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-glass-primary">Subclass</h2>
+        <p className="text-glass-secondary text-sm mt-1">
+          Choose your school. As a Wizard, you follow one of two magical schools.
         </p>
       </div>
 
-      {/* Class info */}
-      <div className="mb-4 p-3 bg-indigo-50 rounded-xl">
-        <h3 className="font-semibold text-indigo-900">Wizard</h3>
-        <p className="text-sm text-indigo-700 mt-1">
-          Domains: Codex + Splendor • HP: {wizard.hp} • Evasion: {wizard.evasion}
+      {/* Class info banner with purple tint */}
+      <div className="mb-6 glass rounded-xl p-3 bg-gradient-to-r from-indigo-500/10 to-transparent">
+        <h3 className="font-semibold text-glass-primary">Wizard</h3>
+        <p className="text-sm text-glass-secondary mt-1">
+          Domains: Codex + Splendor &bull; HP: {wizard.hp} &bull; Evasion: {wizard.evasion}
         </p>
       </div>
 
-      <div className="flex-1 overflow-auto pb-20 space-y-4">
-        {subclasses.map(({ data, highlight }) => (
-          <Card
-            key={data.name}
-            selected={selected === data.name}
-            onTap={() => onSelect(data.name as WizardSubclass)}
-            padding="md"
-          >
-            <h3 className="font-semibold text-gray-900 mb-1">{data.name}</h3>
-            <p className="text-sm text-gray-600 mb-3">{data.description}</p>
+      {/* Subclass Cards - Horizontal scroll with snap */}
+      <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-4 px-4">
+        <div className="flex gap-4 pb-4">
+          {subclasses.map(({ data, highlight, domainColor, subtitle }) => {
+            const isSelected = selected === data.name
+            const hasSelection = !!selected
+            const cardOpacity = hasSelection ? (isSelected ? 1 : 0.5) : 1
 
-            <div className="mb-3 px-3 py-2 bg-amber-50 rounded-lg">
-              <span className="text-sm text-amber-800">{highlight}</span>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-gray-700">Foundations</h4>
-              {data.foundations.map((foundation) => (
+            return (
+              <motion.div
+                key={data.name}
+                className="snap-center flex-shrink-0"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: cardOpacity, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              >
                 <div
-                  key={foundation.name}
-                  className="p-2 bg-ios-gray-light rounded-lg"
+                  style={{
+                    borderRadius: '24px',
+                    padding: '4px',
+                    background: isSelected
+                      ? `linear-gradient(135deg, ${domainColor}, ${domainColor}80)`
+                      : 'transparent',
+                    boxShadow: isSelected
+                      ? `0 0 20px ${domainColor}60, 0 8px 32px rgba(0,0,0,0.3)`
+                      : 'none',
+                    transition: 'all 0.3s ease',
+                  }}
                 >
-                  <h5 className="text-sm font-medium text-gray-900">
-                    {foundation.name}
-                  </h5>
-                  <p className="text-xs text-gray-600 mt-0.5">{foundation.text}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
-        ))}
-      </div>
+                  <SubclassCard
+                    title={data.name}
+                    subtitle={subtitle}
+                    className="Wizard"
+                    domainColor={domainColor}
+                    artworkSrc={getSubclassImage(data.name)}
+                    scale={0.75}
+                    onClick={() => onSelect(data.name as WizardSubclass)}
+                  >
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 mb-3">{data.description}</p>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-ios-separator flex gap-3">
-        <Button onClick={onBack} variant="secondary" className="flex-1">
-          Back
-        </Button>
-        <Button onClick={onNext} disabled={!selected} className="flex-1">
-          Continue
-        </Button>
+                    {/* Highlight badge */}
+                    <div
+                      className="mb-3 px-3 py-2 rounded-lg"
+                      style={{
+                        backgroundColor: `${domainColor}15`,
+                        border: `1px solid ${domainColor}30`,
+                      }}
+                    >
+                      <span className="text-sm font-medium" style={{ color: domainColor }}>
+                        {highlight}
+                      </span>
+                    </div>
+
+                    {/* Foundations */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                        Foundations
+                      </h4>
+                      {data.foundations.map((foundation) => (
+                        <div
+                          key={foundation.name}
+                          className="p-2 rounded-lg"
+                          style={{ backgroundColor: `${domainColor}08` }}
+                        >
+                          <h5 className="text-sm font-semibold" style={{ color: domainColor }}>
+                            {foundation.name}
+                          </h5>
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                            {foundation.text}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </SubclassCard>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
