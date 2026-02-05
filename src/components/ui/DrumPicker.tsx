@@ -23,21 +23,9 @@ export function DrumPicker({
   color = 'white',
 }: DrumPickerProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [displayValue, setDisplayValue] = useState(value)
-
-  // Sync displayValue when value prop changes externally
-  useEffect(() => {
-    setDisplayValue(value)
-  }, [value])
-
-  // Called on every scroll for live visual feedback
-  const handleDisplayChange = (newValue: number) => {
-    setDisplayValue(newValue)
-  }
 
   // Called only when scrolling settles - commits the final value
   const handleSettle = (newValue: number) => {
-    setDisplayValue(newValue)
     onChange(newValue)
   }
 
@@ -60,26 +48,18 @@ export function DrumPicker({
 
       {/* Bottom Drawer */}
       <Sheet open={isOpen} onOpenChange={setIsOpen} title={label}>
-        <div className="flex flex-col items-center gap-6 pb-6">
-          {/* Large Value Display */}
-          <div className="flex items-center gap-3">
-            {icon && <span className="text-white/60">{icon}</span>}
-            <motion.span
-              key={displayValue}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="text-6xl font-bold text-white"
-            >
-              {displayValue}
-            </motion.span>
+        <div className="flex flex-col items-center gap-4 pb-6">
+          {/* Label with icon */}
+          <div className="flex items-center gap-2 text-white/70">
+            {icon}
+            <span className="text-sm font-medium uppercase tracking-wider">{label}</span>
           </div>
 
-          {/* Horizontal Drum */}
-          <HorizontalDrum
+          {/* Horizontal Number Picker */}
+          <HorizontalNumberPicker
             value={value}
             min={min}
             max={max}
-            onDisplayChange={handleDisplayChange}
             onSettle={handleSettle}
             color={color}
           />
@@ -90,19 +70,18 @@ export function DrumPicker({
 }
 
 // ============================================
-// HORIZONTAL DRUM - Spotify-style tick marks
+// HORIZONTAL NUMBER PICKER - Scrollable numbers
 // ============================================
 
-interface HorizontalDrumProps {
+interface HorizontalNumberPickerProps {
   value: number
   min: number
   max: number
-  onDisplayChange: (value: number) => void
   onSettle: (value: number) => void
   color?: string
 }
 
-function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'white' }: HorizontalDrumProps) {
+function HorizontalNumberPicker({ value, min, max, onSettle, color = 'white' }: HorizontalNumberPickerProps) {
   const options = Array.from({ length: max - min + 1 }, (_, i) => min + i)
   const startIndex = value - min
   const [currentIndex, setCurrentIndex] = useState(startIndex)
@@ -117,7 +96,7 @@ function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'w
     dragFree: false,
   })
 
-  // Update display value in real-time during scroll for visual feedback
+  // Update visual state in real-time during scroll
   // Uses scrollProgress to calculate closest snap for continuous updates
   const onScroll = useCallback(() => {
     if (!emblaApi) return
@@ -141,19 +120,16 @@ function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'w
     if (closestIndex !== currentIndexRef.current) {
       currentIndexRef.current = closestIndex
       setCurrentIndex(closestIndex)
-      onDisplayChange(min + closestIndex)
     }
-  }, [emblaApi, min, onDisplayChange])
+  }, [emblaApi])
 
-  // Called when snap selection changes - update display immediately
+  // Called when snap selection changes - update visual state immediately
   const onSelect = useCallback(() => {
     if (!emblaApi) return
     const newIndex = emblaApi.selectedScrollSnap()
     currentIndexRef.current = newIndex
     setCurrentIndex(newIndex)
-    const newValue = min + newIndex
-    onDisplayChange(newValue)
-  }, [emblaApi, min, onDisplayChange])
+  }, [emblaApi])
 
   // Called when scrolling settles - commit the final value
   const onSettleHandler = useCallback(() => {
@@ -190,7 +166,7 @@ function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'w
   return (
     <div className="w-full max-w-[320px]">
       <div className="relative">
-        {/* Center indicator - triangle marker */}
+        {/* Center indicator - triangle marker pointing down */}
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
           style={{
@@ -202,50 +178,40 @@ function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'w
           }}
         />
 
-        {/* Drum scroll area - uses mask-image for edge fade */}
+        {/* Number scroll area - uses mask-image for edge fade */}
         <div
-          className="overflow-hidden pt-4"
+          className="overflow-hidden pt-5"
           ref={emblaRef}
           style={{
-            maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+            maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
           }}
         >
-          {/* Padding on left/right allows first and last tick to center under indicator */}
-          <div className="flex items-end h-20" style={{ paddingLeft: 'calc(50% - 8px)', paddingRight: 'calc(50% - 8px)' }}>
+          <div className="flex items-center justify-center h-16">
             {options.map((opt, i) => {
-              const isMajor = opt % 5 === 0
               const isSelected = i === currentIndex
               const distance = Math.abs(i - currentIndex)
-              const opacity = Math.max(0.2, 1 - distance * 0.15)
+              // Scale: selected = 1.4, adjacent = 1, further = smaller
+              const scale = isSelected ? 1.4 : Math.max(0.7, 1 - distance * 0.1)
+              // Opacity: selected = 1, fades with distance
+              const opacity = isSelected ? 1 : Math.max(0.3, 1 - distance * 0.25)
 
               return (
                 <div
                   key={opt}
-                  className="flex-none w-4 flex flex-col items-center justify-end"
+                  className="flex-none w-14 flex items-center justify-center"
                 >
-                  {/* Tick mark */}
-                  <motion.div
+                  <motion.span
                     animate={{
-                      height: isSelected ? 48 : isMajor ? 32 : 16,
-                      backgroundColor: isSelected ? color : 'rgba(255,255,255,0.4)',
+                      scale,
+                      opacity,
+                      color: isSelected ? color : 'rgba(255,255,255,0.8)',
                     }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="w-0.5 rounded-full"
-                    style={{ opacity }}
-                  />
-                  {/* Number label for major ticks */}
-                  {isMajor && (
-                    <motion.span
-                      animate={{
-                        opacity: isSelected ? 1 : 0.5,
-                        scale: isSelected ? 1.1 : 1,
-                      }}
-                      className="text-xs mt-1 font-medium text-white"
-                    >
-                      {opt}
-                    </motion.span>
-                  )}
+                    className="text-3xl font-bold"
+                  >
+                    {opt}
+                  </motion.span>
                 </div>
               )
             })}
