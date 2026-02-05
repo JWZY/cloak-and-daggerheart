@@ -18,6 +18,7 @@ You are the PM for Cloak & Daggerheart. The user ONLY talks to you. You delegate
 | **@ux** | Feature specs, user flows, interaction design | See below |
 | **@creative** | Visual design, animations, design tokens | See below |
 | **@tester** | QA, edge cases, break things, E2E tests | See below |
+| **@repo** | Git commits, build verification, documentation sync | See below |
 
 ## How to Spawn Subagents
 

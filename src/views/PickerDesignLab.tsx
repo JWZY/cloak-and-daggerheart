@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Picker from 'react-mobile-picker'
 import useEmblaCarousel from 'embla-carousel-react'
-import { ArrowLeft, Heart, Brain, Shield } from 'lucide-react'
+import { ArrowLeft, Heart, Brain, Shield, Zap } from 'lucide-react'
+import { DrumPicker } from '../components/ui/DrumPicker'
 
 // ============================================
 // APPROACH 1: iOS Wheel Picker (react-mobile-picker)
@@ -434,6 +435,11 @@ export function PickerDesignLab({ onBack }: PickerDesignLabProps) {
   const [stress5, setStress5] = useState(3)
   const [armor5, setArmor5] = useState(2)
 
+  // Approach 6: Drum Picker (Spotify-style)
+  const [hp6, setHp6] = useState(12)
+  const [stress6, setStress6] = useState(3)
+  const [armor6, setArmor6] = useState(2)
+
   return (
     <div className="fixed inset-0 bg-black text-white overflow-y-scroll" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Header */}
@@ -567,6 +573,58 @@ export function PickerDesignLab({ onBack }: PickerDesignLabProps) {
               icon={<Shield size={14} />}
               color="#3b82f6"
             />
+          </div>
+        </section>
+
+        {/* Approach 6: Drum Picker (Spotify-style) */}
+        <section>
+          <h2 className="text-lg font-semibold text-white/60 mb-4">6. Drum Picker (Spotify-style)</h2>
+          <p className="text-sm text-white/40 mb-6">Compact trigger + bottom drawer with horizontal drum and tick marks</p>
+
+          <div className="flex justify-center gap-4">
+            <DrumPicker
+              value={hp6}
+              min={0}
+              max={20}
+              onChange={setHp6}
+              label="HP"
+              icon={<Heart size={14} />}
+              color="#ef4444"
+            />
+            <DrumPicker
+              value={stress6}
+              min={0}
+              max={6}
+              onChange={setStress6}
+              label="Stress"
+              icon={<Brain size={14} />}
+              color="#a855f7"
+            />
+            <DrumPicker
+              value={armor6}
+              min={0}
+              max={10}
+              onChange={setArmor6}
+              label="Armor"
+              icon={<Shield size={14} />}
+              color="#3b82f6"
+            />
+          </div>
+
+          {/* Additional example with different configuration */}
+          <div className="mt-8">
+            <h3 className="text-sm font-medium text-white/50 mb-4">Wide range example (0-100)</h3>
+            <div className="flex justify-center">
+              <DrumPicker
+                value={50}
+                min={0}
+                max={100}
+                onChange={(v) => console.log('Speed:', v)}
+                label="Speed"
+                icon={<Zap size={14} />}
+                color="#f59e0b"
+              />
+            </div>
           </div>
         </section>
       </div>

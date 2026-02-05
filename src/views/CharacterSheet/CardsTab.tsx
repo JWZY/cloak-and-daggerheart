@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { Card } from '../../components/ui/Card'
 import { DomainCard } from '../../components/cards/DomainCard'
 import { SubclassCard } from '../../components/cards/SubclassCard'
+import { Markdown } from '../../components/ui/Markdown'
 import type { Character } from '../../types/character'
 import { wizard, getSubclass } from '../../data/srd'
 
@@ -130,7 +131,7 @@ export function CardsTab({ character }: CardsTabProps) {
                 cardType: 'domain',
               })}
             >
-              {card.text}
+              <Markdown>{card.text}</Markdown>
             </DomainCard>
           ))}
         </HorizontalCardRail>
@@ -160,7 +161,7 @@ export function CardsTab({ character }: CardsTabProps) {
                 cardType: 'subclass',
               })}
             >
-              {feat.text}
+              <Markdown>{feat.text}</Markdown>
             </SubclassCard>
           ))}
           {subclass.specializations.map((feat) => (
@@ -180,7 +181,7 @@ export function CardsTab({ character }: CardsTabProps) {
                 cardType: 'subclass',
               })}
             >
-              {feat.text}
+              <Markdown>{feat.text}</Markdown>
             </SubclassCard>
           ))}
           {subclass.masteries.map((feat) => (
@@ -200,7 +201,7 @@ export function CardsTab({ character }: CardsTabProps) {
                 cardType: 'subclass',
               })}
             >
-              {feat.text}
+              <Markdown>{feat.text}</Markdown>
             </SubclassCard>
           ))}
         </HorizontalCardRail>
@@ -229,7 +230,7 @@ export function CardsTab({ character }: CardsTabProps) {
                 cardType: 'ancestry',
               })}
             >
-              {feat.text}
+              <Markdown>{feat.text}</Markdown>
             </DomainCard>
           ))}
         </HorizontalCardRail>
@@ -258,7 +259,7 @@ export function CardsTab({ character }: CardsTabProps) {
                 cardType: 'community',
               })}
             >
-              {feat.text}
+              <Markdown>{feat.text}</Markdown>
             </DomainCard>
           ))}
         </HorizontalCardRail>
@@ -360,7 +361,7 @@ function CardLightbox({ card, onClose, subclassColor }: CardLightboxProps) {
                 artworkSrc={card.backgroundImage}
                 scale={0.85}
               >
-                <p className="text-sm leading-relaxed">{card.text}</p>
+                <Markdown>{card.text}</Markdown>
               </SubclassCard>
             ) : (
               <DomainCard
@@ -373,7 +374,7 @@ function CardLightbox({ card, onClose, subclassColor }: CardLightboxProps) {
                 artworkSrc={card.backgroundImage}
                 scale={0.85}
               >
-                <p className="text-sm leading-relaxed">{card.text}</p>
+                <Markdown>{card.text}</Markdown>
               </DomainCard>
             )}
           </motion.div>

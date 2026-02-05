@@ -169,9 +169,9 @@ export function SubclassCard({
             </div>
 
             {/* Title and content section */}
-            <div className="flex flex-col justify-start relative overflow-hidden px-[11px] z-40 text-base text-black pt-1">
+            <div className="flex flex-col justify-start relative flex-1 min-h-0 px-[11px] z-40 text-base text-black pt-1">
               {/* Title */}
-              <div className="flex flex-col items-center text-center">
+              <div className="flex flex-col items-center text-center flex-shrink-0">
                 <div className="w-full max-w-full pt-0">
                   <h1
                     className="tracking-wide pb-1 pl-1.5 pt-[6px] uppercase w-full text-center"
@@ -197,8 +197,8 @@ export function SubclassCard({
                 )}
               </div>
 
-              {/* Card text content */}
-              <div className="flex-1 px-1 py-2 text-sm leading-relaxed">
+              {/* Card text content - scrollable */}
+              <div className="flex-1 min-h-0 px-1 py-2 text-sm leading-relaxed overflow-y-auto">
                 {children}
               </div>
             </div>

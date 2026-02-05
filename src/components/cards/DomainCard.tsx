@@ -200,9 +200,9 @@ export function DomainCard({
             </div>
 
             {/* Title and content section */}
-            <div className="flex flex-col justify-start relative overflow-hidden px-[11px] z-40 text-base text-black pt-1">
+            <div className="flex flex-col justify-start relative flex-1 min-h-0 px-[11px] z-40 text-base text-black pt-1">
               {/* Title */}
-              <div className="flex flex-col items-center text-center">
+              <div className="flex flex-col items-center text-center flex-shrink-0">
                 <div className="w-full max-w-full pt-0">
                   <h1
                     className="tracking-wide pb-1 pl-1.5 pt-[6px] uppercase w-full text-center"
@@ -230,7 +230,7 @@ export function DomainCard({
 
               {/* Metadata row */}
               {(type || level !== undefined || recall) && (
-                <div className="flex items-center justify-center gap-3 text-gray-500 text-[11px] py-2">
+                <div className="flex items-center justify-center gap-3 text-gray-500 text-[11px] py-2 flex-shrink-0">
                   {type && <span className="uppercase tracking-wider">{type}</span>}
                   {level !== undefined && (
                     <>
@@ -247,8 +247,8 @@ export function DomainCard({
                 </div>
               )}
 
-              {/* Card text content */}
-              <div className="flex-1 px-1 py-2 text-sm leading-relaxed text-gray-800">
+              {/* Card text content - scrollable */}
+              <div className="flex-1 min-h-0 px-1 py-2 text-sm leading-relaxed text-gray-800 overflow-y-auto">
                 {children}
               </div>
             </div>

@@ -4,6 +4,928 @@ Notes passed between agents. Most recent at top.
 
 ---
 
+## 2026-02-05 | @tester: DrumPicker QA Report
+
+**From:** @tester
+**To:** @orchestrator / @frontend
+
+### Test Report: DrumPicker Component
+
+**Date:** 2026-02-05
+**Tester:** @tester
+**Test URL:** http://localhost:3000/cloak-and-daggerheart/?pickers
+
+---
+
+### Summary
+
+The DrumPicker component has a **working foundation** but is **incomplete relative to the spec**. Core scroll mechanics work well, but several key features from the spec are missing. The edge fade implementation uses a different (and better) approach than spec suggested. Priority fixes needed for spec compliance.
+
+---
+
+### Behaviors Tested
+
+| Behavior | Expected | Actual | Status |
+|----------|----------|--------|--------|
+| Scroll with momentum | iOS-like momentum scroll | Works via embla-carousel | PASS |
+| Live display updates | Large number updates while scrolling | Updates via `onScroll` event | PASS |
+| Bounds enforcement | Stays within min/max | `containScroll: 'keepSnaps'` handles this | PASS |
+| Snap to discrete values | Snaps on release | Works via `settle` event | PASS |
+| Edge fade | Gradient fade (no black boxes) | Uses CSS `mask-image` - works correctly | PASS |
+| Triangle indicator | Points down, in stat color | Correctly positioned with border trick | PASS |
+
+---
+
+### Bugs Found
+
+#### BUG-001: Embla Configuration Differs from Spec (LOW)
+
+**Severity:** Low
+**Location:** `src/components/ui/DrumPicker.tsx` line 114
+
+**Expected (from spec):**
+```tsx
+containScroll: false
+```
+
+**Actual:**
+```tsx
+containScroll: 'keepSnaps'
+```
+
+**Impact:** Minimal - `keepSnaps` may actually be better for bounds enforcement. The scroll behavior still feels correct. **Consider this a design decision rather than a bug.**
+
+---
+
+#### BUG-002: Tick Spacing Too Narrow (MEDIUM)
+
+**Severity:** Medium
+**Location:** `src/components/ui/DrumPicker.tsx` line 197
+
+**Expected (from spec):**
+- Tick spacing: 48px between each tick
+
+**Actual:**
+- Uses `w-4` (16px) per tick container
+
+**Impact:** The drum feels cramped on wider ranges (0-100). For small ranges (0-6), it's fine. For HP (0-20) it works but is a bit dense.
+
+**Suggested Fix:**
+```tsx
+// Change line 197 from:
+className="flex-none w-4 flex flex-col items-center justify-end"
+// To:
+className="flex-none w-12 flex flex-col items-center justify-end"
+```
+
+---
+
+### Missing Features (Not Implemented)
+
+#### MISSING-001: Quick-Select Presets (HIGH)
+
+**Severity:** High - Core spec feature
+**Spec Reference:** Part 3: Quick-Select Presets
+
+**Expected:** Below the drum, preset buttons like:
+- HP: "Empty", "Half", "-1", "Full"
+- Stress: 0, 2, 4, 6
+- Armor: "Empty", "Full"
+
+**Actual:** No presets implemented at all.
+
+**Impact:** Users must scroll to common values instead of one-tap selection. This defeats the "quick adjustment during gameplay" user story.
+
+**Suggested Implementation:**
+```tsx
+interface DrumPickerProps {
+  // ... existing props
+  presets?: Array<number | { value: number; label: string }>
+}
+
+// Add below the HorizontalDrum:
+{presets && (
+  <div className="flex justify-center gap-2 mt-4">
+    {presets.map((preset) => {
+      const val = typeof preset === 'number' ? preset : preset.value
+      const label = typeof preset === 'number' ? preset.toString() : preset.label
+      return (
+        <motion.button
+          key={val}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => { onChange(val); triggerHaptic() }}
+          className="glass-flat-sm rounded-xl px-4 py-2 min-w-[48px] text-sm font-semibold text-white/70"
+        >
+          {label}
+        </motion.button>
+      )
+    })}
+  </div>
+)}
+```
+
+---
+
+#### MISSING-002: Max Value Display in Trigger (MEDIUM)
+
+**Severity:** Medium - Spec explicitly requires this
+**Spec Reference:** Part 1: Compact Trigger Design, lines 36-39
+
+**Expected:** Trigger shows "3/6" format for stats with max (HP, Stress, Armor)
+
+**Actual:** Trigger only shows current value (e.g., "12")
+
+**Impact:** Users can't see their max at a glance. For HP, this means they don't know if 8 is nearly full or nearly empty.
+
+**Suggested Fix:**
+Add `maxValue` and `showMaxInTrigger` props:
+```tsx
+interface DrumPickerProps {
+  // ... existing props
+  maxValue?: number
+  showMaxInTrigger?: boolean  // Default: true if maxValue provided
+}
+
+// In trigger display:
+<span className="text-3xl font-bold text-white">
+  {value}
+  {maxValue && showMaxInTrigger !== false && (
+    <span className="text-lg text-white/40">/{maxValue}</span>
+  )}
+</span>
+```
+
+---
+
+#### MISSING-003: Haptic Feedback (LOW)
+
+**Severity:** Low - Nice to have, not critical
+**Spec Reference:** Part 5: Interactions
+
+**Expected:** `navigator.vibrate(10)` on value snap and preset tap
+
+**Actual:** No haptic feedback
+
+**Suggested Fix:**
+```tsx
+const triggerHaptic = () => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(10)
+  }
+}
+
+// Call in onSettle and preset button clicks
+```
+
+---
+
+#### MISSING-004: Warning States (LOW)
+
+**Severity:** Low - Polish feature
+**Spec Reference:** Part 6: Warning States
+
+**Expected:**
+- HP at 0: Pulsing red border on trigger
+- Stress at max: Pulsing purple border on trigger
+
+**Actual:** No warning states
+
+---
+
+#### MISSING-005: Trigger Value Color (LOW)
+
+**Severity:** Low - Visual polish
+**Spec Reference:** Part 1, Color Tokens table
+
+**Expected:** Value text uses stat color (red for HP, amber for Hope, etc.)
+
+**Actual:** Trigger value is always white. Only the triangle indicator uses the color prop.
+
+**Location:** `src/components/ui/DrumPicker.tsx` line 56
+
+**Suggested Fix:**
+```tsx
+// Change line 56 from:
+<span className="text-3xl font-bold text-white">
+// To:
+<span className="text-3xl font-bold" style={{ color }}>
+```
+
+---
+
+### Edge Cases Checked
+
+| Case | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Min value (0) | Stops at 0 | Works | PASS |
+| Max value | Stops at max | Works | PASS |
+| Wide range (0-100) | Scrollable | Works but cramped | PARTIAL |
+| Rapid scrolling | Smooth | Smooth | PASS |
+| Sheet dismiss | Closes on swipe/overlay tap | Works via Vaul | PASS |
+| External value change | Syncs carousel position | Works via useEffect | PASS |
+| Re-open sheet | Shows current value centered | Works | PASS |
+
+---
+
+### What's Working Well
+
+1. **Core scroll mechanics** - Embla provides smooth momentum scrolling
+2. **Live value updates** - Large display updates in real-time during scroll
+3. **Snap behavior** - Values snap cleanly to discrete integers
+4. **Edge fade** - CSS `mask-image` approach is cleaner than overlay divs (actually better than spec)
+5. **Triangle indicator** - Positioned correctly, animates with color
+6. **Tick mark animations** - Selected tick grows/highlights with spring animation
+7. **Sheet integration** - Vaul drawer works correctly
+8. **Glass styling** - Trigger and sheet use glass classes consistently
+
+---
+
+### What Needs Work
+
+**Priority 1 - High (Spec Compliance):**
+1. Add Quick-Select Presets (MISSING-001) - This is core to the UX spec
+2. Add max value display in trigger (MISSING-002) - Spec explicitly requires "3/6" format
+
+**Priority 2 - Medium (Polish):**
+3. Increase tick spacing for better touch targets (BUG-002)
+4. Add haptic feedback (MISSING-003)
+5. Color the trigger value text (MISSING-005)
+
+**Priority 3 - Low (Nice to Have):**
+6. Add warning states for HP=0 and Stress=max (MISSING-004)
+
+---
+
+### Acceptance Criteria Status (from spec)
+
+- [x] Compact trigger displays value with stat-appropriate color (PARTIAL - only triangle uses color)
+- [ ] Trigger shows "X/Y" format for HP, Stress, Armor
+- [x] Trigger shows just value for Hope (default behavior works)
+- [x] Tapping trigger opens Vaul bottom sheet
+- [x] Sheet displays large current value at top
+- [x] Drum picker shows horizontal tick marks
+- [x] Center indicator (triangle) shows selected position
+- [x] Dragging drum scrolls through values
+- [x] Drum snaps to nearest value on release
+- [ ] Tapping tick mark selects that value (NOT IMPLEMENTED)
+- [ ] Quick-select presets appear below drum (NOT IMPLEMENTED)
+- [ ] Tapping preset jumps to that value (NOT IMPLEMENTED)
+- [x] Sheet dismisses on swipe down or overlay tap
+- [ ] Haptic feedback on value change (NOT IMPLEMENTED)
+- [ ] Warning state for HP=0 (NOT IMPLEMENTED)
+- [ ] Warning state for Stress=max (NOT IMPLEMENTED)
+- [x] Touch targets meet 44pt minimum (trigger: 80px min-width)
+- [x] Works with reduced motion preference (Framer Motion handles this)
+
+**Checklist: 10/17 complete (59%)**
+
+---
+
+### Files Reviewed
+
+- `src/components/ui/DrumPicker.tsx` - Main implementation (229 lines)
+- `src/components/ui/Sheet.tsx` - Bottom sheet wrapper
+- `src/views/PickerDesignLab.tsx` - Demo page with 3 DrumPicker instances
+- `src/index.css` - Glass styling classes
+
+---
+
+### Recommendations for @frontend
+
+1. **First**: Add the presets feature - this is the biggest gap from spec
+2. **Second**: Add `maxValue` prop and "X/Y" display in trigger
+3. **Third**: Apply color to trigger value text
+4. **Fourth**: Add tap-to-select on tick marks (currently only drag works)
+5. **Optional**: Add haptic feedback and warning states
+
+The component is 60% complete. Core mechanics are solid. Missing features are well-defined and straightforward to add.
+
+---
+
+## 2026-02-03 | @ux: Drum Picker Component Spec (Spotify-Inspired)
+
+**From:** @ux
+**To:** @frontend
+
+### Feature Spec: Drum Picker Component
+
+#### User Story
+
+As a player managing my character during a session, I want a quick and tactile way to adjust numeric values like HP, Hope, Stress, and Armor Slots so that I can track resources without interrupting gameplay.
+
+---
+
+### Overview
+
+Create a "Drum Picker" component inspired by Spotify's playback speed control. The pattern consists of:
+
+1. **Compact Trigger**: Inline display of current value that invites tapping
+2. **Bottom Sheet Picker**: Full picker interface with visual drum/tick marks
+3. **Quick-Select Buttons**: Preset value buttons for common adjustments
+
+**Reference Inspiration:** Spotify's speed control shows current value (e.g., "1.5x" in green), opens a bottom sheet with a visual scale, tick marks, and preset buttons.
+
+---
+
+### Answers to @frontend's Open Questions
+
+| Question | Answer |
+|----------|--------|
+| Slot display in compact mode? | Show text "3/6" format, not filled circles. Simpler and cleaner. |
+| Preset button labels? | Use text labels: "Empty", "Half", "Full", "-1" for HP. Plain numbers for Hope/Stress. |
+| Haptic feedback? | Yes, use `navigator.vibrate(10)` on value change where supported. |
+| Max value display? | Show "X/Y" for HP, Stress, Armor. Show just "X" for Hope. |
+
+---
+
+### Component Architecture
+
+```
+<DrumPicker>
+  ├── <DrumPickerTrigger>     // Compact inline display
+  └── <DrumPickerSheet>       // Bottom sheet picker (via Vaul)
+        ├── <DrumPickerHeader>   // Label + current value (large)
+        ├── <DrumPickerDrum>     // Horizontal tick mark picker
+        └── <DrumPickerPresets>  // Quick-select buttons
+```
+
+---
+
+### Part 1: Compact Trigger Design
+
+#### Visual Layout
+
+**For stats WITH max (HP, Stress, Armor):**
+```
+┌───────────┐
+│    3      │  <- Current value, large, colored
+│   / 6     │  <- Max value, smaller, muted
+│    HP     │  <- Label at bottom
+└───────────┘
+```
+
+**For stats WITHOUT max (Hope):**
+```
+┌───────────┐
+│    4      │  <- Current value only
+│   Hope    │  <- Label at bottom
+└───────────┘
+```
+
+#### Styling
+
+```tsx
+interface DrumPickerTriggerProps {
+  value: number
+  maxValue?: number           // Optional - shows "X/Y" format
+  label: string
+  color: 'red' | 'gold' | 'purple' | 'blue' | 'default'
+  icon?: React.ReactNode
+  disabled?: boolean
+  onTap: () => void
+}
+```
+
+**CSS:**
+- Container: `.glass-flat-sm rounded-xl p-3 min-w-[72px] min-h-[72px]`
+- Current value: `text-2xl font-bold` with color
+- Max value: `text-sm text-white/40`
+- Label: `text-xs uppercase tracking-wide text-white/50 mt-1`
+
+**Color Tokens:**
+| Stat | Color | Hex |
+|------|-------|-----|
+| HP | `text-red-400` | #f87171 |
+| Hope | `text-amber-400` | #fbbf24 |
+| Stress | `text-purple-400` | #c084fc |
+| Armor | `text-blue-400` | #60a5fa |
+
+**Touch Target:** Minimum 72x72px (exceeds 44pt iOS guideline)
+
+**Tap Feedback:** `whileTap={{ scale: 0.95 }}`
+
+---
+
+### Part 2: Bottom Sheet Picker
+
+#### Layout
+
+```
+┌──────────────────────────────────────┐
+│            ═══════════              │  <- Drag handle
+│                                      │
+│              HOPE                    │  <- Label (small)
+│                4                     │  <- Current value (5xl, colored)
+│               / 6                    │  <- Max if applicable
+│                                      │
+│  ╔════════════════════════════════╗  │
+│  ║         Center indicator       ║  │
+│  ║              ▼                 ║  │  <- Fixed triangle
+│  ║    |  |  |  |  |  |  |  |     ║  │  <- Scrollable ticks
+│  ║    0  1  2  3  4  5  6        ║  │
+│  ╚════════════════════════════════╝  │
+│                                      │
+│  ┌──────┐ ┌────┐ ┌────┐ ┌──────┐    │
+│  │Empty │ │Half│ │ -1 │ │ Full │    │  <- Presets
+│  └──────┘ └────┘ └────┘ └──────┘    │
+│                                      │
+└──────────────────────────────────────┘
+```
+
+#### Header Section
+
+```tsx
+<div className="text-center mb-6">
+  <span className="text-xs uppercase tracking-wider text-white/50 block mb-2">
+    {label}
+  </span>
+  <span className="text-5xl font-bold" style={{ color: statColor }}>
+    {currentValue}
+  </span>
+  {maxValue && (
+    <span className="text-xl text-white/40 ml-1">/ {maxValue}</span>
+  )}
+</div>
+```
+
+#### Drum Picker (Tick Mark Visualization)
+
+**Design: Horizontal scale with fixed center indicator**
+
+```
+         ┌────────────────────────────┐
+  Faded  │              ▼             │  Faded
+  edge   │  │  │  │  │  │  │  │  │    │  edge
+         │  0  1  2  3  4  5  6       │
+         └────────────────────────────┘
+              ← drag to scroll →
+```
+
+**Implementation:**
+- Use `embla-carousel` with `align: 'center'`, `containScroll: false`
+- Tick spacing: 48px between each tick
+- Tick height: 24px (small), 36px (selected)
+- Tick color: `bg-white/30` normal, `bg-white` selected
+- Center indicator: `▼` triangle in stat color, fixed position
+- Gradient fade edges: `from-black/80 to-transparent`
+
+**Scroll Behavior:**
+- Snap to nearest value on release (`dragFree: false`)
+- Momentum with deceleration
+- Haptic on snap: `navigator.vibrate(10)`
+
+**Tap to Select:**
+- Tapping a tick scrolls to center that value
+
+---
+
+### Part 3: Quick-Select Presets
+
+**Preset Configurations by Stat:**
+
+**HP (with dynamic max):**
+```tsx
+presets={[
+  { value: 0, label: 'Empty' },
+  { value: Math.floor(max / 2), label: 'Half' },
+  { value: max - 1, label: '-1' },
+  { value: max, label: 'Full' }
+]}
+```
+
+**Hope (0-unlimited, but typically 0-6):**
+```tsx
+presets={[0, 2, 3, 5, 6]}  // Common Hope values
+```
+
+**Stress (0-6):**
+```tsx
+presets={[0, 2, 4, 6]}
+```
+
+**Armor Slots (with dynamic max):**
+```tsx
+presets={[
+  { value: 0, label: 'Empty' },
+  { value: max, label: 'Full' }
+]}
+```
+
+**Preset Button Styling:**
+```tsx
+<motion.button
+  whileTap={{ scale: 0.95 }}
+  className={cn(
+    "glass-flat-sm rounded-xl px-4 py-2 min-w-[48px] min-h-[44px]",
+    "text-sm font-semibold",
+    isSelected && "ring-2 ring-white/40 bg-white/15"
+  )}
+  style={{ color: isSelected ? statColor : 'rgba(255,255,255,0.7)' }}
+>
+  {preset.label ?? preset.value}
+</motion.button>
+```
+
+---
+
+### Part 4: Full Component API
+
+```tsx
+interface DrumPickerProps {
+  // Value control
+  value: number
+  onChange: (value: number) => void
+  min?: number              // Default: 0
+  max: number               // Required
+
+  // Display
+  label: string             // "HP", "Hope", "Stress", "Armor"
+  color: 'red' | 'gold' | 'purple' | 'blue' | 'default'
+  icon?: React.ReactNode    // Optional icon next to label
+  showMaxInTrigger?: boolean  // Show "X/Y" in trigger (default: true if max provided)
+
+  // Presets (optional)
+  presets?: Array<number | { value: number; label: string }>
+}
+```
+
+#### Usage Examples
+
+```tsx
+// HP with presets
+<DrumPicker
+  value={character.hp.current}
+  max={character.hp.max}
+  onChange={onHPChange}
+  label="HP"
+  color="red"
+  presets={[
+    { value: 0, label: 'Empty' },
+    { value: Math.floor(character.hp.max / 2), label: 'Half' },
+    { value: character.hp.max - 1, label: '-1' },
+    { value: character.hp.max, label: 'Full' }
+  ]}
+/>
+
+// Hope (no max display)
+<DrumPicker
+  value={character.hope}
+  max={20}
+  onChange={onHopeChange}
+  label="Hope"
+  color="gold"
+  showMaxInTrigger={false}
+  presets={[0, 2, 3, 5, 6]}
+/>
+
+// Stress
+<DrumPicker
+  value={character.stress.current}
+  max={character.stress.max}
+  onChange={onStressChange}
+  label="Stress"
+  color="purple"
+  presets={[0, 2, 4, 6]}
+/>
+
+// Armor Slots
+<DrumPicker
+  value={character.armorSlots.current}
+  max={character.armorSlots.max}
+  onChange={onArmorChange}
+  label="Armor"
+  color="blue"
+  presets={[
+    { value: 0, label: 'Empty' },
+    { value: character.armorSlots.max, label: 'Full' }
+  ]}
+/>
+```
+
+---
+
+### Part 5: Interactions
+
+| Interaction | Behavior |
+|-------------|----------|
+| Tap trigger | Opens bottom sheet |
+| Drag drum | Scrolls through values |
+| Release drum | Snaps to nearest value |
+| Tap tick mark | Scrolls to that value |
+| Tap preset | Jumps to preset value |
+| Swipe down handle | Closes sheet |
+| Tap overlay | Closes sheet |
+
+**Haptic Feedback:**
+```tsx
+const triggerHaptic = () => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(10)
+  }
+}
+
+// Call on: value snap, preset tap
+```
+
+**Animation Specs:**
+- Sheet open: `type: "spring", stiffness: 300, damping: 30`
+- Scroll snap: Embla default with momentum
+- Value counter: `type: "spring", stiffness: 500, damping: 30`
+
+---
+
+### Part 6: Warning States
+
+**HP at 0:**
+- Trigger has pulsing red border
+- Use `@keyframes pulse-warning` animation
+
+**Stress at max (6):**
+- Trigger has pulsing purple border
+- Text shows "BROKEN" indicator?
+
+```css
+@keyframes pulse-warning {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--color), 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(var(--color), 0); }
+}
+```
+
+---
+
+### Part 7: Integration with StatsTab
+
+**Current Pattern (slot circles):**
+```tsx
+<SlotDisplay current={hp.current} max={hp.max} onChange={onHPChange} label="HP" />
+```
+
+**New Pattern (drum pickers in grid):**
+```tsx
+<Card variant="glass" padding="md">
+  <h3 className="text-xs uppercase tracking-wide text-white/40 mb-4">Resources</h3>
+  <div className="grid grid-cols-2 gap-3">
+    <DrumPicker value={hp.current} max={hp.max} onChange={onHPChange} label="HP" color="red" ... />
+    <DrumPicker value={stress.current} max={stress.max} onChange={onStressChange} label="Stress" color="purple" ... />
+    <DrumPicker value={hope} max={20} onChange={onHopeChange} label="Hope" color="gold" showMaxInTrigger={false} />
+    <DrumPicker value={armor.current} max={armor.max} onChange={onArmorChange} label="Armor" color="blue" ... />
+  </div>
+</Card>
+```
+
+---
+
+### Acceptance Criteria
+
+- [ ] Compact trigger displays value with stat-appropriate color
+- [ ] Trigger shows "X/Y" format for HP, Stress, Armor
+- [ ] Trigger shows just value for Hope
+- [ ] Tapping trigger opens Vaul bottom sheet
+- [ ] Sheet displays large current value at top
+- [ ] Drum picker shows horizontal tick marks
+- [ ] Center indicator (triangle) shows selected position
+- [ ] Dragging drum scrolls through values
+- [ ] Drum snaps to nearest value on release
+- [ ] Tapping tick mark selects that value
+- [ ] Quick-select presets appear below drum
+- [ ] Tapping preset jumps to that value
+- [ ] Sheet dismisses on swipe down or overlay tap
+- [ ] Haptic feedback on value change (where supported)
+- [ ] Warning state for HP=0 (pulsing red border)
+- [ ] Warning state for Stress=max (pulsing purple border)
+- [ ] Touch targets meet 44pt minimum
+- [ ] Works with reduced motion preference
+
+---
+
+### Files to Create/Modify
+
+1. **NEW: `src/components/ui/DrumPicker/index.tsx`**
+   - Main component with trigger + sheet
+
+2. **NEW: `src/components/ui/DrumPicker/DrumPickerDrum.tsx`**
+   - Horizontal tick mark picker using embla-carousel
+
+3. **NEW: `src/components/ui/DrumPicker/DrumPickerPresets.tsx`**
+   - Quick-select button row
+
+4. **MODIFY: `src/views/CharacterSheet/StatsTab.tsx`**
+   - Replace SlotDisplay with DrumPicker triggers
+
+5. **MODIFY: `src/views/PickerDesignLab.tsx`**
+   - Add "Approach 6: Drum Picker (Spotify-style)" demo
+
+6. **MODIFY: `src/index.css`**
+   - Add `@keyframes pulse-warning` if needed
+
+---
+
+### Design Rationale
+
+**Why this pattern?**
+
+1. **Familiar**: Spotify's speed control is widely understood
+2. **Visual**: Tick marks give spatial context for the value
+3. **Fast**: Presets enable one-tap common adjustments
+4. **Tactile**: Swipe + snap feels satisfying
+5. **Compact**: Triggers fit in a grid without clutter
+
+**Why NOT other patterns?**
+
+- **Slot circles** (current): Tedious for frequent HP changes during combat
+- **+/- steppers**: Too many taps for large adjustments
+- **Direct input**: Keyboard disrupts gameplay flow
+- **iOS wheel picker**: Less visual, harder to see range at a glance
+
+---
+
+### Dependencies
+
+All libraries already installed:
+- `vaul` - Bottom sheet
+- `embla-carousel-react` - Horizontal scroll with snap
+- `framer-motion` - Animations
+- `lucide-react` - Icons
+
+No new dependencies required.
+
+---
+
+## 2026-02-03 | @frontend: Drum Picker Research & Recommendation
+
+**From:** @frontend
+**To:** @orchestrator / @ux / next @frontend session
+
+### Research: iOS-Style Drum Picker Component
+
+#### Task
+Research implementation approaches for a Spotify-style value picker that:
+1. Shows as a compact value display inline
+2. Opens a bottom sheet when tapped
+3. Has a visual "drum" with tick marks showing the range
+4. Allows swiping/dragging to change value
+5. Has quick-select buttons for preset values
+
+---
+
+### Current State Analysis
+
+#### What We Already Have
+
+**Libraries installed:**
+- `react-mobile-picker@1.2.0` - iOS-style vertical wheel picker
+- `embla-carousel-react@8.6.0` - Carousel with momentum scrolling
+- `framer-motion@11.0.3` - Animation and gesture handling
+- `vaul@0.9.0` - Bottom sheet (Drawer component)
+
+**Existing implementations in `src/views/PickerDesignLab.tsx`:**
+1. **WheelPicker** - Vertical iOS wheel using react-mobile-picker
+2. **HorizontalPicker** - Horizontal scroll with snap (embla-carousel)
+3. **RulerPicker** - Scale/ruler with tick marks (embla-carousel, dragFree)
+4. **NeumorphicSlots** - Tactile push-button slots
+5. **CompactPicker** - Tap to open modal wheel picker
+
+**Current stat display in `StatsTab.tsx`:**
+- `SlotDisplay` component - tappable filled/empty circles
+- `Counter` component in `src/components/ui/Counter.tsx` - +/- buttons
+- Hope uses +/- buttons inline (lines 149-168)
+
+---
+
+### Library Options Evaluated
+
+| Library | Pros | Cons |
+|---------|------|------|
+| **react-mobile-picker** (installed) | iOS-native feel, wheelMode support, already working in PickerDesignLab | Vertical only, styling requires CSS overrides |
+| **react-wheel-picker** (ncdai) | Vercel-backed, inertia scrolling, infinite loop | Not installed, may duplicate functionality |
+| **Embla Carousel** (installed) | Horizontal scrolling, snap, momentum, highly customizable | Not a "picker" - requires building selection UI |
+| **Framer Motion** (installed) | Full gesture control, spring physics, animation | Requires building everything from scratch |
+| **Custom scroll-snap CSS** | Zero dependencies | No momentum, less iOS-native feel |
+
+---
+
+### Recommendation: Hybrid Approach
+
+**Use the existing CompactPicker pattern from PickerDesignLab as the foundation**, enhanced with:
+
+1. **Display Layer**: Glass-styled tap target using existing `.lg-card` or `Card variant="glass"`
+2. **Sheet Layer**: Our existing `Sheet` component (Vaul) for bottom sheet
+3. **Picker Layer**: `react-mobile-picker` for the wheel (already proven working)
+4. **Quick-Select**: Add preset buttons below the wheel
+
+#### Why This Approach?
+
+- **No new dependencies** - Uses only installed libraries
+- **Proven patterns** - CompactPicker in PickerDesignLab already demonstrates the tap-to-open-wheel flow
+- **Design system consistent** - Can use existing glass classes
+- **iOS-native feel** - react-mobile-picker provides authentic wheel behavior
+
+---
+
+### Proposed Component API
+
+```tsx
+interface DrumPickerProps {
+  // Value
+  value: number
+  onChange: (value: number) => void
+  min?: number
+  max?: number
+
+  // Display
+  label: string
+  icon?: React.ReactNode
+  color?: string // For value text color accent
+
+  // Optional presets (quick-select buttons)
+  presets?: number[]
+
+  // Slot display mode (for HP/Stress/Armor with visual slots)
+  showSlots?: boolean
+  slotMax?: number
+}
+```
+
+#### Usage Examples
+
+```tsx
+// HP with slot display and presets
+<DrumPicker
+  value={hp}
+  onChange={setHp}
+  min={0}
+  max={12}
+  label="HP"
+  icon={<Heart />}
+  color="#ef4444"
+  showSlots
+  slotMax={12}
+  presets={[0, 6, 12]} // Full, Half, Empty
+/>
+
+// Hope (no max, no slots)
+<DrumPicker
+  value={hope}
+  onChange={setHope}
+  min={0}
+  max={20}
+  label="Hope"
+  icon={<Star />}
+  color="#3b82f6"
+  presets={[0, 2, 5]}
+/>
+```
+
+---
+
+### Implementation Plan
+
+#### Phase 1: Core Component
+1. Create `src/components/ui/DrumPicker.tsx`
+2. Compact display (glass card with icon + label + value)
+3. Tap opens Sheet with react-mobile-picker wheel
+4. "Done" button closes sheet
+
+#### Phase 2: Enhanced Features
+1. Add preset quick-select buttons below wheel
+2. Optional slot visualization in display mode
+3. Color theming for different stat types
+
+#### Phase 3: Integration
+1. Replace Hope +/- buttons in StatsTab with DrumPicker
+2. Add DrumPicker option to SlotDisplay (tap value to open picker)
+3. Update CharacterSheet to use new picker pattern
+
+---
+
+### Files to Create/Modify
+
+| File | Action |
+|------|--------|
+| `src/components/ui/DrumPicker.tsx` | CREATE - Main component |
+| `src/views/CharacterSheet/StatsTab.tsx` | MODIFY - Integrate DrumPicker |
+| `src/views/PickerDesignLab.tsx` | MODIFY - Add DrumPicker demo section |
+
+---
+
+### Open Questions for @ux
+
+1. **Slot display in compact mode?** Should HP show filled slots inline, or just "5/12" text?
+2. **Preset button labels?** Icons, text, or values? (e.g., "Full", "Half" vs icons vs "12", "6")
+3. **Haptic feedback?** Should we investigate navigator.vibrate() for value changes?
+4. **Max value display?** Should the picker show "HP: 5" or "HP: 5/12" when max is relevant?
+
+---
+
+### References
+
+- [react-mobile-picker GitHub](https://github.com/adcentury/react-mobile-picker)
+- [react-wheel-picker (alternative)](https://github.com/ncdai/react-wheel-picker)
+- Existing implementation: `src/views/PickerDesignLab.tsx` (Approach 5: CompactPicker)
+- Current stat display: `src/views/CharacterSheet/StatsTab.tsx`
+
+---
+
 ## 2026-02-03 | @ux: Breadcrumb Navigation for Character Creation
 
 **From:** @ux
