@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import useEmblaCarousel from 'embla-carousel-react'
 import { Sheet } from './Sheet'
@@ -107,6 +107,7 @@ function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'w
   const startIndex = value - min
   const [currentIndex, setCurrentIndex] = useState(startIndex)
   const [isScrolling, setIsScrolling] = useState(false)
+  const currentIndexRef = useRef(startIndex)
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     axis: 'x',
@@ -117,21 +118,38 @@ function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'w
   })
 
   // Update display value in real-time during scroll for visual feedback
+  // Uses scrollProgress to calculate closest snap for continuous updates
   const onScroll = useCallback(() => {
     if (!emblaApi) return
     setIsScrolling(true)
-    // Use selectedScrollSnap for accurate index during scroll
-    const newIndex = emblaApi.selectedScrollSnap()
-    setCurrentIndex(newIndex)
-    // Update display for visual feedback only - doesn't commit the value
-    const newValue = min + newIndex
-    onDisplayChange(newValue)
+
+    const progress = emblaApi.scrollProgress()
+    const snapList = emblaApi.scrollSnapList()
+
+    // Find closest snap to current scroll position
+    let closestIndex = 0
+    let closestDistance = Infinity
+
+    snapList.forEach((snapPos, index) => {
+      const distance = Math.abs(progress - snapPos)
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestIndex = index
+      }
+    })
+
+    if (closestIndex !== currentIndexRef.current) {
+      currentIndexRef.current = closestIndex
+      setCurrentIndex(closestIndex)
+      onDisplayChange(min + closestIndex)
+    }
   }, [emblaApi, min, onDisplayChange])
 
   // Called when snap selection changes - update display immediately
   const onSelect = useCallback(() => {
     if (!emblaApi) return
     const newIndex = emblaApi.selectedScrollSnap()
+    currentIndexRef.current = newIndex
     setCurrentIndex(newIndex)
     const newValue = min + newIndex
     onDisplayChange(newValue)
@@ -143,6 +161,7 @@ function HorizontalDrum({ value, min, max, onDisplayChange, onSettle, color = 'w
     setIsScrolling(false)
     const newIndex = emblaApi.selectedScrollSnap()
     const newValue = min + newIndex
+    currentIndexRef.current = newIndex
     setCurrentIndex(newIndex)
     onSettle(newValue)
   }, [emblaApi, min, onSettle])
