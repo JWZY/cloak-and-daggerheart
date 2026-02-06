@@ -47,7 +47,7 @@ export function DrumPicker({
       </motion.button>
 
       {/* Bottom Drawer */}
-      <Sheet open={isOpen} onOpenChange={setIsOpen} title={label}>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <div className="flex flex-col items-center gap-4 pb-6">
           {/* Label with icon */}
           <div className="flex items-center gap-2 text-white/70">
