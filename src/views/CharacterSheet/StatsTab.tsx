@@ -36,9 +36,45 @@ export function StatsTab({
 
   return (
     <div className="space-y-4 pb-24">
-      {/* Stats Grid: HP, Stress, Hope, Armor */}
+      {/* Defense: Evasion + Armor Slots */}
       <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Stats</h3>
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Defense</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center">
+            <span className="text-xs uppercase tracking-wide text-white/75 block mb-2">Evasion</span>
+            <p className="text-3xl font-semibold text-white">{character.evasion}</p>
+          </div>
+          <DrumPicker
+            value={armorSlots.current}
+            onChange={onArmorChange}
+            min={0}
+            max={armorSlots.max}
+            label="Armor"
+            icon={<Shield size={14} />}
+            color="#3b82f6"
+          />
+        </div>
+      </Card>
+
+      {/* Damage & Health: Thresholds + HP + Stress */}
+      <Card variant="glass" padding="md">
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Damage &amp; Health</h3>
+        {/* Damage Thresholds */}
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="text-center">
+            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Minor</span>
+            <span className="text-2xl font-semibold text-white">1-{majorThreshold - 1}</span>
+          </div>
+          <div className="text-center">
+            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Major</span>
+            <span className="text-2xl font-semibold text-white">{majorThreshold}-{severeThreshold - 1}</span>
+          </div>
+          <div className="text-center">
+            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Severe</span>
+            <span className="text-2xl font-semibold text-white">{severeThreshold}+</span>
+          </div>
+        </div>
+        {/* HP and Stress */}
         <div className="grid grid-cols-2 gap-3">
           <DrumPicker
             value={character.hp.current}
@@ -58,6 +94,13 @@ export function StatsTab({
             icon={<Zap size={14} />}
             color="#a855f7"
           />
+        </div>
+      </Card>
+
+      {/* Hope: DrumPicker + Hope Feature */}
+      <Card variant="glass" padding="md">
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Hope</h3>
+        <div className="flex justify-center mb-4">
           <DrumPicker
             value={character.hope}
             onChange={onHopeChange}
@@ -67,67 +110,11 @@ export function StatsTab({
             icon={<Sparkles size={14} />}
             color="#eab308"
           />
-          <DrumPicker
-            value={armorSlots.current}
-            onChange={onArmorChange}
-            min={0}
-            max={armorSlots.max}
-            label="Armor"
-            icon={<Shield size={14} />}
-            color="#3b82f6"
-          />
         </div>
-      </Card>
-
-      {/* Defense: Evasion */}
-      <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Defense</h3>
-        <div className="text-center">
-          <span className="text-xs uppercase tracking-wide text-white/75 block mb-2">Evasion</span>
-          <p className="text-3xl font-semibold text-white">{character.evasion}</p>
-        </div>
-      </Card>
-
-      {/* Damage Thresholds */}
-      <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Damage Thresholds</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Minor</span>
-            <span className="text-2xl font-semibold text-white">1-{majorThreshold - 1}</span>
-          </div>
-          <div className="text-center">
-            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Major</span>
-            <span className="text-2xl font-semibold text-white">{majorThreshold}-{severeThreshold - 1}</span>
-          </div>
-          <div className="text-center">
-            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Severe</span>
-            <span className="text-2xl font-semibold text-white">{severeThreshold}+</span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Hope Feature */}
-      <Card variant="glass" padding="md">
-        <span className="text-xs uppercase tracking-wide text-white/75 font-semibold block mb-2">Hope Feature</span>
-        <h4 className="font-medium text-white text-sm">{wizard.hope_feat_name}</h4>
-        <p className="text-xs text-white/50 mt-1 leading-relaxed">{wizard.hope_feat_text}</p>
-      </Card>
-
-      {/* Proficiency */}
-      <Card variant="glass" padding="md">
-        <div className="flex items-center justify-center gap-3">
-          <span className="text-xs uppercase tracking-wide text-white/75 font-semibold">Proficiency</span>
-          <div className="flex gap-1.5">
-            {[1, 2, 3, 4, 5, 6].map((level) => (
-              <div
-                key={level}
-                className={`w-3 h-3 rounded-full border border-white/30 ${
-                  level <= character.proficiency ? 'bg-white' : 'bg-transparent'
-                }`}
-              />
-            ))}
-          </div>
+        <div className="border-t border-white/10 pt-3">
+          <span className="text-xs uppercase tracking-wide text-white/75 font-semibold block mb-2">Hope Feature</span>
+          <h4 className="font-medium text-white text-sm">{wizard.hope_feat_name}</h4>
+          <p className="text-xs text-white/50 mt-1 leading-relaxed">{wizard.hope_feat_text}</p>
         </div>
       </Card>
 
