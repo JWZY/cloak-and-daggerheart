@@ -24,7 +24,7 @@ export function Sheet({ open, onOpenChange, children, title, variant = 'glass' }
     : 'bg-white'
 
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange}>
+    <Drawer.Root open={open} onOpenChange={onOpenChange} snapPoints={[0.9]}>
       <Drawer.Portal>
         <Drawer.Overlay
           className={`fixed inset-0 z-40 ${
