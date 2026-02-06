@@ -276,37 +276,3 @@ export function OfficialCard({
   )
 }
 
-// Compact version for rail display
-interface OfficialCardCompactProps {
-  title: string
-  subtitle?: string
-  domain: string
-  tier: 'Foundation' | 'Specialization' | 'Mastery'
-  children: ReactNode
-  backgroundImage?: string
-  onClick?: () => void
-}
-
-export function OfficialCardCompact({
-  title,
-  subtitle,
-  domain,
-  tier,
-  children,
-  backgroundImage,
-  onClick,
-}: OfficialCardCompactProps) {
-  return (
-    <OfficialCard
-      title={title}
-      subtitle={subtitle}
-      domain={domain}
-      tier={tier}
-      backgroundImage={backgroundImage}
-      scale={0.5}
-      onClick={onClick}
-    >
-      {children}
-    </OfficialCard>
-  )
-}
