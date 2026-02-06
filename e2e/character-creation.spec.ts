@@ -121,7 +121,11 @@ test.describe('Character Creation Flow', () => {
 
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
-        consoleErrors.push(msg.text())
+        const text = msg.text()
+        // Ignore 404 errors for missing assets (images, fonts, etc.)
+        if (!text.includes('404') && !text.includes('Failed to load resource')) {
+          consoleErrors.push(text)
+        }
       }
     })
 

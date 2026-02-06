@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BarChart3, Layers, Sword, FileText, Pencil } from 'lucide-react'
 import { StatsTab } from './StatsTab'
 import { CardsTab } from './CardsTab'
 import { InventoryTab } from './InventoryTab'
 import { NotesTab } from './NotesTab'
+import { PortraitHeader } from './PortraitHeader'
 import { useCharacterStore } from '../../stores/characterStore'
 import type { Character } from '../../types/character'
 import type { LucideIcon } from 'lucide-react'
@@ -25,6 +26,7 @@ const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
 
 export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
   const [activeTab, setActiveTab] = useState<Tab>('stats')
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const {
     updateHP,
     updateArmorSlots,
@@ -59,15 +61,8 @@ export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="glass-strong px-4 py-4">
-        <div className="text-center">
-          <h1 className="text-xl font-bold text-white">{character.name}</h1>
-          <p className="text-sm text-white/60">
-            {character.ancestry.name} {character.class} · {character.subclass}
-          </p>
-        </div>
-      </div>
+      {/* Collapsible Portrait Header */}
+      <PortraitHeader character={character} scrollContainerRef={scrollContainerRef} />
 
       {/* Tab bar */}
       <div className="glass px-2 py-2">
@@ -102,7 +97,7 @@ export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-4 pb-24">
+      <div ref={scrollContainerRef} className="flex-1 overflow-auto p-4 pb-24">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
