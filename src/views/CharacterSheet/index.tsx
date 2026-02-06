@@ -64,40 +64,8 @@ export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
       {/* Collapsible Portrait Header */}
       <PortraitHeader character={character} scrollContainerRef={scrollContainerRef} />
 
-      {/* Tab bar */}
-      <div className="glass px-2 py-2">
-        <div className="flex gap-1">
-          {TABS.map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors relative ${
-                  activeTab === tab.id
-                    ? 'text-white'
-                    : 'text-white/50'
-                }`}
-              >
-                {activeTab === tab.id && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-white/20 rounded-lg"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10 flex items-center justify-center gap-1.5">
-                  <Icon size={16} />
-                  {tab.label}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
       {/* Content */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-auto p-4 pb-24">
+      <div ref={scrollContainerRef} className="flex-1 overflow-auto p-4 pb-28">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -143,15 +111,51 @@ export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
         </AnimatePresence>
       </div>
 
-      {/* Bottom action bar */}
-      <div className="fixed bottom-6 right-4 left-4 flex justify-end gap-3 z-30">
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => onEdit({ activeTab })}
-          className="w-14 h-14 rounded-full glass bg-white/20 text-white shadow-lg flex items-center justify-center"
-        >
-          <Pencil size={22} />
-        </motion.button>
+      {/* Bottom tab bar with Edit button */}
+      <div className="fixed bottom-0 left-0 right-0 glass px-2 pt-2 z-30" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
+        <div className="flex items-center gap-1">
+          {/* Tab buttons */}
+          <div className="flex flex-1 gap-1">
+            {TABS.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-colors relative ${
+                    activeTab === tab.id
+                      ? 'text-white'
+                      : 'text-white/50'
+                  }`}
+                >
+                  {activeTab === tab.id && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-white/20 rounded-lg"
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex flex-col items-center justify-center gap-0.5">
+                    <Icon size={20} />
+                    <span className="text-xs">{tab.label}</span>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Edit button */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onEdit({ activeTab })}
+            className="py-2 px-4 rounded-lg text-sm font-medium text-white/50 hover:text-white transition-colors relative"
+          >
+            <span className="relative z-10 flex flex-col items-center justify-center gap-0.5">
+              <Pencil size={20} />
+              <span className="text-xs">Edit</span>
+            </span>
+          </motion.button>
+        </div>
       </div>
     </div>
   )
