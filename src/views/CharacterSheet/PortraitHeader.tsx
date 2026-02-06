@@ -10,7 +10,8 @@ interface PortraitHeaderProps {
 // Map subclass names to image paths
 function getSubclassImage(subclass: string): string {
   const slug = subclass.toLowerCase().replace(/\s+/g, '-')
-  return `/images/cards/subclass/${slug}.webp`
+  const base = import.meta.env.BASE_URL || '/'
+  return `${base}images/cards/subclass/${slug}.webp`
 }
 
 export function PortraitHeader({ character, scrollContainerRef }: PortraitHeaderProps) {
