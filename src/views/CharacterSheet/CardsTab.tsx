@@ -137,73 +137,41 @@ export function CardsTab({ character }: CardsTabProps) {
         </HorizontalCardRail>
       </div>
 
-      {/* Subclass Cards */}
+      {/* Subclass Cards - One card per tier, grouped by Foundation/Specialization/Mastery */}
       <div>
         <h3 className="text-xs uppercase tracking-wide text-white/40 mb-2">
           {character.subclass}
         </h3>
 
         <HorizontalCardRail>
-          {subclass.foundations.map((feat) => (
+          {/* Foundation Card - always shown at level 1 */}
+          {subclass.foundations.length > 0 && (
             <SubclassCard
-              key={feat.name}
-              title={feat.name}
-              subtitle="Foundation"
+              key="foundation"
+              title="Foundation"
+              subtitle={character.subclass}
               className="Wizard"
               domainColor={subclassColor}
               artworkSrc={subclassImage}
               scale={CARD_SCALE}
               onClick={() => setExpandedCard({
-                title: feat.name,
-                subtitle: `${character.subclass} - Foundation`,
-                text: feat.text,
+                title: 'Foundation',
+                subtitle: character.subclass,
+                text: subclass.foundations.map(f => `**${f.name}**\n\n${f.text}`).join('\n\n---\n\n'),
                 backgroundImage: subclassImage,
                 cardType: 'subclass',
               })}
             >
-              <Markdown>{feat.text}</Markdown>
+              {subclass.foundations.map((feat, idx) => (
+                <div key={feat.name} className={idx > 0 ? 'mt-3 pt-3 border-t border-white/10' : ''}>
+                  <div className="font-semibold text-white/90 mb-1">{feat.name}</div>
+                  <Markdown>{feat.text}</Markdown>
+                </div>
+              ))}
             </SubclassCard>
-          ))}
-          {subclass.specializations.map((feat) => (
-            <SubclassCard
-              key={feat.name}
-              title={feat.name}
-              subtitle="Specialization"
-              className="Wizard"
-              domainColor={subclassColor}
-              artworkSrc={subclassImage}
-              scale={CARD_SCALE}
-              onClick={() => setExpandedCard({
-                title: feat.name,
-                subtitle: `${character.subclass} - Specialization`,
-                text: feat.text,
-                backgroundImage: subclassImage,
-                cardType: 'subclass',
-              })}
-            >
-              <Markdown>{feat.text}</Markdown>
-            </SubclassCard>
-          ))}
-          {subclass.masteries.map((feat) => (
-            <SubclassCard
-              key={feat.name}
-              title={feat.name}
-              subtitle="Mastery"
-              className="Wizard"
-              domainColor={subclassColor}
-              artworkSrc={subclassImage}
-              scale={CARD_SCALE}
-              onClick={() => setExpandedCard({
-                title: feat.name,
-                subtitle: `${character.subclass} - Mastery`,
-                text: feat.text,
-                backgroundImage: subclassImage,
-                cardType: 'subclass',
-              })}
-            >
-              <Markdown>{feat.text}</Markdown>
-            </SubclassCard>
-          ))}
+          )}
+          {/* TODO: Show Specialization at higher levels */}
+          {/* TODO: Show Mastery at even higher levels */}
         </HorizontalCardRail>
       </div>
 
