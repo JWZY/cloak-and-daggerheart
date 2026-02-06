@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import type { Character } from '../../types/character'
 
@@ -15,134 +14,112 @@ function getSubclassImage(subclass: string): string {
 }
 
 export function PortraitHeader({ character, scrollContainerRef }: PortraitHeaderProps) {
-  const headerRef = useRef<HTMLDivElement>(null)
-
   // Track scroll position of the content container
   const { scrollY } = useScroll({
     container: scrollContainerRef,
   })
 
-  // Animation ranges - transition over 150px of scroll
+  // Animation threshold
   const SCROLL_THRESHOLD = 150
 
-  // Portrait size: 160px -> 48px
-  const portraitSize = useTransform(scrollY, [0, SCROLL_THRESHOLD], [160, 48])
+  // Scroll progress: 0 = expanded (top), 1 = collapsed (scrolled)
+  const progress = useTransform(scrollY, [0, SCROLL_THRESHOLD], [0, 1])
 
-  // Portrait border radius: 24px -> 24px (stays rounded)
-  const portraitBorderRadius = useTransform(scrollY, [0, SCROLL_THRESHOLD], [24, 24])
+  // Header height: 260px (expanded) -> 72px (collapsed)
+  const headerHeight = useTransform(scrollY, [0, SCROLL_THRESHOLD], [260, 72])
 
-  // Header height: 240px -> 70px
-  const headerHeight = useTransform(scrollY, [0, SCROLL_THRESHOLD], [240, 70])
+  // Portrait size: 140px -> 48px
+  const portraitSize = useTransform(scrollY, [0, SCROLL_THRESHOLD], [140, 48])
 
-  // Header padding: 24px -> 12px
-  const headerPadding = useTransform(scrollY, [0, SCROLL_THRESHOLD], [24, 12])
+  // Portrait border radius
+  const portraitRadius = useTransform(scrollY, [0, SCROLL_THRESHOLD], [20, 24])
 
-  // Text transforms - scale and position
-  // Name: large centered -> small left
-  const nameScale = useTransform(scrollY, [0, SCROLL_THRESHOLD], [1.5, 1]) // 1.5rem -> 1rem equivalent
-  const nameX = useTransform(scrollY, [0, SCROLL_THRESHOLD], [0, 0])
+  // Text scale
+  const nameScale = useTransform(scrollY, [0, SCROLL_THRESHOLD], [1.4, 1])
+  const subtitleScale = useTransform(scrollY, [0, SCROLL_THRESHOLD], [1, 0.9])
 
-  // Subtitle: normal centered -> smaller
-  const subtitleScale = useTransform(scrollY, [0, SCROLL_THRESHOLD], [1, 0.85])
-
-  // Content layout transition
-  // In expanded: centered column layout
-  // In collapsed: left-aligned row layout
-  const justifyContent = useTransform(
-    scrollY,
-    [0, SCROLL_THRESHOLD],
-    ['center', 'flex-start']
-  )
-
-  const flexDirection = useTransform(
-    scrollY,
-    [0, SCROLL_THRESHOLD],
-    ['column', 'row']
-  )
-
-  // Text container positioning
-  const textAlignItems = useTransform(
-    scrollY,
-    [0, SCROLL_THRESHOLD],
-    ['center', 'flex-start']
-  )
-
-  // Gap between portrait and text
-  const contentGap = useTransform(scrollY, [0, SCROLL_THRESHOLD], [16, 12])
-
-  // Text margin when collapsed (to account for row layout)
-  const textMarginLeft = useTransform(scrollY, [0, SCROLL_THRESHOLD], [0, 0])
+  // Text opacity for smooth transition
+  const textOpacity = useTransform(scrollY, [0, 50], [1, 1])
 
   const subtitle = `${character.ancestry.name} ${character.class} · ${character.subclass}`
   const portraitImage = getSubclassImage(character.subclass)
 
   return (
     <motion.div
-      ref={headerRef}
       className="glass-strong overflow-hidden relative"
-      style={{
-        height: headerHeight,
-        padding: headerPadding,
-      }}
+      style={{ height: headerHeight }}
     >
-      {/* Layout container */}
+      {/* Expanded layout - column, centered */}
       <motion.div
-        className="h-full flex items-center"
+        className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4"
         style={{
-          justifyContent,
-          flexDirection,
-          gap: contentGap,
+          opacity: useTransform(progress, [0, 0.5], [1, 0]),
+          pointerEvents: useTransform(progress, p => p > 0.5 ? 'none' : 'auto'),
         }}
       >
-        {/* Portrait container */}
+        {/* Large portrait */}
         <motion.div
-          className="relative flex-shrink-0"
+          className="overflow-hidden bg-white/10 flex-shrink-0"
           style={{
             width: portraitSize,
             height: portraitSize,
+            borderRadius: portraitRadius,
           }}
         >
-          <motion.div
-            className="w-full h-full overflow-hidden bg-white/10"
-            style={{
-              borderRadius: portraitBorderRadius,
-            }}
-          >
-            <img
-              src={portraitImage}
-              alt={`${character.name} portrait`}
-              className="w-full h-full object-cover object-top"
-              loading="eager"
-            />
-          </motion.div>
+          <img
+            src={portraitImage}
+            alt={`${character.name} portrait`}
+            className="w-full h-full object-cover object-top"
+            loading="eager"
+          />
         </motion.div>
 
-        {/* Text container - single set of elements that animate */}
-        <motion.div
-          className="flex flex-col justify-center min-w-0"
-          style={{
-            alignItems: textAlignItems,
-            marginLeft: textMarginLeft,
-          }}
-        >
+        {/* Centered text */}
+        <div className="text-center">
           <motion.h1
-            className="font-bold text-white truncate text-base origin-left"
-            style={{
-              scale: nameScale,
-              x: nameX,
-            }}
+            className="font-bold text-white text-xl"
+            style={{ scale: nameScale, opacity: textOpacity }}
           >
             {character.name}
           </motion.h1>
           <motion.p
-            className="text-white/60 truncate text-xs origin-left"
-            style={{
-              scale: subtitleScale,
-            }}
+            className="text-white/60 text-sm mt-1"
+            style={{ scale: subtitleScale }}
           >
             {subtitle}
           </motion.p>
+        </div>
+      </motion.div>
+
+      {/* Collapsed layout - row, left aligned */}
+      <motion.div
+        className="absolute inset-0 flex items-center gap-3 px-4"
+        style={{
+          opacity: useTransform(progress, [0.5, 1], [0, 1]),
+          pointerEvents: useTransform(progress, p => p < 0.5 ? 'none' : 'auto'),
+        }}
+      >
+        {/* Small portrait thumbnail */}
+        <motion.div
+          className="overflow-hidden bg-white/10 flex-shrink-0 w-12 h-12 rounded-xl"
+        >
+          <img
+            src={portraitImage}
+            alt={`${character.name} portrait`}
+            className="w-full h-full object-cover object-top"
+            loading="eager"
+          />
         </motion.div>
+
+        {/* Left-aligned text */}
+        <div className="min-w-0 flex-1">
+          <h1 className="font-bold text-white text-base truncate">
+            {character.name}
+          </h1>
+          <p className="text-white/60 text-xs truncate">
+            {subtitle}
+          </p>
+        </div>
       </motion.div>
     </motion.div>
   )
