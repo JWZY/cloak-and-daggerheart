@@ -111,49 +111,51 @@ export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
         </AnimatePresence>
       </div>
 
-      {/* Floating bottom bar - two separate elements */}
+      {/* Floating bottom bar - centered container */}
       <div
-        className="fixed bottom-4 left-4 right-4 flex justify-between items-end z-30"
+        className="fixed bottom-4 left-4 right-4 z-30"
         style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {/* Navigation pill */}
-        <div className="glass rounded-full px-2 py-2 flex gap-1">
-          {TABS.map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-2 px-3 rounded-full text-sm font-medium transition-colors relative ${
-                  activeTab === tab.id
-                    ? 'text-white'
-                    : 'text-white/50'
-                }`}
-              >
-                {activeTab === tab.id && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-white/20 rounded-full"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10 flex items-center justify-center gap-1.5">
-                  <Icon size={18} />
-                  <span className="text-xs">{tab.label}</span>
-                </span>
-              </button>
-            )
-          })}
-        </div>
+        <div className="max-w-md mx-auto flex justify-between items-end gap-4">
+          {/* Navigation pill */}
+          <div className="glass rounded-full px-2 py-2 flex gap-1">
+            {TABS.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-2 px-3 rounded-full text-sm font-medium transition-colors relative ${
+                    activeTab === tab.id
+                      ? 'text-white'
+                      : 'text-white/50'
+                  }`}
+                >
+                  {activeTab === tab.id && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-white/20 rounded-full"
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center justify-center gap-1.5">
+                    <Icon size={18} />
+                    <span className="text-xs">{tab.label}</span>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
 
-        {/* Edit circle button */}
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => onEdit({ activeTab })}
-          className="glass rounded-full w-14 h-14 flex items-center justify-center text-white/70 hover:text-white transition-colors"
-        >
-          <Pencil size={22} />
-        </motion.button>
+          {/* Edit circle button */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onEdit({ activeTab })}
+            className="glass rounded-full w-14 h-14 flex items-center justify-center text-white/70 hover:text-white transition-colors"
+          >
+            <Pencil size={22} />
+          </motion.button>
+        </div>
       </div>
     </div>
   )
