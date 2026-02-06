@@ -52,15 +52,15 @@ test.describe('Character Edit Flow', () => {
     await page.click('button:has-text("Create Character")')
 
     // Verify character sheet loaded
-    await expect(page.locator('h1')).toContainText('Test Wizard')
+    await expect(page.locator('h1').first()).toContainText('Test Wizard')
   })
 
   test('edit from Stats tab shows Ancestry step', async ({ page }) => {
     // We're on the character sheet, Stats tab should be active by default
     await expect(page.locator('button:has-text("Stats")')).toBeVisible()
 
-    // Click the edit button (the pencil icon in the floating button)
-    await page.locator('button.rounded-full:has(svg)').click()
+    // Click the edit button (the floating glass button with pencil icon)
+    await page.locator('button.glass.rounded-full.w-14').click()
 
     // Should navigate to the edit flow at Ancestry step
     await expect(page.locator('h2')).toContainText('Choose Your Ancestry', { timeout: 5000 })
@@ -73,7 +73,7 @@ test.describe('Character Edit Flow', () => {
     await expect(page.locator('h3:has-text("Domain Cards")')).toBeVisible()
 
     // Click the edit button
-    await page.locator('button.rounded-full:has(svg)').click()
+    await page.locator('button.glass.rounded-full.w-14').click()
 
     // Should navigate to the edit flow at Cards step (domain cards)
     await expect(page.locator('h2')).toContainText('Choose Domain Cards', { timeout: 5000 })
@@ -90,7 +90,7 @@ test.describe('Character Edit Flow', () => {
     await expect(page.locator('text=/active weapons/i')).toBeVisible({ timeout: 5000 })
 
     // Click the edit button
-    await page.locator('button.rounded-full:has(svg)').click()
+    await page.locator('button.glass.rounded-full.w-14').click()
 
     // Should navigate to the edit flow at Equipment step
     await expect(page.locator('h2')).toContainText('Choose Your Equipment', { timeout: 5000 })
@@ -103,7 +103,7 @@ test.describe('Character Edit Flow', () => {
     await expect(page.locator('h3:has-text("Session Notes")')).toBeVisible()
 
     // Click the edit button
-    await page.locator('button.rounded-full:has(svg)').click()
+    await page.locator('button.glass.rounded-full.w-14').click()
 
     // Should navigate to the edit flow at Summary step
     await expect(page.locator('h2')).toContainText('Review Your Character', { timeout: 5000 })

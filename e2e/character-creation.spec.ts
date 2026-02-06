@@ -85,8 +85,8 @@ test.describe('Character Creation Flow', () => {
     await page.click('button:has-text("Create Character")')
 
     // Verify character sheet loaded
-    await expect(page.locator('h1')).toContainText('Test Wizard')
-    await expect(page.locator('text=Clank Wizard')).toBeVisible()
+    await expect(page.locator('h1').first()).toContainText('Test Wizard')
+    await expect(page.locator('text=Clank Wizard').first()).toBeVisible()
 
     // Navigate tabs to verify they work
     await page.click('button:has-text("Cards")')
@@ -184,7 +184,7 @@ test.describe('Character Creation Flow', () => {
     await page.click('button:has-text("Create Character")')
 
     // Verify character loaded
-    await expect(page.locator('h1')).toContainText('War Wizard')
+    await expect(page.locator('h1').first()).toContainText('War Wizard')
 
     expect(consoleErrors, 'Console errors were found').toHaveLength(0)
   })
