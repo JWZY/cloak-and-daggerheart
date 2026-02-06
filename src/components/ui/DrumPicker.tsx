@@ -10,7 +10,6 @@ interface DrumPickerProps {
   max: number
   label: string
   icon?: React.ReactNode
-  color?: string
 }
 
 export function DrumPicker({
@@ -20,7 +19,6 @@ export function DrumPicker({
   max,
   label,
   icon,
-  color = 'white',
 }: DrumPickerProps) {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -61,7 +59,6 @@ export function DrumPicker({
             min={min}
             max={max}
             onSettle={handleSettle}
-            color={color}
           />
         </div>
       </Sheet>
@@ -78,10 +75,9 @@ interface HorizontalNumberPickerProps {
   min: number
   max: number
   onSettle: (value: number) => void
-  color?: string
 }
 
-function HorizontalNumberPicker({ value, min, max, onSettle, color = 'white' }: HorizontalNumberPickerProps) {
+function HorizontalNumberPicker({ value, min, max, onSettle }: HorizontalNumberPickerProps) {
   const options = Array.from({ length: max - min + 1 }, (_, i) => min + i)
   const startIndex = value - min
   const [currentIndex, setCurrentIndex] = useState(startIndex)
@@ -174,7 +170,7 @@ function HorizontalNumberPicker({ value, min, max, onSettle, color = 'white' }: 
             height: 0,
             borderLeft: '8px solid transparent',
             borderRight: '8px solid transparent',
-            borderTop: `12px solid ${color}`,
+            borderTop: '12px solid white',
           }}
         />
 
@@ -205,10 +201,9 @@ function HorizontalNumberPicker({ value, min, max, onSettle, color = 'white' }: 
                     animate={{
                       scale,
                       opacity,
-                      color: isSelected ? color : 'rgba(255,255,255,0.8)',
                     }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="text-3xl font-bold"
+                    className="text-3xl font-bold text-white"
                   >
                     {opt}
                   </motion.span>
