@@ -27,7 +27,7 @@ export default {
       },
       backgroundImage: {
         'gradient-knowledge': 'linear-gradient(135deg, #0a1628 0%, #0f2847 25%, #1e3a5f 50%, #0f2847 75%, #0a1628 100%)',
-        'gradient-war': 'linear-gradient(135deg, #451a03 0%, #78350f 25%, #b45309 50%, #d97706 75%, #451a03 100%)',
+        'gradient-war': 'linear-gradient(135deg, #3d1703 0%, #6b2f0d 25%, #a04b08 50%, #c26b05 75%, #3d1703 100%)',
         'gradient-default': 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
       },
     },
