@@ -306,8 +306,9 @@ export function InventoryTab({
         open={openSheet === 'primary'}
         onOpenChange={(open) => !open && setOpenSheet(null)}
         title="Select Primary Weapon"
+        size="full"
       >
-        <div className="space-y-2 max-h-[60vh] overflow-auto">
+        <div className="space-y-2">
           <button
             onClick={() => {
               onSetPrimaryWeapon(null)
@@ -348,8 +349,9 @@ export function InventoryTab({
         open={openSheet === 'secondary'}
         onOpenChange={(open) => !open && setOpenSheet(null)}
         title="Select Secondary Weapon"
+        size="full"
       >
-        <div className="space-y-2 max-h-[60vh] overflow-auto">
+        <div className="space-y-2">
           <button
             onClick={() => {
               onSetSecondaryWeapon(null)
@@ -390,8 +392,9 @@ export function InventoryTab({
         open={openSheet === 'armor'}
         onOpenChange={(open) => !open && setOpenSheet(null)}
         title="Select Armor"
+        size="full"
       >
-        <div className="space-y-2 max-h-[60vh] overflow-auto">
+        <div className="space-y-2">
           <button
             onClick={() => {
               onSetArmor(null)
@@ -431,8 +434,9 @@ export function InventoryTab({
         open={openSheet === 'items'}
         onOpenChange={(open) => !open && setOpenSheet(null)}
         title="Add Item"
+        size="full"
       >
-        <div className="space-y-2 max-h-[60vh] overflow-auto">
+        <div className="space-y-2">
           {srdItems.map((item) => (
             <button
               key={item.name}
@@ -453,8 +457,9 @@ export function InventoryTab({
         open={openSheet === 'consumables'}
         onOpenChange={(open) => !open && setOpenSheet(null)}
         title="Add Consumable"
+        size="full"
       >
-        <div className="space-y-2 max-h-[60vh] overflow-auto">
+        <div className="space-y-2">
           {srdConsumables.map((cons) => (
             <button
               key={cons.name}

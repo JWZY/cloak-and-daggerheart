@@ -7,9 +7,11 @@ interface SheetProps {
   children: ReactNode
   title?: string
   variant?: 'solid' | 'glass'
+  /** Use 'full' for long scrollable lists like item selection */
+  size?: 'auto' | 'full'
 }
 
-export function Sheet({ open, onOpenChange, children, title, variant = 'glass' }: SheetProps) {
+export function Sheet({ open, onOpenChange, children, title, variant = 'glass', size = 'auto' }: SheetProps) {
   const isGlass = variant === 'glass'
 
   // Liquid Glass styling for sheet content
@@ -24,7 +26,7 @@ export function Sheet({ open, onOpenChange, children, title, variant = 'glass' }
     : 'bg-white'
 
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange} snapPoints={[0.9]}>
+    <Drawer.Root open={open} onOpenChange={onOpenChange} snapPoints={size === 'full' ? [0.9] : undefined}>
       <Drawer.Portal>
         <Drawer.Overlay
           className={`fixed inset-0 z-40 ${
