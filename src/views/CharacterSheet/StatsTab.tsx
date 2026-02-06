@@ -97,11 +97,11 @@ export function StatsTab({
             <span className="text-2xl font-semibold text-white">1-{majorThreshold - 1}</span>
           </div>
           <div className="text-center">
-            <span className="text-xs uppercase tracking-wide text-amber-400/80 block mb-1">Major</span>
+            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Major</span>
             <span className="text-2xl font-semibold text-white">{majorThreshold}-{severeThreshold - 1}</span>
           </div>
           <div className="text-center">
-            <span className="text-xs uppercase tracking-wide text-red-400/80 block mb-1">Severe</span>
+            <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Severe</span>
             <span className="text-2xl font-semibold text-white">{severeThreshold}+</span>
           </div>
         </div>
