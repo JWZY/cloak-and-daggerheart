@@ -101,7 +101,7 @@ export function CardsTab({ character }: CardsTabProps) {
       {/* Domain Cards */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-xs uppercase tracking-wide text-white/40">Domain Cards</h3>
+          <h3 className="text-xs uppercase tracking-wide text-white/40 font-semibold">Domain Cards</h3>
           <span className="text-sm text-white/50">
             {character.domainCards.length} cards
           </span>
@@ -139,7 +139,7 @@ export function CardsTab({ character }: CardsTabProps) {
 
       {/* Subclass Cards - One card per tier, grouped by Foundation/Specialization/Mastery */}
       <div>
-        <h3 className="text-xs uppercase tracking-wide text-white/40 mb-2">
+        <h3 className="text-xs uppercase tracking-wide text-white/40 font-semibold mb-2">
           {character.subclass}
         </h3>
 
@@ -177,7 +177,7 @@ export function CardsTab({ character }: CardsTabProps) {
 
       {/* Ancestry Cards */}
       <div>
-        <h3 className="text-xs uppercase tracking-wide text-white/40 mb-2">
+        <h3 className="text-xs uppercase tracking-wide text-white/40 font-semibold mb-2">
           Ancestry: {character.ancestry.name}
         </h3>
 
@@ -206,7 +206,7 @@ export function CardsTab({ character }: CardsTabProps) {
 
       {/* Community Cards */}
       <div>
-        <h3 className="text-xs uppercase tracking-wide text-white/40 mb-2">
+        <h3 className="text-xs uppercase tracking-wide text-white/40 font-semibold mb-2">
           Community: {character.community.name}
         </h3>
 
@@ -235,7 +235,7 @@ export function CardsTab({ character }: CardsTabProps) {
 
       {/* Class Features */}
       <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/40 mb-4">Class Features</h3>
+        <h3 className="text-xs uppercase tracking-wide text-white/40 font-semibold mb-4">Class Features</h3>
         <div className="space-y-5">
           {wizard.class_feats.map((feat) => (
             <div key={feat.name}>

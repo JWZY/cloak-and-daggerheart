@@ -38,7 +38,7 @@ export function StatsTab({
     <div className="space-y-4 pb-24">
       {/* Stats Grid: HP, Stress, Hope, Armor */}
       <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 mb-4">Stats</h3>
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Stats</h3>
         <div className="grid grid-cols-2 gap-3">
           <DrumPicker
             value={character.hp.current}
@@ -81,7 +81,7 @@ export function StatsTab({
 
       {/* Defense: Evasion */}
       <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 mb-4">Defense</h3>
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Defense</h3>
         <div className="text-center">
           <span className="text-xs uppercase tracking-wide text-white/75 block mb-2">Evasion</span>
           <p className="text-3xl font-semibold text-white">{character.evasion}</p>
@@ -90,7 +90,7 @@ export function StatsTab({
 
       {/* Damage Thresholds */}
       <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 mb-4">Damage Thresholds</h3>
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Damage Thresholds</h3>
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center">
             <span className="text-xs uppercase tracking-wide text-white/75 block mb-1">Minor</span>
@@ -109,7 +109,7 @@ export function StatsTab({
 
       {/* Hope Feature */}
       <Card variant="glass" padding="md">
-        <span className="text-xs uppercase tracking-wide text-white/75 block mb-2">Hope Feature</span>
+        <span className="text-xs uppercase tracking-wide text-white/75 font-semibold block mb-2">Hope Feature</span>
         <h4 className="font-medium text-white text-sm">{wizard.hope_feat_name}</h4>
         <p className="text-xs text-white/50 mt-1 leading-relaxed">{wizard.hope_feat_text}</p>
       </Card>
@@ -117,7 +117,7 @@ export function StatsTab({
       {/* Proficiency */}
       <Card variant="glass" padding="md">
         <div className="flex items-center justify-center gap-3">
-          <span className="text-xs uppercase tracking-wide text-white/75">Proficiency</span>
+          <span className="text-xs uppercase tracking-wide text-white/75 font-semibold">Proficiency</span>
           <div className="flex gap-1.5">
             {[1, 2, 3, 4, 5, 6].map((level) => (
               <div
@@ -133,7 +133,7 @@ export function StatsTab({
 
       {/* Traits */}
       <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 mb-4">Traits</h3>
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Traits</h3>
         <div className="grid grid-cols-3 gap-4">
           {(Object.entries(character.traits) as [keyof Traits, number][]).map(
             ([trait, value]) => (
@@ -152,7 +152,7 @@ export function StatsTab({
 
       {/* Character info */}
       <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 mb-4">Character Info</h3>
+        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Character Info</h3>
         <div className="divide-y divide-white/10">
           <div className="py-3 first:pt-0 last:pb-0 flex justify-between items-center">
             <span className="text-sm text-white/50">Ancestry</span>
