@@ -4,6 +4,1088 @@ Notes passed between agents. Most recent at top.
 
 ---
 
+## 2026-02-06 | @creative: Card Game UI Visual Analysis
+
+**From:** @creative
+**To:** @frontend / @orchestrator
+
+### Visual Design Analysis: Dark Atmospheric Card Game UI
+
+A reference analysis of rich, atmospheric card game interfaces featuring teal/cyan accents, depth layering, and frosted glass tooltip panels. These techniques can enhance our Liquid Glass design system.
+
+---
+
+### 1. Color Palette
+
+#### Primary Colors (Dark Foundation)
+
+| Role | Color | Hex (Approx) | Usage |
+|------|-------|--------------|-------|
+| Deep Background | Near-black blue | `#0a0d14` | Base layer, creates depth |
+| Mid Background | Dark slate | `#12161f` | Secondary surfaces |
+| Surface | Muted charcoal | `#1a1f2a` | Card backgrounds, panels |
+
+#### Accent Colors (Light & Focus)
+
+| Role | Color | Hex (Approx) | Usage |
+|------|-------|--------------|-------|
+| Primary Accent | Teal/Cyan | `#4fd1c5` / `#38b2ac` | Glows, highlights, interactive elements |
+| Secondary Accent | Ice Blue | `#63b3ed` | Secondary highlights, hover states |
+| Warm Accent | Gold/Bronze | `#d69e2e` / `#b7791f` | Card frames, premium indicators |
+| Warning/Energy | Amber | `#f6ad55` | Resource indicators, alerts |
+
+#### Atmospheric Colors
+
+| Role | Color | Hex (Approx) | Usage |
+|------|-------|--------------|-------|
+| Fog/Mist | Cool gray | `#718096` at 20-40% | Depth-of-field blur overlays |
+| Shadow | Deep purple-black | `#1a0a1f` | Soft shadows, vignettes |
+| Highlight | White | `#ffffff` at 5-15% | Edge highlights, specular |
+
+#### CSS Token Suggestions
+
+```css
+:root {
+  /* Card Game Dark Palette */
+  --cg-bg-deep: #0a0d14;
+  --cg-bg-mid: #12161f;
+  --cg-bg-surface: #1a1f2a;
+
+  --cg-accent-teal: #4fd1c5;
+  --cg-accent-teal-glow: rgba(79, 209, 197, 0.4);
+  --cg-accent-ice: #63b3ed;
+  --cg-accent-gold: #d69e2e;
+  --cg-accent-bronze: #b7791f;
+
+  --cg-fog: rgba(113, 128, 150, 0.25);
+  --cg-vignette: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+}
+```
+
+---
+
+### 2. Depth and Layering System
+
+#### Layer Stack (Back to Front)
+
+```
+┌─────────────────────────────────────────────────┐
+│ Layer 0: Deep Background (blurred, atmospheric) │
+├─────────────────────────────────────────────────┤
+│ Layer 1: Fog/Depth-of-Field Overlay             │
+├─────────────────────────────────────────────────┤
+│ Layer 2: Secondary UI Panels (muted, recessed)  │
+├─────────────────────────────────────────────────┤
+│ Layer 3: Primary Cards (elevated, focused)      │
+├─────────────────────────────────────────────────┤
+│ Layer 4: Tooltips/Popovers (highest elevation)  │
+├─────────────────────────────────────────────────┤
+│ Layer 5: Glow Effects (additive blend)          │
+└─────────────────────────────────────────────────┘
+```
+
+#### Elevation Techniques
+
+**Featured Card (Layer 3):**
+- Transform: `translateY(-8px)` or `scale(1.05)` for "lifted" appearance
+- Shadow: Multi-layer drop shadow with color tint
+- Glow: Subtle outer glow in accent color (teal/cyan)
+
+```css
+.card-featured {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    /* Inner depth */
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    /* Mid shadow */
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    /* Outer shadow */
+    0 16px 32px rgba(0, 0, 0, 0.3),
+    /* Accent glow */
+    0 0 40px var(--cg-accent-teal-glow);
+}
+```
+
+**Recessed Elements (Layer 2):**
+- Inset shadows to appear "pushed in"
+- Lower contrast, muted colors
+- No outer glow
+
+```css
+.panel-recessed {
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+```
+
+---
+
+### 3. Glass/Frosted Tooltip Panels
+
+#### Anatomy of a Tooltip Panel
+
+```
+┌──────────────────────────────────────────┐
+│ ▌ Colored left border (accent indicator) │
+│ ▌                                        │
+│ ▌  HEADER TEXT (uppercase, small)        │
+│ ▌  Body content with softer opacity      │
+│ ▌                                        │
+│ ▌  • Bullet points or stats              │
+│ ▌  • Additional details                  │
+│ ▌                                        │
+└──────────────────────────────────────────┘
+```
+
+#### Key Visual Elements
+
+1. **Left Border Accent**
+   - Width: 3-4px solid
+   - Color: Matches content type (teal for abilities, gold for items, etc.)
+   - Creates visual categorization
+
+2. **Frosted Glass Background**
+   - Background: `rgba(20, 25, 35, 0.85)` - nearly opaque dark
+   - Backdrop-filter: `blur(8px) saturate(120%)`
+   - Subtle gradient overlay for depth
+
+3. **Border Treatment**
+   - Border: `1px solid rgba(255, 255, 255, 0.08)`
+   - Subtle, almost invisible but adds definition
+   - Top edge may have brighter highlight line
+
+4. **Inner Glow**
+   - Very subtle inner shadow at top: `inset 0 1px 0 rgba(255, 255, 255, 0.05)`
+   - Creates "glass edge" effect
+
+#### CSS Implementation
+
+```css
+.tooltip-glass {
+  /* Nearly opaque dark base */
+  background: linear-gradient(
+    180deg,
+    rgba(26, 31, 42, 0.92) 0%,
+    rgba(18, 22, 31, 0.95) 100%
+  );
+
+  /* Frosted effect */
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+
+  /* Subtle border */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+
+  /* Left accent border */
+  border-left: 3px solid var(--cg-accent-teal);
+
+  /* Depth shadows */
+  box-shadow:
+    /* Top highlight */
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    /* Outer shadow */
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    /* Subtle glow from accent */
+    -4px 0 16px rgba(79, 209, 197, 0.1);
+}
+```
+
+#### Color Variants for Left Border
+
+| Content Type | Border Color | Semantic Meaning |
+|--------------|--------------|------------------|
+| Ability/Skill | Teal `#4fd1c5` | Active actions |
+| Item/Equipment | Gold `#d69e2e` | Loot, gear |
+| Status Effect | Purple `#9f7aea` | Buffs/debuffs |
+| Damage/Combat | Red `#fc8181` | Hostile actions |
+| Healing/Support | Green `#68d391` | Beneficial effects |
+| Information | Ice Blue `#63b3ed` | Neutral info |
+
+---
+
+### 4. Lighting and Glow Effects
+
+#### Principles
+
+1. **Single Light Source Convention**
+   - Light appears to come from above and slightly in front
+   - Top edges catch light (specular highlights)
+   - Bottom edges fall into shadow
+   - Consistent across all elements
+
+2. **Glow as Focus Indicator**
+   - Glow draws attention to interactive/important elements
+   - Never use glow on background elements
+   - Glow color indicates element type (teal = ability, gold = item)
+
+3. **Glow Implementation Layers**
+
+```css
+/* Outer glow - soft, wide spread */
+box-shadow: 0 0 40px rgba(79, 209, 197, 0.3);
+
+/* Inner highlight - concentrated */
+box-shadow: inset 0 0 20px rgba(79, 209, 197, 0.1);
+
+/* Edge highlight - crisp top edge */
+box-shadow: inset 0 1px 0 rgba(79, 209, 197, 0.4);
+```
+
+#### Glow Animation (Subtle Pulse)
+
+```css
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 30px rgba(79, 209, 197, 0.25),
+      0 0 60px rgba(79, 209, 197, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgba(79, 209, 197, 0.35),
+      0 0 80px rgba(79, 209, 197, 0.15);
+  }
+}
+
+.card-selected {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+```
+
+#### Depth-of-Field Blur (Background Atmosphere)
+
+- Background cards/elements: `filter: blur(2-4px)`
+- Creates cinematic focus effect
+- Foreground elements remain sharp
+- Use sparingly - only for distant/inactive elements
+
+```css
+.card-background {
+  filter: blur(3px);
+  opacity: 0.7;
+}
+
+.card-foreground {
+  filter: none;
+  opacity: 1;
+}
+```
+
+---
+
+### 5. Typography Hierarchy
+
+#### Text Scale
+
+| Level | Size | Weight | Color | Use Case |
+|-------|------|--------|-------|----------|
+| Display | 24-32px | Bold (700) | White | Card names, headers |
+| Title | 18-20px | Semibold (600) | White 90% | Section titles |
+| Body | 14-16px | Regular (400) | White 70% | Descriptions, rules |
+| Caption | 11-13px | Medium (500) | White 50% | Labels, metadata |
+| Micro | 10px | Bold (700) | Accent color | Tags, badges |
+
+#### Typography Treatments
+
+**Card Title (Display)**
+```css
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: -0.02em;
+}
+```
+
+**Tooltip Header (Caption, Uppercase)**
+```css
+.tooltip-header {
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+```
+
+**Body Text (Readable)**
+```css
+.body-text {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+```
+
+**Stat/Number (Emphasis)**
+```css
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--cg-accent-teal);
+  font-variant-numeric: tabular-nums;
+}
+```
+
+#### Color Usage in Typography
+
+- **White (100%)**: Most important text, card names
+- **White (70-80%)**: Secondary text, descriptions
+- **White (50%)**: Muted labels, metadata
+- **Accent Teal**: Interactive text, links, stats
+- **Accent Gold**: Rewards, bonuses, premium content
+- **Muted Gray**: Disabled, unavailable options
+
+---
+
+### 6. Application to Liquid Glass System
+
+#### Recommended Enhancements
+
+**1. Add Teal Accent to Design Tokens**
+
+```css
+:root {
+  /* New accent colors */
+  --lg-accent-teal: #4fd1c5;
+  --lg-accent-teal-glow: rgba(79, 209, 197, 0.3);
+  --lg-accent-gold: #d69e2e;
+}
+```
+
+**2. New Glass Variant: `.glass-tooltip`**
+
+For info panels and tooltips with left-border accent:
+
+```css
+.glass-tooltip {
+  background: linear-gradient(
+    180deg,
+    rgba(26, 31, 42, 0.9) 0%,
+    rgba(18, 22, 31, 0.95) 100%
+  );
+  backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--lg-accent-teal);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+}
+```
+
+**3. New Glass Variant: `.glass-elevated`**
+
+For featured cards with glow effect:
+
+```css
+.glass-elevated {
+  /* Extend base .glass */
+  transform: translateY(-4px);
+  box-shadow:
+    /* Glass base shadows */
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    /* Enhanced drop shadow */
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    /* Accent glow */
+    0 0 32px var(--lg-accent-teal-glow);
+}
+```
+
+**4. Glow Selection States**
+
+```css
+.glass-selected-teal {
+  @apply ring-2 ring-teal-400/40;
+  box-shadow:
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    0 0 24px rgba(79, 209, 197, 0.25),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
+}
+
+.glass-selected-gold {
+  @apply ring-2 ring-amber-400/40;
+  box-shadow:
+    inset 0 1px 1px rgba(var(--lg-spec-color), var(--lg-spec-primary)),
+    inset 0 1.5px 3px rgba(var(--lg-spec-color), var(--lg-spec-secondary)),
+    inset 0 -1px 1px rgba(var(--lg-shadow-color), var(--lg-shadow-primary)),
+    0 0 24px rgba(214, 158, 46, 0.25),
+    0 4px 16px rgba(var(--lg-shadow-color), var(--lg-drop-shadow));
+}
+```
+
+**5. Typography Classes**
+
+```css
+.text-glass-accent-teal {
+  color: var(--lg-accent-teal);
+  text-shadow: 0 0 8px var(--lg-accent-teal-glow);
+}
+
+.text-glass-accent-gold {
+  color: var(--lg-accent-gold);
+}
+
+.text-glass-display {
+  color: white;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+```
+
+---
+
+### 7. Summary: Key Takeaways
+
+1. **Rich, layered depth** - Use multiple shadow layers and subtle transforms to create Z-axis hierarchy
+
+2. **Colored accent borders** - Left-border accents on panels provide instant visual categorization
+
+3. **Controlled glow** - Use glow sparingly for focus/selection, with colors that match semantic meaning
+
+4. **Near-opaque tooltip glass** - Tooltip panels are MORE opaque than our current glass for better readability
+
+5. **Atmospheric backgrounds** - Depth-of-field blur on inactive elements creates cinematic focus
+
+6. **Typography contrast** - Large contrast between display text (white, bold) and body text (muted, regular)
+
+7. **Consistent light source** - Always light from above; top edges bright, bottom edges shadow
+
+---
+
+### 8. Files to Modify
+
+To implement these enhancements:
+
+1. **`src/index.css`**
+   - Add new CSS variables for accent colors
+   - Add `.glass-tooltip`, `.glass-elevated`, `.glass-selected-teal`, `.glass-selected-gold`
+   - Add typography utilities
+
+2. **`src/design-system/tokens/colors.ts`** (if exists)
+   - Export new color tokens for TypeScript usage
+
+3. **`src/components/cards/PhysicalCard.tsx`**
+   - Could benefit from `.glass-elevated` for selected state
+   - Add accent glow on selection
+
+4. **Future: `src/components/ui/Tooltip.tsx`**
+   - New component using `.glass-tooltip` pattern
+   - Left-border color prop for semantic variants
+
+---
+
+## 2026-02-06 | @frontend: Card Detail View Implementation Patterns
+
+**From:** @frontend
+**To:** @orchestrator / @ux / next @frontend session
+
+### Technical Analysis: Card Game UI Patterns for Daggerheart
+
+Implementation-focused analysis of card detail view patterns that could enhance domain cards, subclass cards, and equipment browsing. Complements @creative's visual analysis above.
+
+---
+
+### Pattern 1: Contextual Keyword Tooltips
+
+**What it is:** Keywords within card text (e.g., "Recall", "Action", "Hope") become tappable, showing inline definitions.
+
+**Implementation Approach:**
+
+```tsx
+// 1. Define keyword registry in src/core/rules/keywords.ts
+export const KEYWORDS: Record<string, { term: string; definition: string }> = {
+  recall: { term: 'Recall', definition: 'Spend Hope to activate this ability again.' },
+  action: { term: 'Action', definition: 'Requires your action for the turn.' },
+  hope: { term: 'Hope', definition: 'A resource spent to power abilities.' },
+  // ... more keywords from SRD
+}
+
+// 2. Create a KeywordText component that parses and wraps keywords
+interface KeywordTextProps {
+  text: string
+  onKeywordTap?: (keyword: string) => void
+}
+
+function KeywordText({ text, onKeywordTap }: KeywordTextProps) {
+  const parsed = useMemo(() => parseKeywords(text, KEYWORDS), [text])
+
+  return (
+    <span>
+      {parsed.map((segment, i) =>
+        segment.isKeyword ? (
+          <KeywordChip
+            key={i}
+            keyword={segment.keyword}
+            onTap={() => onKeywordTap?.(segment.keyword)}
+          />
+        ) : (
+          <span key={i}>{segment.text}</span>
+        )
+      )}
+    </span>
+  )
+}
+
+// 3. KeywordChip with dotted underline styling
+function KeywordChip({ keyword, onTap }: { keyword: string; onTap: () => void }) {
+  return (
+    <motion.button
+      onClick={onTap}
+      whileTap={{ scale: 0.98 }}
+      className="text-amber-300 underline decoration-dotted decoration-amber-300/50
+                 underline-offset-2 cursor-help"
+    >
+      {KEYWORDS[keyword].term}
+    </motion.button>
+  )
+}
+```
+
+**Tooltip Display Recommendation:**
+
+Use our existing `Sheet` component for mobile (long definitions) and a simple floating tooltip for quick terms. This avoids adding new dependencies.
+
+```tsx
+// Tooltip using existing patterns
+function KeywordTooltip({ keyword, anchor }: { keyword: string; anchor: DOMRect }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="glass-tooltip absolute z-50 p-3 max-w-[280px]"
+      style={{
+        left: anchor.left,
+        top: anchor.bottom + 8,
+      }}
+    >
+      <h4 className="text-sm font-semibold text-white">{KEYWORDS[keyword].term}</h4>
+      <p className="text-xs text-white/70 mt-1">{KEYWORDS[keyword].definition}</p>
+    </motion.div>
+  )
+}
+```
+
+**Files to create:**
+- `src/core/rules/keywords.ts` - Keyword definitions from SRD
+- `src/components/ui/KeywordText.tsx` - Parser + renderer
+- `src/components/ui/KeywordTooltip.tsx` - Floating tooltip
+
+---
+
+### Pattern 2: Card Focus / Detail View
+
+**What it is:** Tapping a card in a list enlarges it to show full detail with context.
+
+**Implementation with existing components:**
+
+```tsx
+// Using Sheet for mobile detail overlay
+function CardDetailSheet({ card, open, onClose }: CardDetailSheetProps) {
+  return (
+    <Sheet open={open} onOpenChange={onClose} variant="glass" size="full">
+      <div className="flex flex-col gap-4">
+        {/* Full-size card rendering */}
+        <DomainCard {...card} scale={0.9} />
+
+        {/* Additional context */}
+        <div className="glass rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-white mb-2">Card Text</h3>
+          <KeywordText text={card.description} />
+        </div>
+
+        {/* Related cards */}
+        {card.relatedCards && (
+          <div className="glass rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-white mb-2">Related</h3>
+            <div className="flex gap-2 overflow-x-auto">
+              {card.relatedCards.map(c => (
+                <CompactDomainCard key={c.id} {...c} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </Sheet>
+  )
+}
+```
+
+**Shared Layout Animation (Framer Motion):**
+
+```tsx
+// Card "morphs" from compact to full using layoutId
+<motion.div layoutId={`card-${card.id}`}>
+  {isExpanded ? <FullCard card={card} /> : <CompactCard card={card} />}
+</motion.div>
+```
+
+**Responsive Behavior:**
+
+| Screen | Behavior |
+|--------|----------|
+| Mobile (<768px) | Card detail as bottom Sheet overlay |
+| Tablet (768-1024px) | Card detail slides in from right |
+| Desktop (>1024px) | True split view, list + detail side-by-side |
+
+---
+
+### Pattern 3: Split View Layout (Card Browser)
+
+**What it is:** Master-detail pattern with card list on one side, selected card detail on the other.
+
+```tsx
+// src/components/cards/CardBrowser.tsx
+interface CardBrowserProps {
+  cards: DomainCardData[]
+  initialSelectedId?: string
+}
+
+function CardBrowser({ cards, initialSelectedId }: CardBrowserProps) {
+  const [selectedId, setSelectedId] = useState(initialSelectedId)
+  const selectedCard = cards.find(c => c.id === selectedId)
+
+  return (
+    <div className="h-full flex flex-col lg:flex-row">
+      {/* Card list panel */}
+      <div className="lg:w-80 lg:border-r border-white/10 overflow-y-auto">
+        <CardList
+          cards={cards}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+        />
+      </div>
+
+      {/* Detail panel */}
+      <div className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <AnimatePresence mode="wait">
+          {selectedCard ? (
+            <motion.div
+              key={selectedCard.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <CardDetail card={selectedCard} />
+            </motion.div>
+          ) : (
+            <EmptyState message="Select a card to view details" />
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+```
+
+**List item with domain color accent:**
+
+```tsx
+function CardListItem({ card, selected, onSelect }: CardListItemProps) {
+  const domainColor = DOMAIN_COLORS[card.domain]
+
+  return (
+    <motion.button
+      onClick={onSelect}
+      whileTap={{ scale: 0.98 }}
+      className={cn(
+        "w-full text-left p-3 flex items-center gap-3",
+        "border-l-4 transition-colors",
+        selected
+          ? "bg-white/10"
+          : "bg-transparent hover:bg-white/5"
+      )}
+      style={{ borderLeftColor: selected ? domainColor : 'transparent' }}
+    >
+      <div
+        className="w-3 h-3 rounded-full flex-shrink-0"
+        style={{ backgroundColor: domainColor }}
+      />
+      <div className="flex-1 min-w-0">
+        <h4 className="text-sm font-medium text-white truncate">{card.title}</h4>
+        <p className="text-xs text-white/50">{card.domain} * Level {card.level}</p>
+      </div>
+    </motion.button>
+  )
+}
+```
+
+---
+
+### Pattern 4: Card Component Reuse (Size Variants)
+
+**Current state:** We have `DomainCard` (full, 360x504) and `CompactDomainCard` (thumbnail, 140x196) as separate components.
+
+**Improved approach - Single component with size prop:**
+
+```tsx
+type CardSize = 'xs' | 'sm' | 'md' | 'lg' | 'full'
+
+const SIZE_CONFIG: Record<CardSize, {
+  width: number
+  showContent: boolean
+  showArtwork: boolean
+  titleLines: number
+}> = {
+  xs: { width: 80, showContent: false, showArtwork: false, titleLines: 1 },
+  sm: { width: 120, showContent: false, showArtwork: true, titleLines: 2 },
+  md: { width: 160, showContent: true, showArtwork: true, titleLines: 2 },
+  lg: { width: 240, showContent: true, showArtwork: true, titleLines: 3 },
+  full: { width: 360, showContent: true, showArtwork: true, titleLines: -1 },
+}
+
+interface UnifiedDomainCardProps {
+  card: DomainCardData
+  size?: CardSize
+  selected?: boolean
+  onClick?: () => void
+}
+
+function UnifiedDomainCard({ card, size = 'md', selected, onClick }: Props) {
+  const config = SIZE_CONFIG[size]
+  // Single component adapts based on size config
+}
+```
+
+**Benefits:**
+- Consistent styling across all sizes
+- Single source of truth for domain colors, badges, borders
+- Easier to maintain
+
+---
+
+### Pattern 5: Selection State Management
+
+**Zustand store for browser state:**
+
+```tsx
+// src/stores/cardBrowserStore.ts
+interface CardBrowserState {
+  focusedCardId: string | null
+  viewMode: 'grid' | 'list' | 'detail'
+  filters: { domain?: string; level?: number; type?: string }
+
+  setFocusedCard: (id: string | null) => void
+  setViewMode: (mode: 'grid' | 'list' | 'detail') => void
+  setFilter: (key: string, value: string | number | undefined) => void
+  clearFilters: () => void
+}
+
+export const useCardBrowserStore = create<CardBrowserState>((set) => ({
+  focusedCardId: null,
+  viewMode: 'grid',
+  filters: {},
+
+  setFocusedCard: (id) => set({ focusedCardId: id }),
+  setViewMode: (mode) => set({ viewMode: mode }),
+  setFilter: (key, value) => set((s) => ({
+    filters: { ...s.filters, [key]: value }
+  })),
+  clearFilters: () => set({ filters: {} }),
+}))
+```
+
+---
+
+### Recommended Implementation Order
+
+1. **Phase 1: Keyword System** (Foundation)
+   - `src/core/rules/keywords.ts` - Daggerheart keyword definitions
+   - `KeywordText` component - Parser + renderer
+   - Tooltip using `.glass-tooltip` from @creative's spec
+
+2. **Phase 2: Card Size Variants** (Refactor)
+   - Unify `DomainCard` and `CompactDomainCard`
+   - Add size prop with predefined configs
+   - Update existing usages
+
+3. **Phase 3: Card Browser View** (New Feature)
+   - `CardBrowser` component with split view
+   - Responsive behavior (sheet on mobile)
+   - Zustand store for state
+
+4. **Phase 4: Detail View Transitions** (Polish)
+   - `layoutId` for smooth card morphing
+   - Selection animations
+   - Keyboard navigation
+
+---
+
+### Files to Create/Modify
+
+**New files:**
+- `src/core/rules/keywords.ts` - Keyword definitions
+- `src/components/ui/KeywordText.tsx` - Keyword parser/renderer
+- `src/components/ui/KeywordTooltip.tsx` - Tooltip display
+- `src/components/cards/CardBrowser.tsx` - Split view browser
+- `src/components/cards/CardListItem.tsx` - List item
+- `src/stores/cardBrowserStore.ts` - Browser state
+
+**Modified files:**
+- `src/components/cards/DomainCard.tsx` - Add size variants
+- `src/views/CharacterSheet/CardsTab.tsx` - Integrate browser pattern
+
+---
+
+### Dependencies
+
+All required packages are already installed:
+- `framer-motion` - Animations, layoutId
+- `vaul` - Bottom sheets (Sheet component)
+- `zustand` - State management
+
+No new dependencies needed.
+
+---
+
+### Design Lab Testing
+
+Add to `?cards` design lab:
+
+```tsx
+<section>
+  <h2>Keyword Tooltips</h2>
+  <KeywordText text="Spend 2 Hope to use this Action. On success, Recall this card." />
+</section>
+
+<section>
+  <h2>Card Sizes</h2>
+  <div className="flex gap-4 items-end">
+    <UnifiedDomainCard card={testCard} size="xs" />
+    <UnifiedDomainCard card={testCard} size="sm" />
+    <UnifiedDomainCard card={testCard} size="md" />
+    <UnifiedDomainCard card={testCard} size="lg" />
+  </div>
+</section>
+
+<section>
+  <h2>Split View Browser</h2>
+  <CardBrowser cards={domainCards} />
+</section>
+```
+
+---
+
+### References
+
+- Existing cards: `src/components/cards/DomainCard.tsx`, `PhysicalCard.tsx`
+- Domain colors: `DOMAIN_COLORS` constant
+- Glass styling: `src/index.css` (`.glass`, `.glass-tooltip` from @creative)
+- Sheet component: `src/components/ui/Sheet.tsx`
+
+---
+
+## 2026-02-05 | @ux: DrumPicker Redesign Spec
+
+**From:** @ux
+**To:** @frontend
+
+### Feature Spec: DrumPicker Horizontal Number Picker Redesign
+
+#### User Story
+
+As a player adjusting stats during gameplay, I want a faster way to navigate through numbers so that I can quickly set my HP, Stress, or other values without excessive scrolling through tick marks.
+
+---
+
+### Overview
+
+Redesign the DrumPicker component from a vertical tick-mark ruler to a **horizontal row of centered numbers** where the selected value is prominently displayed under the indicator triangle.
+
+**Current Design:**
+- Large static number at top
+- Scrollable tick marks below (like a ruler)
+- Triangle indicator pointing down
+
+**New Design:**
+- Label with icon at top (e.g., "⚡ Stress")
+- Triangle indicator below label
+- Horizontal scrolling ROW OF NUMBERS as the picker itself
+- Selected number centered, larger, and highlighted
+- Adjacent numbers visible but faded
+
+---
+
+### Visual Layout
+
+```
+        ⚡ Stress            ← Label with icon
+           ▼                 ← Triangle indicator pointing down
+    2   3  [4]  5   6        ← Scrollable number row, 4 selected/centered
+```
+
+---
+
+### Part 1: Header Section
+
+#### Label + Icon
+- Position: Top of sheet content
+- Format: Icon (optional) + Label text (e.g., "⚡ Stress")
+- Styling: `text-glass-primary` (white), `text-xs uppercase tracking-wide`
+- Icon: Small inline, colored to match stat (red for HP, purple for Stress, etc.)
+
+#### Triangle Indicator
+- Position: Below label, centered
+- Style: Downward-pointing triangle (border trick or SVG)
+- Color: Matches stat color (red, purple, gold, blue)
+- Size: ~16px width, ~12px height
+- Animation: Subtle pulse when value changes (optional)
+
+---
+
+### Part 2: Number Row (The Picker)
+
+#### Scrollable Container
+- Overflow: `overflow-x-auto scrollbar-hide`
+- Snap behavior: `snap-x snap-mandatory` with `snap-center`
+- Padding: `px-4` for side breathing room
+- Height: ~60px minimum to accommodate larger selected number
+
+#### Number Styling
+
+**Selected Number (Under Triangle):**
+- Size: `text-4xl` or `text-5xl` (significantly larger than adjacent)
+- Weight: `font-bold`
+- Color: Stat color (red, purple, gold, blue)
+- Background: Optional subtle highlight with `.glass-flat` or shadow
+
+**Adjacent Numbers (±1, ±2 away):**
+- Size: `text-lg` (noticeably smaller)
+- Weight: `font-semibold`
+- Color: `text-white/40` (faded)
+- Opacity: Gradual fade as distance increases
+- Interactivity: Tappable to select
+
+**Far Numbers (±3+ away):**
+- Size: `text-base`
+- Color: `text-white/20` (heavily faded)
+- May be hidden on very small screens
+
+#### Number Items
+- Spacing: `gap-3` between numbers
+- Flex: `flex-none` to prevent compression
+- Width: `w-8` for number containers (or more for touch targets)
+- Center alignment: All numbers vertically centered with selected number
+
+---
+
+### Part 3: Interaction & Animation
+
+#### Scrolling
+- User scrolls horizontally through numbers
+- Numbers rearrange continuously as scroll position changes
+- No snapping mid-scroll (only on release)
+
+#### Snap Behavior
+- On release: Carousel snaps selected number to center under triangle
+- Animation: Spring physics (embla-carousel default or Framer Motion)
+- Duration: ~300ms with natural deceleration
+
+#### Tap to Select
+- Tapping any visible number scrolls it to center (select position)
+- Small animation: `scale: 1.1` on tap for feedback
+- Haptic feedback: `navigator.vibrate(10)` on snap (if supported)
+
+#### Number Scaling
+- Numbers that are farther from center should appear progressively smaller
+- Create gradient from `text-5xl` (selected) → `text-lg` → `text-base`
+- Opacity fades similarly: `text-white` → `text-white/40` → `text-white/20`
+
+---
+
+### Part 4: Edge Cases & Bounds
+
+#### Minimum/Maximum Values
+- Carousel should not scroll beyond min/max values
+- At min (e.g., 0): number 0 is centered, no negative numbers visible
+- At max (e.g., 6): number 6 is centered, no overflow visible
+
+#### Small Screens (<360px width)
+- Reduce number item spacing to `gap-2`
+- Reduce text sizes slightly: `text-3xl` for selected instead of `text-5xl`
+- May hide numbers beyond ±2 distance
+
+#### Wide Screens (>=375px)
+- Full spacing and sizing as specified above
+- Show numbers up to ±3 distance
+
+---
+
+### Part 5: Color Tokens
+
+Use stat-appropriate colors for the triangle and selected number text:
+
+| Stat | Color Class | Hex |
+|------|------------|-----|
+| HP | `text-red-400` | #f87171 |
+| Hope | `text-amber-400` | #fbbf24 |
+| Stress | `text-purple-400` | #c084fc |
+| Armor | `text-blue-400` | #60a5fa |
+
+---
+
+### Part 6: Component Props
+
+```tsx
+interface DrumPickerProps {
+  // ... existing props (value, onChange, min, max, label, color, etc.)
+
+  // New for horizontal design:
+  // - All existing functionality remains
+  // - Carousel now shows numbers as items instead of tick marks
+  // - Selected number is centered and scaled up
+}
+```
+
+No API changes needed—internal implementation changes only.
+
+---
+
+### Integration Notes
+
+- Existing props: `value`, `onChange`, `min`, `max`, `label`, `color`, `icon`, `presets`, `maxValue`
+- Keep Sheet trigger design unchanged
+- Keep preset buttons below the number row (if implemented)
+- All other functionality (validation, haptics, states) remains the same
+
+---
+
+### Acceptance Criteria
+
+- [ ] Header shows label with icon at top
+- [ ] Triangle indicator positioned below label, centered
+- [ ] Horizontal scrollable row of numbers displayed
+- [ ] Selected number (centered under triangle) is large and bold
+- [ ] Adjacent numbers visible but progressively smaller/faded
+- [ ] Scrolling updates which number is centered
+- [ ] Snap behavior centers selected number on release
+- [ ] Tapping a number scrolls it to center
+- [ ] Min/max bounds enforced (no scroll overflow)
+- [ ] Selected number color matches stat color
+- [ ] Works on small screens with adjusted sizing
+- [ ] Haptic feedback on snap (if navigator.vibrate available)
+- [ ] Touch targets remain 44px+ minimum
+- [ ] Sheet dismisses correctly (unchanged)
+- [ ] Presets still appear below number row if specified (unchanged)
+
+---
+
+### Files to Modify
+
+- `src/components/ui/DrumPicker.tsx` - Main redesign (carousel display, scaling, colors)
+- `src/views/PickerDesignLab.tsx` - Update demo to show new visual
+
+---
+
+
+
 ## 2026-02-05 | @tester: DrumPicker QA Report
 
 **From:** @tester
