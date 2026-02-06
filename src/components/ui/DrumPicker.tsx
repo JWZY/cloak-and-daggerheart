@@ -33,7 +33,7 @@ export function DrumPicker({
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="flex flex-col items-center gap-1 p-3 rounded-2xl glass min-w-[80px]"
+        className="flex flex-col items-center gap-1 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors min-w-[80px]"
       >
         <div className="flex items-center gap-1.5 text-white/60">
           {icon}
