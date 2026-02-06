@@ -111,51 +111,49 @@ export function CharacterSheet({ character, onEdit }: CharacterSheetProps) {
         </AnimatePresence>
       </div>
 
-      {/* Bottom tab bar with Edit button */}
-      <div className="fixed bottom-0 left-0 right-0 glass px-2 pt-2 z-30" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
-        <div className="flex items-center gap-1">
-          {/* Tab buttons */}
-          <div className="flex flex-1 gap-1">
-            {TABS.map((tab) => {
-              const Icon = tab.icon
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-colors relative ${
-                    activeTab === tab.id
-                      ? 'text-white'
-                      : 'text-white/50'
-                  }`}
-                >
-                  {activeTab === tab.id && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute inset-0 bg-white/20 rounded-lg"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                  <span className="relative z-10 flex flex-col items-center justify-center gap-0.5">
-                    <Icon size={20} />
-                    <span className="text-xs">{tab.label}</span>
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Edit button */}
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onEdit({ activeTab })}
-            className="py-2 px-4 rounded-lg text-sm font-medium text-white/50 hover:text-white transition-colors relative"
-          >
-            <span className="relative z-10 flex flex-col items-center justify-center gap-0.5">
-              <Pencil size={20} />
-              <span className="text-xs">Edit</span>
-            </span>
-          </motion.button>
+      {/* Floating bottom bar - two separate elements */}
+      <div
+        className="fixed bottom-4 left-4 right-4 flex justify-between items-end z-30"
+        style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {/* Navigation pill */}
+        <div className="glass rounded-full px-2 py-2 flex gap-1">
+          {TABS.map((tab) => {
+            const Icon = tab.icon
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-2 px-3 rounded-full text-sm font-medium transition-colors relative ${
+                  activeTab === tab.id
+                    ? 'text-white'
+                    : 'text-white/50'
+                }`}
+              >
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute inset-0 bg-white/20 rounded-full"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center justify-center gap-1.5">
+                  <Icon size={18} />
+                  <span className="text-xs">{tab.label}</span>
+                </span>
+              </button>
+            )
+          })}
         </div>
+
+        {/* Edit circle button */}
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={() => onEdit({ activeTab })}
+          className="glass rounded-full w-14 h-14 flex items-center justify-center text-white/70 hover:text-white transition-colors"
+        >
+          <Pencil size={22} />
+        </motion.button>
       </div>
     </div>
   )
