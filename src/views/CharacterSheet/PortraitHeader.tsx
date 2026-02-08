@@ -1,4 +1,5 @@
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { useState } from 'react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import type { Character } from '../../types/character'
 
 interface PortraitHeaderProps {
@@ -13,33 +14,32 @@ function getSubclassImage(subclass: string): string {
   return `${base}images/cards/subclass/${slug}.webp`
 }
 
+// Spring transition for smooth snapping
+const springTransition = {
+  type: 'spring' as const,
+  stiffness: 400,
+  damping: 30,
+}
+
 export function PortraitHeader({ character, scrollContainerRef }: PortraitHeaderProps) {
+  // Binary state: expanded or collapsed
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
   // Track scroll position of the content container
   const { scrollY } = useScroll({
     container: scrollContainerRef,
   })
 
-  // Animation threshold
-  const SCROLL_THRESHOLD = 150
+  // Animation threshold - snap at 60px
+  const SCROLL_THRESHOLD = 60
 
-  // Scroll progress: 0 = expanded (top), 1 = collapsed (scrolled)
-  const progress = useTransform(scrollY, [0, SCROLL_THRESHOLD], [0, 1])
-
-  // Header height: 260px (expanded) -> 72px (collapsed)
-  const headerHeight = useTransform(scrollY, [0, SCROLL_THRESHOLD], [260, 72])
-
-  // Portrait size: 140px -> 48px
-  const portraitSize = useTransform(scrollY, [0, SCROLL_THRESHOLD], [140, 48])
-
-  // Portrait border radius
-  const portraitRadius = useTransform(scrollY, [0, SCROLL_THRESHOLD], [20, 24])
-
-  // Text scale
-  const nameScale = useTransform(scrollY, [0, SCROLL_THRESHOLD], [1.4, 1])
-  const subtitleScale = useTransform(scrollY, [0, SCROLL_THRESHOLD], [1, 0.9])
-
-  // Text opacity for smooth transition
-  const textOpacity = useTransform(scrollY, [0, 50], [1, 1])
+  // Detect when scroll crosses threshold and update state
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    const shouldCollapse = latest >= SCROLL_THRESHOLD
+    if (shouldCollapse !== isCollapsed) {
+      setIsCollapsed(shouldCollapse)
+    }
+  })
 
   const subtitle = `${character.ancestry.name} ${character.class} · ${character.subclass}`
   const portraitImage = getSubclassImage(character.subclass)
@@ -47,24 +47,28 @@ export function PortraitHeader({ character, scrollContainerRef }: PortraitHeader
   return (
     <motion.div
       className="glass-strong overflow-hidden relative"
-      style={{ height: headerHeight }}
+      animate={{ height: isCollapsed ? 72 : 260 }}
+      transition={springTransition}
     >
       {/* Expanded layout - column, centered */}
       <motion.div
         className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4"
+        animate={{
+          opacity: isCollapsed ? 0 : 1,
+        }}
+        transition={springTransition}
         style={{
-          opacity: useTransform(progress, [0, 0.5], [1, 0]),
-          pointerEvents: useTransform(progress, p => p > 0.5 ? 'none' : 'auto'),
+          pointerEvents: isCollapsed ? 'none' : 'auto',
         }}
       >
         {/* Large portrait */}
         <motion.div
-          className="overflow-hidden bg-white/10 flex-shrink-0"
-          style={{
-            width: portraitSize,
-            height: portraitSize,
-            borderRadius: portraitRadius,
+          className="overflow-hidden bg-white/10 flex-shrink-0 rounded-[20px]"
+          animate={{
+            width: isCollapsed ? 48 : 140,
+            height: isCollapsed ? 48 : 140,
           }}
+          transition={springTransition}
         >
           <img
             src={portraitImage}
@@ -77,14 +81,14 @@ export function PortraitHeader({ character, scrollContainerRef }: PortraitHeader
         {/* Centered text */}
         <div className="text-center">
           <motion.h1
-            className="font-bold text-white text-xl"
-            style={{ scale: nameScale, opacity: textOpacity }}
+            className="font-bold text-white text-xl origin-center"
+            animate={{ scale: isCollapsed ? 1 : 1.4 }}
+            transition={springTransition}
           >
             {character.name}
           </motion.h1>
           <motion.p
             className="text-white/60 text-sm mt-1"
-            style={{ scale: subtitleScale }}
           >
             {subtitle}
           </motion.p>
@@ -94,22 +98,23 @@ export function PortraitHeader({ character, scrollContainerRef }: PortraitHeader
       {/* Collapsed layout - row, left aligned */}
       <motion.div
         className="absolute inset-0 flex items-center gap-3 px-4"
+        animate={{
+          opacity: isCollapsed ? 1 : 0,
+        }}
+        transition={springTransition}
         style={{
-          opacity: useTransform(progress, [0.5, 1], [0, 1]),
-          pointerEvents: useTransform(progress, p => p < 0.5 ? 'none' : 'auto'),
+          pointerEvents: isCollapsed ? 'auto' : 'none',
         }}
       >
         {/* Small portrait thumbnail */}
-        <motion.div
-          className="overflow-hidden bg-white/10 flex-shrink-0 w-12 h-12 rounded-xl"
-        >
+        <div className="overflow-hidden bg-white/10 flex-shrink-0 w-12 h-12 rounded-xl">
           <img
             src={portraitImage}
             alt={`${character.name} portrait`}
             className="w-full h-full object-cover object-top"
             loading="eager"
           />
-        </motion.div>
+        </div>
 
         {/* Left-aligned text */}
         <div className="min-w-0 flex-1">

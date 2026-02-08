@@ -589,7 +589,6 @@ export function PickerDesignLab({ onBack }: PickerDesignLabProps) {
               onChange={setHp6}
               label="HP"
               icon={<Heart size={14} />}
-              color="#ef4444"
             />
             <DrumPicker
               value={stress6}
@@ -598,7 +597,6 @@ export function PickerDesignLab({ onBack }: PickerDesignLabProps) {
               onChange={setStress6}
               label="Stress"
               icon={<Brain size={14} />}
-              color="#a855f7"
             />
             <DrumPicker
               value={armor6}
@@ -607,7 +605,6 @@ export function PickerDesignLab({ onBack }: PickerDesignLabProps) {
               onChange={setArmor6}
               label="Armor"
               icon={<Shield size={14} />}
-              color="#3b82f6"
             />
           </div>
 
@@ -622,7 +619,6 @@ export function PickerDesignLab({ onBack }: PickerDesignLabProps) {
                 onChange={(v) => console.log('Speed:', v)}
                 label="Speed"
                 icon={<Zap size={14} />}
-                color="#f59e0b"
               />
             </div>
           </div>

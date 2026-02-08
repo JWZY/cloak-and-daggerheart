@@ -51,7 +51,6 @@ export function StatsTab({
             max={armorSlots.max}
             label="Armor"
             icon={<Shield size={14} />}
-            color="#3b82f6"
           />
         </div>
       </Card>
@@ -83,7 +82,6 @@ export function StatsTab({
             max={character.hp.max}
             label="HP"
             icon={<Heart size={14} />}
-            color="#ef4444"
           />
           <DrumPicker
             value={character.stress.current}
@@ -92,7 +90,6 @@ export function StatsTab({
             max={character.stress.max}
             label="Stress"
             icon={<Zap size={14} />}
-            color="#a855f7"
           />
         </div>
       </Card>
@@ -108,7 +105,6 @@ export function StatsTab({
             max={6}
             label="Hope"
             icon={<Sparkles size={14} />}
-            color="#eab308"
           />
         </div>
         <div className="border-t border-white/10 pt-3">
@@ -137,28 +133,6 @@ export function StatsTab({
         </div>
       </Card>
 
-      {/* Character info */}
-      <Card variant="glass" padding="md">
-        <h3 className="text-xs uppercase tracking-wide text-white/75 font-semibold mb-4">Character Info</h3>
-        <div className="divide-y divide-white/10">
-          <div className="py-3 first:pt-0 last:pb-0 flex justify-between items-center">
-            <span className="text-sm text-white/50">Ancestry</span>
-            <span className="text-sm font-medium text-white">{character.ancestry.name}</span>
-          </div>
-          <div className="py-3 first:pt-0 last:pb-0 flex justify-between items-center">
-            <span className="text-sm text-white/50">Community</span>
-            <span className="text-sm font-medium text-white">{character.community.name}</span>
-          </div>
-          <div className="py-3 first:pt-0 last:pb-0 flex justify-between items-center">
-            <span className="text-sm text-white/50">Class</span>
-            <span className="text-sm font-medium text-white">{character.class}</span>
-          </div>
-          <div className="py-3 last:pb-0 flex justify-between items-center">
-            <span className="text-sm text-white/50">Subclass</span>
-            <span className="text-sm font-medium text-white">{character.subclass}</span>
-          </div>
-        </div>
-      </Card>
     </div>
   )
 }

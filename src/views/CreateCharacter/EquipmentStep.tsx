@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Swords, Shield, Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Swords, Shield, Check, ChevronDown, ChevronUp, type LucideIcon } from 'lucide-react'
 import { Card } from '../../components/ui/Card'
 import type { Equipment, Weapon, Armor } from '../../types/character'
 import {
@@ -40,7 +40,7 @@ function AccordionHeader({
   onClick,
 }: {
   title: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: LucideIcon
   isExpanded: boolean
   isSelected: boolean
   summary: string
