@@ -5,6 +5,7 @@ import { CharacterSheet } from './views/CharacterSheet'
 import { ComponentsLibrary } from './views/ComponentsLibrary'
 import { CardDesignLab } from './views/CardDesignLab'
 import { PickerDesignLab } from './views/PickerDesignLab'
+import { SRDCardPage } from './views/SRDCardPage'
 import { useCharacterStore } from './stores/characterStore'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { THEME_CONFIGS } from './contexts/themeConfig'
@@ -28,6 +29,7 @@ function App() {
   const showComponentsLibrary = searchParams.has('components')
   const showCardDesignLab = searchParams.has('cards') || searchParams.has('designlab')
   const showPickerDesignLab = searchParams.has('pickers')
+  const showSRDCardPage = searchParams.has('srdcard')
   // Enable cursor-following glow effect on glass elements
   useMouseGlow()
 
@@ -91,6 +93,11 @@ function App() {
   // Show picker design lab if ?pickers is in URL
   if (showPickerDesignLab) {
     return <PickerDesignLab onBack={() => window.location.href = window.location.pathname} />
+  }
+
+  // Show SRD card page if ?srdcard is in URL
+  if (showSRDCardPage) {
+    return <SRDCardPage />
   }
 
   return (
