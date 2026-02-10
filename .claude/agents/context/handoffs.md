@@ -4,6 +4,281 @@ Notes passed between agents. Most recent at top.
 
 ---
 
+## 2026-02-09 | SRD Subclass Card Design Lab — Day 1 Complete
+
+**From:** @orchestrator
+**Status:** In progress — typography and layout locked in, card frame and banner finalized
+
+### What was built
+- **`SRDCard` component** (`src/components/cards/SRDCard.tsx`) — reusable card for Daggerheart SRD subclass data
+- **`SRDCardPage` design lab** (`src/views/SRDCardPage.tsx`) — WYSIWYG tweaker panel at `?srdcard`
+- **5 sample cards**: Syndicate (Rogue), School of War (Wizard), School of Knowledge (Wizard), Call of the Slayer (Warrior), Divine Wielder (Seraph)
+
+### Design decisions locked in
+- **Typography**: EB Garamond for titles/footer/class name, Crimson Text for body
+- **Title**: 36px, weight 400, small-caps, gold gradient text, heavy drop-shadow filter
+- **Class name + Footer**: 13px, weight 500, small-caps, gold gradient text, heavy drop-shadow filter (all three share the same visual style)
+- **Shadow approach**: `drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))` — other variants (text-shadow, light drop-shadow, solid gold) were tested and removed
+- **Card border**: Textured SVG frame overlay (`public/images/card-frame.svg`) at 40% opacity, replacing CSS gradient border
+- **Banner**: CSS `mask-image` approach (Figma-native) — all layers clipped to a single pennant mask SVG. Replaced the old SVG-shapes + clipPath polygon approach after side-by-side comparison showed cleaner edges
+- **Card dimensions**: 360x508 (matches Figma frame)
+
+### Key files
+- `src/components/cards/SRDCard.tsx` — main card component with `MaskedBanner`, `DomainIconSvg`
+- `src/components/cards/domain-icons.ts` — SVG path data for 6 domain icons (midnight, grace, codex, splendor, blade, bone)
+- `src/views/SRDCardPage.tsx` — design lab with slider/toggle/select controls
+- `public/images/card-frame.svg` — textured border frame (brushstroke style)
+- `public/images/cards/banners/banner-mask.svg` — pennant mask shape for CSS masking
+- `public/images/cards/banners/banner-texture.png` — texture overlay for banner
+- `public/images/cards/subclass/*.png` — 5 character illustration PNGs
+
+### What's next
+- Fine-tune body text layout and spacing
+- Add more subclass cards with different classes
+- Consider making banner color/icons data-driven from SRD content
+- Card back design
+- Integration with main app navigation (currently only accessible via `?srdcard` query param)
+
+---
+
+## 2026-02-06 | @ux: Equipment Step Multi-Selection UX Spec
+
+**From:** @ux
+**To:** @frontend / @orchestrator
+
+### Problem Statement
+
+The Equipment/Gear selection step in character creation requires users to make 3 separate selections (Primary Weapon, Secondary Weapon, Armor), but the current horizontal card rail layout makes it unclear that:
+1. There are exactly 3 categories to choose from
+2. Which categories have been completed
+3. What the overall progress is
+
+Users may scroll through one section and miss the others entirely.
+
+---
+
+### Recommended Pattern: Accordion Checklist with Summary Cards
+
+A hybrid pattern combining:
+- **Accordion sections** that expand/collapse (one active at a time)
+- **Progress indicator** showing completion state (0/3, 1/3, etc.)
+- **Summary cards** for completed selections (tap to re-edit)
+
+This pattern is inspired by:
+- iOS Wallet card stacking
+- E-commerce checkout flows (shipping -> payment -> review)
+- Form wizards with collapsible completed sections
+
+---
+
+### Visual Layout (ASCII)
+
+**Initial State (nothing selected):**
+```
+┌─────────────────────────────────────────┐
+│  Choose Your Equipment                  │
+│  Select weapons and armor    ○ ○ ○ 0/3  │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ⚔️  Primary Weapon              [OPEN]  │
+├─────────────────────────────────────────┤
+│  ┌────────┐ ┌────────┐ ┌────────┐       │
+│  │Longbow │ │Rapier  │ │Staff   │  ...  │
+│  │2d8 dmg │ │2d6 dmg │ │1d8 dmg │       │
+│  └────────┘ └────────┘ └────────┘       │
+│        << horizontal scroll >>          │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ⚔️  Secondary Weapon (optional)    [ ]  │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ 🛡️  Armor                          [ ]  │
+└─────────────────────────────────────────┘
+```
+
+**After selecting Primary Weapon:**
+```
+┌─────────────────────────────────────────┐
+│  Choose Your Equipment                  │
+│  Select weapons and armor    ● ○ ○ 1/3  │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ✓ Primary Weapon                        │
+│   Quarterstaff · 1d8 dmg · Melee  [tap] │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ⚔️  Secondary Weapon (optional)  [OPEN] │
+├─────────────────────────────────────────┤
+│  ┌────────┐ ┌────────┐ ┌────────┐       │
+│  │ None   │ │Dagger  │ │Sling   │  ...  │
+│  │        │ │1d4 dmg │ │1d6 dmg │       │
+│  └────────┘ └────────┘ └────────┘       │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ 🛡️  Armor                          [ ]  │
+└─────────────────────────────────────────┘
+```
+
+**All complete:**
+```
+┌─────────────────────────────────────────┐
+│  Choose Your Equipment                  │
+│  All selected!           ● ● ● 3/3  ✓   │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ✓ Primary Weapon                        │
+│   Quarterstaff · 1d8 dmg · Melee  [tap] │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ✓ Secondary Weapon                      │
+│   None                            [tap] │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ✓ Armor                                 │
+│   Leather Armor · Score 4         [tap] │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### Interaction Flow
+
+1. **On mount**: First incomplete section auto-expands (Primary Weapon by default)
+
+2. **On selection**:
+   - Current section collapses to summary card
+   - Next section auto-expands
+   - Progress indicator updates (dots + count)
+   - Spring animation for collapse/expand
+
+3. **Tapping collapsed section**:
+   - Closes any open section
+   - Opens tapped section for re-editing
+
+4. **Auto-advance logic**:
+   - Primary -> Secondary -> Armor (sequential)
+   - Skip already-complete sections when advancing
+   - Final section stays open until user explicitly continues
+
+5. **Continue button**:
+   - Enabled when Primary Weapon + Armor are selected (Secondary is optional)
+   - Show "All selected!" confirmation state
+
+---
+
+### Progress Indicator Specs
+
+**Visual:**
+- 3 dots (○ empty, ● filled) with spacing
+- Counter text: "1/3", "2/3", "3/3"
+- Final checkmark when complete
+
+**Colors (Liquid Glass):**
+- Empty: `text-white/30`
+- Filled: `text-emerald-300`
+- Complete state: Full row gets emerald glow
+
+---
+
+### Edge Cases
+
+| Scenario | Behavior |
+|----------|----------|
+| Secondary = "None" | Counts as complete (valid choice), shows "None" in summary |
+| Armor = "Unarmored" | Counts as complete, shows "Unarmored · Score 3" |
+| User skips sections | Allowed - can tap ahead, but progress tracks actual selections |
+| Return to Equipment step | Restore previous selections, show collapsed summaries |
+| Default selections on mount | Quarterstaff + Leather Armor pre-selected (current behavior preserved) |
+
+---
+
+### Animation Specs (Framer Motion)
+
+**Collapse/Expand:**
+```ts
+const accordionVariants = {
+  collapsed: { height: 'auto', opacity: 1 },
+  expanded: { height: 'auto', opacity: 1 }
+}
+
+// Use AnimatePresence for enter/exit of card rail content
+// Animate height with layout prop for smooth accordion
+```
+
+**Summary card entrance:**
+```ts
+initial={{ opacity: 0, y: -10 }}
+animate={{ opacity: 1, y: 0 }}
+transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+```
+
+**Progress dot fill:**
+```ts
+// Scale pulse on fill
+initial={{ scale: 0.8 }}
+animate={{ scale: 1 }}
+transition={{ type: 'spring', stiffness: 400 }}
+```
+
+---
+
+### Component Structure
+
+```
+EquipmentStep
+├── Header (title + progress indicator)
+├── EquipmentAccordion
+│   ├── AccordionSection (Primary)
+│   │   ├── CollapsedSummary (when collapsed)
+│   │   └── ExpandedContent (horizontal card rail)
+│   ├── AccordionSection (Secondary)
+│   └── AccordionSection (Armor)
+└── CompletionBanner (when 3/3)
+```
+
+**Suggested new components:**
+- `AccordionSection` - reusable collapsible section with header, summary, content
+- `EquipmentSummaryCard` - compact display of selected item
+- `ProgressDots` - reusable 3-dot progress indicator
+
+---
+
+### Accessibility
+
+- Accordion sections should be keyboard navigable (Enter/Space to toggle)
+- Progress announced to screen readers ("1 of 3 selections complete")
+- Clear focus indicators on expanded section
+- ARIA: `aria-expanded`, `aria-controls` on accordion headers
+
+---
+
+### Implementation Priority
+
+1. **P0**: Progress indicator (immediate value, simple)
+2. **P1**: Collapse/expand accordion behavior
+3. **P2**: Summary cards for completed selections
+4. **P3**: Auto-advance between sections
+5. **P4**: Polish animations
+
+---
+
+### References
+
+- Current implementation: `src/views/CreateCharacter/EquipmentStep.tsx`
+- Similar pattern in codebase: TraitsStep (uses completion tracking)
+- Design tokens: Liquid Glass system in `src/index.css`
+
+---
+
 ## 2026-02-06 | @creative: Card Game UI Visual Analysis
 
 **From:** @creative

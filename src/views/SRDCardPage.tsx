@@ -308,25 +308,6 @@ export function SRDCardPage() {
 
       {/* Cards column */}
       <div className="flex-1 min-h-0 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-        {/* Title style comparison */}
-        <div className="py-6 px-8">
-          <div className="text-[10px] uppercase tracking-widest text-white/30 mb-4">Title Style Comparison</div>
-          <div className="flex gap-6 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
-            {([
-              { mode: 'drop-shadow' as const, label: 'Drop Shadow (light)' },
-              { mode: 'drop-shadow-heavy' as const, label: 'Drop Shadow (heavy)' },
-              { mode: 'none' as const, label: 'No Shadow' },
-              { mode: 'text-shadow' as const, label: 'Text Shadow (CSS)' },
-              { mode: 'text-shadow-solid' as const, label: 'Solid Gold + Shadow' },
-            ]).map(({ mode, label }) => (
-              <div key={mode} className="flex flex-col items-center gap-2 flex-shrink-0">
-                <SRDCard {...cards[0]} {...styleOverrides} titleShadowMode={mode} />
-                <span className="text-[11px] text-white/50">{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* All cards */}
         <div className="flex flex-col items-center gap-8 py-8">
           {cards.map((card) => (

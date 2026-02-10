@@ -20,7 +20,6 @@ export interface SRDCardProps {
   titleLetterSpacing?: string
   titleSmallCaps?: boolean
   titleTextTransform?: string
-  titleShadowMode?: 'none' | 'drop-shadow' | 'drop-shadow-heavy' | 'text-shadow' | 'text-shadow-solid'
   classNameFontSize?: number
   classNameLetterSpacing?: string
   bodyFontSize?: number
@@ -30,36 +29,6 @@ export interface SRDCardProps {
   footerTextTransform?: string
   illustrationSrc?: string
   onClick?: () => void
-}
-
-// Rogue class banner — outer trapezoid with configurable fill and gold gradient stroke
-function BannerBackground({ color = '#BD0C70', uid }: { color?: string; uid: string }) {
-  return (
-    <svg viewBox="0 0 40 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-0 left-0 w-[40px] h-[70px]">
-      <path d="M39.4707 0.5L35.5283 69.5H4.47168L0.529297 0.5H39.4707Z" fill={color} stroke={`url(#${uid}-bg-stroke)`}/>
-      <defs>
-        <linearGradient id={`${uid}-bg-stroke`} x1="20" y1="24.57" x2="20" y2="53.62" gradientUnits="userSpaceOnUse">
-          <stop offset="0.61" stopColor="#DBC593"/>
-          <stop offset="1" stopColor="#C29734"/>
-        </linearGradient>
-      </defs>
-    </svg>
-  )
-}
-
-// Inner pennant shape with dark fill and gold gradient stroke
-function BannerForeground({ uid }: { uid: string }) {
-  return (
-    <svg viewBox="0 0 30 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-0 left-[5px] w-[30px] h-[80px]">
-      <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill="#1E1E1E" stroke={`url(#${uid}-fg-stroke)`}/>
-      <defs>
-        <linearGradient id={`${uid}-fg-stroke`} x1="15" y1="0" x2="15" y2="80" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#F9F8F3"/>
-          <stop offset="1" stopColor="#E7BA90"/>
-        </linearGradient>
-      </defs>
-    </svg>
-  )
 }
 
 // Generic domain icon with gold gradient fill and drop shadow
@@ -92,6 +61,71 @@ function DomainIconSvg({ name, uid }: { name: DomainIconName; uid: string }) {
   )
 }
 
+// Masked banner — all layers clipped to a single pennant mask (Figma approach)
+function MaskedBanner({ color = '#BD0C70', uid, domainIcons, basePath }: {
+  color?: string; uid: string; domainIcons?: [DomainIconName, DomainIconName]; basePath: string
+}) {
+  const maskStyle = {
+    WebkitMaskImage: `url('${basePath}images/cards/banners/banner-mask.svg')`,
+    maskImage: `url('${basePath}images/cards/banners/banner-mask.svg')`,
+    WebkitMaskSize: '40px 80px',
+    maskSize: '40px 80px',
+    WebkitMaskRepeat: 'no-repeat',
+    maskRepeat: 'no-repeat',
+  } as React.CSSProperties
+
+  const maskAt = (x: number, y: number) => ({
+    ...maskStyle,
+    WebkitMaskPosition: `${x}px ${y}px`,
+    maskPosition: `${x}px ${y}px`,
+  }) as React.CSSProperties
+
+  return (
+    <div className="absolute z-10" style={{ top: -2, left: 15, width: 40, height: 80 }}>
+      {/* Layer 1: Outer trapezoid — masked to pennant */}
+      <div className="absolute top-0 left-0 w-[40px] h-[70px]" style={maskAt(0, 0)}>
+        <svg viewBox="0 0 40 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          <path d="M39.4707 0.5L35.5283 69.5H4.47168L0.529297 0.5H39.4707Z" fill={color} stroke={`url(#${uid}-m-bg)`}/>
+          <defs>
+            <linearGradient id={`${uid}-m-bg`} x1="20" y1="24.57" x2="20" y2="53.62" gradientUnits="userSpaceOnUse">
+              <stop offset="0.61" stopColor="#DBC593"/>
+              <stop offset="1" stopColor="#C29734"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      {/* Layer 2: Inner pennant — masked to pennant */}
+      <div className="absolute top-0 left-[5px] w-[30px] h-[80px]" style={maskAt(-5, 0)}>
+        <svg viewBox="0 0 30 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill="#1E1E1E" stroke={`url(#${uid}-m-fg)`}/>
+          <defs>
+            <linearGradient id={`${uid}-m-fg`} x1="15" y1="0" x2="15" y2="80" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F9F8F3"/>
+              <stop offset="1" stopColor="#E7BA90"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      {/* Layer 3: Domain icons — masked to pennant */}
+      <div className="absolute flex flex-col items-center justify-center gap-0.5" style={{ top: 9, left: 8, width: 24, height: 48, ...maskAt(-8, -9) }}>
+        <div style={{ width: 17, height: 18 }}>
+          <DomainIconSvg name={domainIcons?.[0] ?? 'midnight'} uid={`${uid}-m`} />
+        </div>
+        <div style={{ width: 17, height: 18 }}>
+          <DomainIconSvg name={domainIcons?.[1] ?? 'grace'} uid={`${uid}-m`} />
+        </div>
+      </div>
+      {/* Layer 4: Texture overlay — masked to pennant */}
+      <img
+        src={`${basePath}images/cards/banners/banner-texture.png`}
+        alt=""
+        className="absolute top-0 left-0 w-[40px] h-[80px] pointer-events-none"
+        style={{ mixBlendMode: 'multiply', ...maskAt(0, 0) }}
+      />
+    </div>
+  )
+}
+
 // Gold gradient style shared across title elements
 const goldGradientStyle = {
   background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
@@ -101,10 +135,6 @@ const goldGradientStyle = {
   textShadow: 'none', // text-shadow doesn't work with background-clip: text
 } as const
 
-// We use a filter-based shadow instead since text-shadow doesn't work with background-clip
-const goldTextWrapperStyle = {
-  filter: 'drop-shadow(0px 1px 1px #4d381e)',
-} as const
 
 export function SRDCard({
   name,
@@ -120,7 +150,6 @@ export function SRDCard({
   titleLetterSpacing,
   titleSmallCaps,
   titleTextTransform,
-  titleShadowMode = 'drop-shadow',
   classNameFontSize,
   classNameLetterSpacing,
   bodyFontSize,
@@ -140,9 +169,8 @@ export function SRDCard({
       className="relative overflow-hidden flex flex-col"
       style={{
         width: 360,
-        height: 504,
+        height: 508,
         borderRadius: 12,
-        border: '2px solid #f9f8f3',
         background: '#03070d',
         cursor: onClick ? 'pointer' : 'default',
       }}
@@ -170,34 +198,7 @@ export function SRDCard({
         />
 
         {/* Class banner (top-left) */}
-        <div
-          className="absolute z-10 overflow-hidden"
-          style={{ top: -2, left: 15, width: 40, height: 80 }}
-        >
-          {/* Layer 1: Outer trapezoid — configurable fill, gold stroke */}
-          <BannerBackground color={bannerColor} uid={uid} />
-          {/* Layer 2: Inner pennant — dark fill, gold stroke */}
-          <BannerForeground uid={uid} />
-          {/* Layer 3: Domain icons */}
-          <div className="absolute flex flex-col items-center justify-center gap-0.5" style={{ top: 9, left: 8, width: 24, height: 48 }}>
-            <div style={{ width: 17, height: 18 }}>
-              <DomainIconSvg name={domainIcons?.[0] ?? 'midnight'} uid={uid} />
-            </div>
-            <div style={{ width: 17, height: 18 }}>
-              <DomainIconSvg name={domainIcons?.[1] ?? 'grace'} uid={uid} />
-            </div>
-          </div>
-          {/* Layer 4: Texture overlay */}
-          <img
-            src={`${basePath}images/cards/banners/banner-texture.png`}
-            alt=""
-            className="absolute top-0 left-0 w-[40px] h-[80px] pointer-events-none"
-            style={{
-              mixBlendMode: 'multiply',
-              clipPath: 'polygon(1.3% 0%, 98.7% 0%, 88.8% 87.5%, 50% 100%, 11.2% 87.5%)',
-            }}
-          />
-        </div>
+        <MaskedBanner color={bannerColor} uid={uid} domainIcons={domainIcons} basePath={basePath} />
       </div>
 
       {/* Content area with gradient background */}
@@ -213,11 +214,7 @@ export function SRDCard({
         {/* Title section */}
         <div className="flex flex-col items-center text-center pt-2">
           {/* Subclass name */}
-          <div style={
-            titleShadowMode === 'drop-shadow' ? { filter: 'drop-shadow(0px 1px 1px #4d381e)' }
-            : titleShadowMode === 'drop-shadow-heavy' ? { filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }
-            : undefined
-          }>
+          <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
             <h1
               style={{
                 fontFamily: "'EB Garamond', serif",
@@ -227,12 +224,7 @@ export function SRDCard({
                 letterSpacing: titleLetterSpacing ?? '0.02em',
                 ...(titleSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
                 ...(titleTextTransform ? { textTransform: titleTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
-                ...(titleShadowMode === 'text-shadow-solid'
-                  ? { color: '#E7BA90', textShadow: '0 1px 1px #4D381E' }
-                  : {
-                      ...goldGradientStyle,
-                      ...(titleShadowMode === 'text-shadow' ? { textShadow: '0 1px 1px #4D381E' } : {}),
-                    }),
+                ...goldGradientStyle,
               }}
             >
               {name}
@@ -259,14 +251,14 @@ export function SRDCard({
             </div>
 
             {/* Class name */}
-            <div style={goldTextWrapperStyle}>
+            <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
               <span
                 style={{
                   fontFamily: "'EB Garamond', serif",
                   fontSize: classNameFontSize ?? 13,
                   fontWeight: 500,
                   letterSpacing: classNameLetterSpacing ?? '0.08em',
-                  textTransform: 'uppercase',
+                  fontVariant: 'small-caps',
                   ...goldGradientStyle,
                 }}
               >
@@ -330,7 +322,7 @@ export function SRDCard({
         {/* Footer */}
         <div
           className="flex items-center justify-between py-3"
-          style={{ flexShrink: 0 }}
+          style={{ flexShrink: 0, filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}
         >
           <span
             style={{
@@ -341,7 +333,6 @@ export function SRDCard({
               ...(footerSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
               ...(footerTextTransform ? { textTransform: footerTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
               ...goldGradientStyle,
-              textShadow: '0 1px 1px #4D381E',
             }}
           >
             {tier}
@@ -357,7 +348,6 @@ export function SRDCard({
                 ...(footerSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
                 ...(footerTextTransform ? { textTransform: footerTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
                 ...goldGradientStyle,
-                textShadow: '0 1px 1px #4D381E',
               }}
             >
               Spellcast: {spellcastTrait}
@@ -365,6 +355,15 @@ export function SRDCard({
           )}
         </div>
       </div>
+
+      {/* Textured border frame overlay */}
+      <img
+        src={`${basePath}images/card-frame.svg`}
+        alt=""
+        className="absolute inset-0 w-full h-full pointer-events-none z-20"
+        style={{ opacity: 0.4 }}
+        draggable={false}
+      />
     </div>
   )
 }
