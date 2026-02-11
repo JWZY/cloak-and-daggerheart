@@ -20,13 +20,20 @@ export interface SRDCardProps {
   titleLetterSpacing?: string
   titleSmallCaps?: boolean
   titleTextTransform?: string
+  titleShadowStyle?: 'heavy' | 'subtle'
   classNameFontSize?: number
   classNameLetterSpacing?: string
+  classNameSmallCaps?: boolean
+  separatorStyle?: 'code' | 'figma'
   bodyFontSize?: number
   bodyLineHeight?: string
+  bodyTextShadow?: boolean
   footerFontSize?: number
   footerSmallCaps?: boolean
   footerTextTransform?: string
+  contentLayout?: 'code' | 'figma'
+  showCardFrame?: boolean
+  showIllustrationOverlay?: boolean
   illustrationSrc?: string
   onClick?: () => void
 }
@@ -150,13 +157,20 @@ export function SRDCard({
   titleLetterSpacing,
   titleSmallCaps,
   titleTextTransform,
+  titleShadowStyle = 'heavy',
   classNameFontSize,
   classNameLetterSpacing,
+  classNameSmallCaps = true,
+  separatorStyle = 'code',
   bodyFontSize,
   bodyLineHeight,
+  bodyTextShadow = false,
   footerFontSize,
   footerSmallCaps = true,
   footerTextTransform,
+  contentLayout = 'code',
+  showCardFrame = true,
+  showIllustrationOverlay = true,
   illustrationSrc,
   onClick,
 }: SRDCardProps) {
@@ -189,13 +203,15 @@ export function SRDCard({
         )}
 
         {/* Dark gradient overlay from bottom */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(180deg, transparent 30%, rgba(3, 7, 13, 0.95) 70%)',
-          }}
-        />
+        {showIllustrationOverlay && (
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, transparent 30%, rgba(3, 7, 13, 0.95) 70%)',
+            }}
+          />
+        )}
 
         {/* Class banner (top-left) */}
         <MaskedBanner color={bannerColor} uid={uid} domainIcons={domainIcons} basePath={basePath} />
@@ -209,12 +225,13 @@ export function SRDCard({
           zIndex: 10,
           background:
             'linear-gradient(180deg, rgba(31, 58, 96, 0) 0%, rgba(3, 7, 13, 0.81) 12%, rgba(3, 7, 13, 0.81) 83%, rgba(19, 36, 60, 0.35) 97%, rgba(31, 58, 96, 0) 100%)',
+          ...(contentLayout === 'figma' ? { gap: 12, paddingTop: 24, paddingBottom: 18 } : {}),
         }}
       >
         {/* Title section */}
-        <div className="flex flex-col items-center text-center pt-2">
+        <div className={contentLayout === 'figma' ? 'flex flex-col items-center text-center' : 'flex flex-col items-center text-center pt-2'}>
           {/* Subclass name */}
-          <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
+          <div style={{ filter: titleShadowStyle === 'subtle' ? 'drop-shadow(0px 1px 1px #4d381e)' : 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
             <h1
               style={{
                 fontFamily: "'EB Garamond', serif",
@@ -232,18 +249,18 @@ export function SRDCard({
           </div>
 
           {/* Decorative separator with class name */}
-          <div className="flex items-center w-full mt-1 mb-3 gap-2">
+          <div className={contentLayout === 'figma' ? 'flex items-center w-full gap-2' : 'flex items-center w-full mt-1 mb-3 gap-2'}>
             {/* Left line with diamond */}
             <div className="flex items-center flex-1">
               <div
                 className="flex-1"
-                style={{ height: 1, background: 'linear-gradient(90deg, transparent, #e7ba90)' }}
+                style={{ height: separatorStyle === 'figma' ? 2 : 1, background: 'linear-gradient(90deg, transparent, #e7ba90)' }}
               />
               <div
                 className="mx-0.5"
                 style={{
-                  width: 5,
-                  height: 5,
+                  width: separatorStyle === 'figma' ? 4 : 5,
+                  height: separatorStyle === 'figma' ? 4 : 5,
                   background: '#e7ba90',
                   transform: 'rotate(45deg)',
                 }}
@@ -258,7 +275,7 @@ export function SRDCard({
                   fontSize: classNameFontSize ?? 13,
                   fontWeight: 500,
                   letterSpacing: classNameLetterSpacing ?? '0.08em',
-                  fontVariant: 'small-caps',
+                  ...(classNameSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
                   ...goldGradientStyle,
                 }}
               >
@@ -271,15 +288,15 @@ export function SRDCard({
               <div
                 className="mx-0.5"
                 style={{
-                  width: 5,
-                  height: 5,
+                  width: separatorStyle === 'figma' ? 4 : 5,
+                  height: separatorStyle === 'figma' ? 4 : 5,
                   background: '#e7ba90',
                   transform: 'rotate(45deg)',
                 }}
               />
               <div
                 className="flex-1"
-                style={{ height: 1, background: 'linear-gradient(90deg, #e7ba90, transparent)' }}
+                style={{ height: separatorStyle === 'figma' ? 2 : 1, background: 'linear-gradient(90deg, #e7ba90, transparent)' }}
               />
             </div>
           </div>
@@ -293,10 +310,11 @@ export function SRDCard({
             fontSize: bodyFontSize ?? 13,
             lineHeight: bodyLineHeight ?? '17px',
             color: 'rgba(249, 248, 243, 0.8)',
+            ...(bodyTextShadow ? { textShadow: '0px 1px 1px #4d381e' } : {}),
           }}
         >
           {feats.map((feat, i) => (
-            <p key={i} className={i > 0 ? 'mt-2' : ''}>
+            <p key={i} className={contentLayout === 'figma' ? '' : (i > 0 ? 'mt-2' : '')}>
               {feat.name && <><span style={{ fontWeight: 700 }}>{feat.name}:</span>{' '}</>}
               {feat.text}
             </p>
@@ -304,14 +322,14 @@ export function SRDCard({
 
           {featList && featList.length > 0 && (
             <ul
-              className="mt-2"
+              className={contentLayout === 'figma' ? '' : 'mt-2'}
               style={{
                 listStyleType: 'disc',
                 paddingLeft: 19.5,
               }}
             >
               {featList.map((item, i) => (
-                <li key={i} className="mb-0.5">
+                <li key={i} className={contentLayout === 'figma' ? '' : 'mb-0.5'}>
                   {item}
                 </li>
               ))}
@@ -321,7 +339,7 @@ export function SRDCard({
 
         {/* Footer */}
         <div
-          className="flex items-center justify-between py-3"
+          className={contentLayout === 'figma' ? 'flex items-center justify-between' : 'flex items-center justify-between py-3'}
           style={{ flexShrink: 0, filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}
         >
           <span
@@ -357,13 +375,15 @@ export function SRDCard({
       </div>
 
       {/* Textured border frame overlay */}
-      <img
-        src={`${basePath}images/card-frame.svg`}
-        alt=""
-        className="absolute inset-0 w-full h-full pointer-events-none z-20"
-        style={{ opacity: 0.4 }}
-        draggable={false}
-      />
+      {showCardFrame && (
+        <img
+          src={`${basePath}images/card-frame.svg`}
+          alt=""
+          className="absolute inset-0 w-full h-full pointer-events-none z-20"
+          style={{ opacity: 0.4 }}
+          draggable={false}
+        />
+      )}
     </div>
   )
 }

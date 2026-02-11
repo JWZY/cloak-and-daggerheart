@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { CreateCharacter } from './views/CreateCharacter'
 import { CharacterSheet } from './views/CharacterSheet'
 import { ComponentsLibrary } from './views/ComponentsLibrary'
-import { CardDesignLab } from './views/CardDesignLab'
 import { PickerDesignLab } from './views/PickerDesignLab'
 import { SRDCardPage } from './views/SRDCardPage'
 import { useCharacterStore } from './stores/characterStore'
@@ -27,9 +26,8 @@ function App() {
   // Check for query params to show dev tools
   const searchParams = new URLSearchParams(window.location.search)
   const showComponentsLibrary = searchParams.has('components')
-  const showCardDesignLab = searchParams.has('cards') || searchParams.has('designlab')
+  const showCardDesignLab = searchParams.has('cards')
   const showPickerDesignLab = searchParams.has('pickers')
-  const showSRDCardPage = searchParams.has('srdcard')
   // Enable cursor-following glow effect on glass elements
   useMouseGlow()
 
@@ -85,19 +83,14 @@ function App() {
     return <ComponentsLibrary />
   }
 
-  // Show card design lab if ?cards or ?designlab is in URL
+  // Show card design lab if ?cards is in URL
   if (showCardDesignLab) {
-    return <CardDesignLab onBack={() => window.location.href = window.location.pathname} />
+    return <SRDCardPage />
   }
 
   // Show picker design lab if ?pickers is in URL
   if (showPickerDesignLab) {
     return <PickerDesignLab onBack={() => window.location.href = window.location.pathname} />
-  }
-
-  // Show SRD card page if ?srdcard is in URL
-  if (showSRDCardPage) {
-    return <SRDCardPage />
   }
 
   return (
