@@ -25,6 +25,7 @@ export interface SRDCardProps {
   classNameLetterSpacing?: string
   classNameSmallCaps?: boolean
   separatorStyle?: 'code' | 'figma'
+  bodyFontFamily?: string
   bodyFontSize?: number
   bodyLineHeight?: string
   bodyTextShadow?: boolean
@@ -143,6 +144,17 @@ const goldGradientStyle = {
 } as const
 
 
+// Shared subtitle style — used by class name and footer
+const subtitleStyle = {
+  fontFamily: "'EB Garamond', serif",
+  fontSize: 13,
+  fontWeight: 600,
+  lineHeight: 'normal' as const,
+  letterSpacing: '0.06em',
+  fontVariant: 'small-caps' as const,
+  ...goldGradientStyle,
+}
+
 // Auto-sizing title that scales down to fit on one line
 function AutoFitTitle({ children, maxFontSize = 36, style }: {
   children: React.ReactNode
@@ -177,6 +189,41 @@ function AutoFitTitle({ children, maxFontSize = 36, style }: {
   )
 }
 
+// Auto-sizing body text that scales down font to fit available height
+function AutoFitBody({ children, maxFontSize = 13, style, className }: {
+  children: React.ReactNode
+  maxFontSize?: number
+  style?: React.CSSProperties
+  className?: string
+}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [fontSize, setFontSize] = useState(maxFontSize)
+
+  const fit = useCallback(() => {
+    const el = containerRef.current
+    if (!el) return
+    let size = maxFontSize
+    el.style.fontSize = `${size}px`
+    while (el.scrollHeight > el.clientHeight && size > 8) {
+      size -= 0.5
+      el.style.fontSize = `${size}px`
+    }
+    setFontSize(size)
+  }, [maxFontSize])
+
+  useEffect(() => { fit() }, [fit, children])
+
+  return (
+    <div
+      ref={containerRef}
+      className={className}
+      style={{ ...style, fontSize, overflow: 'hidden' }}
+    >
+      {children}
+    </div>
+  )
+}
+
 export function SRDCard({
   name,
   className,
@@ -196,6 +243,7 @@ export function SRDCard({
   classNameLetterSpacing,
   classNameSmallCaps = true,
   separatorStyle = 'figma',
+  bodyFontFamily,
   bodyFontSize,
   bodyLineHeight,
   bodyTextShadow = true,
@@ -224,7 +272,13 @@ export function SRDCard({
       }}
     >
       {/* Top illustration area */}
-      <div className="relative" style={{ height: 288, flexShrink: 0 }}>
+      <div className="relative" style={{
+        height: 288,
+        flexShrink: 0,
+        zIndex: 2,
+        WebkitMaskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
+        maskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
+      }}>
         {/* Character illustration */}
         {illustrationSrc && (
           <img
@@ -251,11 +305,20 @@ export function SRDCard({
         <MaskedBanner color={bannerColor} uid={uid} domainIcons={domainIcons} basePath={basePath} />
       </div>
 
-      {/* Content area with gradient background */}
+      {/* Background atmosphere layer — flipped texture behind content */}
+      <img
+        src={`${basePath}images/cards/atmosphere.png`}
+        alt=""
+        className="absolute w-full pointer-events-none"
+        style={{ top: 188, height: 319, objectFit: 'cover', transform: 'scaleY(-1)', zIndex: 1 }}
+        draggable={false}
+      />
+
+      {/* Content area — fixed 297px, pinned to bottom */}
       <div
-        className="relative flex flex-col flex-1 min-h-0 px-6"
+        className="absolute bottom-0 left-0 right-0 flex flex-col px-6"
         style={{
-          marginTop: -120,
+          height: 297,
           zIndex: 10,
           background:
             'linear-gradient(180deg, rgba(31, 58, 96, 0) 0%, rgba(3, 7, 13, 0.81) 12%, rgba(3, 7, 13, 0.81) 83%, rgba(19, 36, 60, 0.35) 97%, rgba(31, 58, 96, 0) 100%)',
@@ -270,9 +333,9 @@ export function SRDCard({
               maxFontSize={titleFontSize ?? 36}
               style={{
                 fontFamily: "'EB Garamond', serif",
-                fontWeight: 400,
+                fontWeight: 500,
                 lineHeight: titleLineHeight ?? '32px',
-                letterSpacing: titleLetterSpacing ?? '0.02em',
+                letterSpacing: titleLetterSpacing ?? '0.01em',
                 ...(titleSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
                 ...(titleTextTransform ? { textTransform: titleTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
                 ...goldGradientStyle,
@@ -304,16 +367,7 @@ export function SRDCard({
 
             {/* Class name */}
             <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
-              <span
-                style={{
-                  fontFamily: "'EB Garamond', serif",
-                  fontSize: classNameFontSize ?? 13,
-                  fontWeight: 500,
-                  letterSpacing: classNameLetterSpacing ?? '0.08em',
-                  ...(classNameSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
-                  ...goldGradientStyle,
-                }}
-              >
+              <span style={subtitleStyle}>
                 {className}
               </span>
             </div>
@@ -337,15 +391,16 @@ export function SRDCard({
           </div>
         </div>
 
-        {/* Body text */}
-        <div
-          className="flex-1 min-h-0 overflow-y-auto"
+        {/* Body text — auto-shrinks to fit */}
+        <AutoFitBody
+          maxFontSize={bodyFontSize ?? 13.5}
+          className="flex-1 min-h-0"
           style={{
-            fontFamily: "'Crimson Text', serif",
-            fontSize: bodyFontSize ?? 13,
-            lineHeight: bodyLineHeight ?? '17px',
-            color: 'rgba(249, 248, 243, 0.8)',
+            fontFamily: bodyFontFamily ?? "'Source Sans 3', sans-serif",
+            lineHeight: bodyLineHeight ?? '1.4',
+            color: 'rgba(212, 207, 199, 0.9)',
             ...(bodyTextShadow ? { textShadow: '0px 1px 1px #4d381e' } : {}),
+            ...(contentLayout === 'figma' ? { display: 'flex', flexDirection: 'column' as const, gap: 12 } : {}),
           }}
         >
           {feats.map((feat, i) => (
@@ -370,39 +425,19 @@ export function SRDCard({
               ))}
             </ul>
           )}
-        </div>
+        </AutoFitBody>
 
         {/* Footer */}
         <div
           className={contentLayout === 'figma' ? 'flex items-center justify-between' : 'flex items-center justify-between py-3'}
           style={{ flexShrink: 0, filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}
         >
-          <span
-            style={{
-              fontFamily: "'EB Garamond', serif",
-              fontSize: footerFontSize ?? 13,
-              fontWeight: 500,
-              lineHeight: 'normal',
-              ...(footerSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
-              ...(footerTextTransform ? { textTransform: footerTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
-              ...goldGradientStyle,
-            }}
-          >
+          <span style={subtitleStyle}>
             {tier}
           </span>
 
           {spellcastTrait && (
-            <span
-              style={{
-                fontFamily: "'EB Garamond', serif",
-                fontSize: footerFontSize ?? 13,
-                fontWeight: 500,
-                lineHeight: 'normal',
-                ...(footerSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
-                ...(footerTextTransform ? { textTransform: footerTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
-                ...goldGradientStyle,
-              }}
-            >
+            <span style={subtitleStyle}>
               Spellcast: {spellcastTrait}
             </span>
           )}
@@ -415,7 +450,7 @@ export function SRDCard({
           src={`${basePath}images/card-frame.svg`}
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none z-20"
-          style={{ opacity: 0.4 }}
+          style={{ opacity: 0.6 }}
           draggable={false}
         />
       )}
