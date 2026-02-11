@@ -10,6 +10,7 @@ interface Delta {
   figmaValue: string
   infoOnly?: boolean
   infoNote?: string
+  saved?: 'code' | 'figma'
 }
 
 const DELTAS: Delta[] = [
@@ -29,6 +30,7 @@ const DELTAS: Delta[] = [
     category: 'typography',
     currentValue: 'true',
     figmaValue: 'false',
+    saved: 'code',
   },
   {
     id: 'classNameLetterSpacing',
@@ -45,6 +47,7 @@ const DELTAS: Delta[] = [
     category: 'typography',
     currentValue: 'true',
     figmaValue: 'false',
+    saved: 'code',
   },
   {
     id: 'footerSmallCaps',
@@ -53,6 +56,7 @@ const DELTAS: Delta[] = [
     category: 'typography',
     currentValue: 'true',
     figmaValue: 'false',
+    saved: 'code',
   },
   // Shadows
   {
@@ -70,6 +74,7 @@ const DELTAS: Delta[] = [
     category: 'shadows',
     currentValue: 'none',
     figmaValue: '0px 1px 1px #4d381e',
+    saved: 'figma',
   },
   // Layout
   {
@@ -79,6 +84,7 @@ const DELTAS: Delta[] = [
     category: 'layout',
     currentValue: 'diamond 5x5, line 1px',
     figmaValue: 'diamond 4x4, line 2px',
+    saved: 'figma',
   },
   {
     id: 'contentLayout',
@@ -87,6 +93,7 @@ const DELTAS: Delta[] = [
     category: 'layout',
     currentValue: 'Tailwind margins (mt-1, mb-3, mt-2, py-3)',
     figmaValue: 'gap: 12px, pad: 24/24/18/24',
+    saved: 'figma',
   },
   // Structural
   {
@@ -96,6 +103,7 @@ const DELTAS: Delta[] = [
     category: 'structural',
     currentValue: 'card-frame.svg at 40%',
     figmaValue: 'none (uses border instead)',
+    saved: 'code',
   },
   {
     id: 'showIllustrationOverlay',
@@ -104,6 +112,7 @@ const DELTAS: Delta[] = [
     category: 'structural',
     currentValue: 'gradient 30%-70%',
     figmaValue: 'none (content gradient handles it)',
+    saved: 'figma',
   },
   {
     id: 'illustrationMask',
@@ -198,16 +207,26 @@ function DeltaRow({ delta, enabled, onChange }: {
           </span>
         </div>
         <div style={{ display: 'flex', gap: 12, fontSize: 11, fontFamily: 'ui-monospace, monospace' }}>
-          <span style={{ color: delta.infoOnly ? '#9ca3af' : (enabled ? '#9ca3af' : '#1f2937') }}>
+          <span style={{ color: delta.saved === 'code' ? '#059669' : delta.infoOnly ? '#9ca3af' : (enabled ? '#9ca3af' : '#1f2937') }}>
             {delta.currentValue}
           </span>
           <span style={{ color: '#d1d5db' }}>&rarr;</span>
-          <span style={{ color: delta.infoOnly ? '#9ca3af' : (enabled ? '#3b82f6' : '#9ca3af') }}>
+          <span style={{ color: delta.saved === 'figma' ? '#059669' : delta.infoOnly ? '#9ca3af' : (enabled ? '#3b82f6' : '#9ca3af') }}>
             {delta.figmaValue}
           </span>
         </div>
       </div>
-      {delta.infoOnly ? (
+      {delta.saved ? (
+        <span style={{
+          fontSize: 13,
+          color: '#059669',
+          flexShrink: 0,
+          width: 36,
+          textAlign: 'center',
+        }}>
+          &#10003;
+        </span>
+      ) : delta.infoOnly ? (
         <span style={{
           fontSize: 10,
           color: '#9ca3af',
@@ -261,18 +280,10 @@ export function SRDCardPage() {
       { name: 'Adept', text: 'When you Utilize an Experience, you can mark a Stress instead of spending a Hope. If you do, double your Experience modifier for that roll.' },
     ],
     illustrationSrc: `${basePath}images/cards/subclass/school-of-knowledge.png`,
-    // Delta-controlled props
+    // Only pass unsaved deltas — saved ones use SRDCard defaults
     titleLetterSpacing: isOn('titleLetterSpacing') ? '0em' : '0.02em',
-    titleSmallCaps: isOn('titleSmallCaps') ? false : true,
     classNameLetterSpacing: isOn('classNameLetterSpacing') ? '0em' : '0.08em',
-    classNameSmallCaps: isOn('classNameSmallCaps') ? false : true,
-    footerSmallCaps: isOn('footerSmallCaps') ? false : true,
     titleShadowStyle: (isOn('titleShadowStyle') ? 'subtle' : 'heavy') as 'subtle' | 'heavy',
-    bodyTextShadow: isOn('bodyTextShadow'),
-    separatorStyle: (isOn('separatorStyle') ? 'figma' : 'code') as 'figma' | 'code',
-    contentLayout: (isOn('contentLayout') ? 'figma' : 'code') as 'figma' | 'code',
-    showCardFrame: isOn('showCardFrame') ? false : true,
-    showIllustrationOverlay: isOn('showIllustrationOverlay') ? false : true,
   }
 
   const activeCount = DELTAS.filter((d) => !d.infoOnly && isOn(d.id)).length

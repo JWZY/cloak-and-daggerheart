@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useId, useRef, useEffect, useState, useCallback } from 'react'
 import { type DomainIconName, DOMAIN_ICON_DATA } from './domain-icons'
 
 export interface SRDCardFeat {
@@ -143,6 +143,40 @@ const goldGradientStyle = {
 } as const
 
 
+// Auto-sizing title that scales down to fit on one line
+function AutoFitTitle({ children, maxFontSize = 36, style }: {
+  children: React.ReactNode
+  maxFontSize?: number
+  style?: React.CSSProperties
+}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLHeadingElement>(null)
+  const [fontSize, setFontSize] = useState(maxFontSize)
+
+  const fit = useCallback(() => {
+    const container = containerRef.current
+    const text = textRef.current
+    if (!container || !text) return
+    let size = maxFontSize
+    text.style.fontSize = `${size}px`
+    while (text.scrollWidth > container.clientWidth && size > 12) {
+      size -= 0.5
+      text.style.fontSize = `${size}px`
+    }
+    setFontSize(size)
+  }, [maxFontSize])
+
+  useEffect(() => { fit() }, [fit, children])
+
+  return (
+    <div ref={containerRef} style={{ width: '100%', overflow: 'hidden' }}>
+      <h1 ref={textRef} style={{ ...style, fontSize, whiteSpace: 'nowrap' }}>
+        {children}
+      </h1>
+    </div>
+  )
+}
+
 export function SRDCard({
   name,
   className,
@@ -155,22 +189,22 @@ export function SRDCard({
   titleFontSize,
   titleLineHeight,
   titleLetterSpacing,
-  titleSmallCaps,
+  titleSmallCaps = true,
   titleTextTransform,
   titleShadowStyle = 'heavy',
   classNameFontSize,
   classNameLetterSpacing,
   classNameSmallCaps = true,
-  separatorStyle = 'code',
+  separatorStyle = 'figma',
   bodyFontSize,
   bodyLineHeight,
-  bodyTextShadow = false,
+  bodyTextShadow = true,
   footerFontSize,
   footerSmallCaps = true,
   footerTextTransform,
-  contentLayout = 'code',
+  contentLayout = 'figma',
   showCardFrame = true,
-  showIllustrationOverlay = true,
+  showIllustrationOverlay = false,
   illustrationSrc,
   onClick,
 }: SRDCardProps) {
@@ -231,21 +265,22 @@ export function SRDCard({
         {/* Title section */}
         <div className={contentLayout === 'figma' ? 'flex flex-col items-center text-center' : 'flex flex-col items-center text-center pt-2'}>
           {/* Subclass name */}
-          <div style={{ filter: titleShadowStyle === 'subtle' ? 'drop-shadow(0px 1px 1px #4d381e)' : 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
-            <h1
+          <div style={{ filter: titleShadowStyle === 'subtle' ? 'drop-shadow(0px 1px 1px #4d381e)' : 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))', width: '100%' }}>
+            <AutoFitTitle
+              maxFontSize={titleFontSize ?? 36}
               style={{
                 fontFamily: "'EB Garamond', serif",
-                fontSize: titleFontSize ?? 36,
                 fontWeight: 400,
                 lineHeight: titleLineHeight ?? '32px',
                 letterSpacing: titleLetterSpacing ?? '0.02em',
                 ...(titleSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
                 ...(titleTextTransform ? { textTransform: titleTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
                 ...goldGradientStyle,
+                textAlign: 'center',
               }}
             >
               {name}
-            </h1>
+            </AutoFitTitle>
           </div>
 
           {/* Decorative separator with class name */}
