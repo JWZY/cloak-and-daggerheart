@@ -1,5 +1,5 @@
 import { useId, useRef, useEffect, useState, useCallback } from 'react'
-import { type DomainIconName, DOMAIN_ICON_DATA } from './domain-icons'
+import { type DomainIconName, getDomainIconPath } from './domain-icons'
 
 export interface SRDCardFeat {
   name?: string  // if omitted, no bold prefix
@@ -14,6 +14,7 @@ export interface SRDCardProps {
   feats: SRDCardFeat[]
   featList?: string[]
   bannerColor?: string
+  bannerInnerColor?: string
   domainIcons?: [DomainIconName, DomainIconName]
   titleFontSize?: number
   titleLineHeight?: string
@@ -39,45 +40,15 @@ export interface SRDCardProps {
   onClick?: () => void
 }
 
-// Generic domain icon with gold gradient fill and drop shadow
-function DomainIconSvg({ name, uid }: { name: DomainIconName; uid: string }) {
-  const icon = DOMAIN_ICON_DATA[name]
-  const filterId = `${uid}-${name}-f`
-  const gradientId = `${uid}-${name}-g`
-  return (
-    <svg viewBox={icon.viewBox} fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-      <g filter={`url(#${filterId})`}>
-        <path d={icon.d} fill={`url(#${gradientId})`}/>
-      </g>
-      <defs>
-        <filter id={filterId} filterUnits="objectBoundingBox" x="-0.1" y="-0.1" width="1.2" height="1.2" colorInterpolationFilters="sRGB">
-          <feFlood floodOpacity="0" result="bg"/>
-          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="a"/>
-          <feOffset/>
-          <feGaussianBlur stdDeviation="1.5"/>
-          <feComposite in2="a" operator="out"/>
-          <feColorMatrix type="matrix" values="0 0 0 0 0.373 0 0 0 0 0.304 0 0 0 0 0 0 0 0 1 0"/>
-          <feBlend in2="bg" result="s"/>
-          <feBlend in="SourceGraphic" in2="s" result="shape"/>
-        </filter>
-        <linearGradient id={gradientId} gradientUnits="objectBoundingBox" x1="0.5" y1="0" x2="0.5" y2="1">
-          <stop stopColor="#F9F8F3"/>
-          <stop offset="1" stopColor="#E7BA90"/>
-        </linearGradient>
-      </defs>
-    </svg>
-  )
-}
-
 // Masked banner — all layers clipped to a single pennant mask (Figma approach)
-function MaskedBanner({ color = '#BD0C70', uid, domainIcons, basePath }: {
-  color?: string; uid: string; domainIcons?: [DomainIconName, DomainIconName]; basePath: string
+function MaskedBanner({ color = '#BD0C70', innerColor = '#1E1E1E', uid, domainIcons, basePath }: {
+  color?: string; innerColor?: string; uid: string; domainIcons?: [DomainIconName, DomainIconName]; basePath: string
 }) {
   const maskStyle = {
-    WebkitMaskImage: `url('${basePath}images/cards/banners/banner-mask.svg')`,
-    maskImage: `url('${basePath}images/cards/banners/banner-mask.svg')`,
-    WebkitMaskSize: '40px 80px',
-    maskSize: '40px 80px',
+    WebkitMaskImage: `url('${basePath}images/cards/banners/mask.svg')`,
+    maskImage: `url('${basePath}images/cards/banners/mask.svg')`,
+    WebkitMaskSize: '44px 80px',
+    maskSize: '44px 80px',
     WebkitMaskRepeat: 'no-repeat',
     maskRepeat: 'no-repeat',
   } as React.CSSProperties
@@ -89,13 +60,13 @@ function MaskedBanner({ color = '#BD0C70', uid, domainIcons, basePath }: {
   }) as React.CSSProperties
 
   return (
-    <div className="absolute z-10" style={{ top: -2, left: 15, width: 40, height: 80 }}>
+    <div className="absolute z-10" style={{ top: -2, left: 15, width: 44, height: 80 }}>
       {/* Layer 1: Outer trapezoid — masked to pennant */}
-      <div className="absolute top-0 left-0 w-[40px] h-[70px]" style={maskAt(0, 0)}>
-        <svg viewBox="0 0 40 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <path d="M39.4707 0.5L35.5283 69.5H4.47168L0.529297 0.5H39.4707Z" fill={color} stroke={`url(#${uid}-m-bg)`}/>
+      <div className="absolute top-0 left-0 w-[44px] h-[70px]" style={maskAt(0, 0)}>
+        <svg viewBox="0 0 44 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          <path d="M43.4678 0.5L39.1299 69.5H4.87012L0.532227 0.5H43.4678Z" fill={color} stroke={`url(#${uid}-m-bg)`}/>
           <defs>
-            <linearGradient id={`${uid}-m-bg`} x1="20" y1="24.57" x2="20" y2="53.62" gradientUnits="userSpaceOnUse">
+            <linearGradient id={`${uid}-m-bg`} x1="22" y1="24.57" x2="22" y2="53.62" gradientUnits="userSpaceOnUse">
               <stop offset="0.61" stopColor="#DBC593"/>
               <stop offset="1" stopColor="#C29734"/>
             </linearGradient>
@@ -103,9 +74,9 @@ function MaskedBanner({ color = '#BD0C70', uid, domainIcons, basePath }: {
         </svg>
       </div>
       {/* Layer 2: Inner pennant — masked to pennant */}
-      <div className="absolute top-0 left-[5px] w-[30px] h-[80px]" style={maskAt(-5, 0)}>
+      <div className="absolute top-0 left-[7px] w-[30px] h-[80px]" style={maskAt(-7, 0)}>
         <svg viewBox="0 0 30 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill="#1E1E1E" stroke={`url(#${uid}-m-fg)`}/>
+          <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill={innerColor} stroke={`url(#${uid}-m-fg)`}/>
           <defs>
             <linearGradient id={`${uid}-m-fg`} x1="15" y1="0" x2="15" y2="80" gradientUnits="userSpaceOnUse">
               <stop stopColor="#F9F8F3"/>
@@ -115,19 +86,15 @@ function MaskedBanner({ color = '#BD0C70', uid, domainIcons, basePath }: {
         </svg>
       </div>
       {/* Layer 3: Domain icons — masked to pennant */}
-      <div className="absolute flex flex-col items-center justify-center gap-0.5" style={{ top: 9, left: 8, width: 24, height: 48, ...maskAt(-8, -9) }}>
-        <div style={{ width: 17, height: 18 }}>
-          <DomainIconSvg name={domainIcons?.[0] ?? 'midnight'} uid={`${uid}-m`} />
-        </div>
-        <div style={{ width: 17, height: 18 }}>
-          <DomainIconSvg name={domainIcons?.[1] ?? 'grace'} uid={`${uid}-m`} />
-        </div>
+      <div className="absolute flex flex-col items-center justify-center gap-0.5" style={{ top: 5, left: 10, width: 24, height: 54, ...maskAt(-10, -5) }}>
+        <img src={getDomainIconPath(domainIcons?.[0] ?? 'midnight', basePath)} alt="" width={24} height={24} draggable={false} />
+        <img src={getDomainIconPath(domainIcons?.[1] ?? 'grace', basePath)} alt="" width={24} height={24} draggable={false} />
       </div>
       {/* Layer 4: Texture overlay — masked to pennant */}
       <img
-        src={`${basePath}images/cards/banners/banner-texture.png`}
+        src={`${basePath}images/cards/banners/texture.png`}
         alt=""
-        className="absolute top-0 left-0 w-[40px] h-[80px] pointer-events-none"
+        className="absolute top-0 left-0 w-[44px] h-[80px] pointer-events-none"
         style={{ mixBlendMode: 'multiply', ...maskAt(0, 0) }}
       />
     </div>
@@ -232,6 +199,7 @@ export function SRDCard({
   feats,
   featList,
   bannerColor = '#BD0C70',
+  bannerInnerColor = '#1E1E1E',
   domainIcons,
   titleFontSize,
   titleLineHeight,
@@ -239,17 +207,15 @@ export function SRDCard({
   titleSmallCaps = true,
   titleTextTransform,
   titleShadowStyle = 'heavy',
-  classNameFontSize,
-  classNameLetterSpacing,
-  classNameSmallCaps = true,
+  // classNameFontSize, classNameLetterSpacing, classNameSmallCaps — kept in interface, not used in render
+
   separatorStyle = 'figma',
   bodyFontFamily,
   bodyFontSize,
   bodyLineHeight,
   bodyTextShadow = true,
-  footerFontSize,
-  footerSmallCaps = true,
-  footerTextTransform,
+  // footerFontSize, footerSmallCaps, footerTextTransform — kept in interface, not used in render
+
   contentLayout = 'figma',
   showCardFrame = true,
   showIllustrationOverlay = false,
@@ -302,7 +268,7 @@ export function SRDCard({
         )}
 
         {/* Class banner (top-left) */}
-        <MaskedBanner color={bannerColor} uid={uid} domainIcons={domainIcons} basePath={basePath} />
+        <MaskedBanner color={bannerColor} innerColor={bannerInnerColor} uid={uid} domainIcons={domainIcons} basePath={basePath} />
       </div>
 
       {/* Background atmosphere layer — flipped texture behind content */}
@@ -447,7 +413,7 @@ export function SRDCard({
       {/* Textured border frame overlay */}
       {showCardFrame && (
         <img
-          src={`${basePath}images/card-frame.svg`}
+          src={`${basePath}images/cards/frame.svg`}
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none z-20"
           style={{ opacity: 0.6 }}

@@ -1,23 +1,10 @@
 import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
+import { DOMAIN_COLORS } from './DomainCard'
 
 // Official Daggerheart card dimensions: 360x504px at full size
 const CARD_WIDTH = 360
 const CARD_HEIGHT = 504
-
-// Domain colors from Daggerheart
-// eslint-disable-next-line react-refresh/only-export-components
-export const DOMAIN_COLORS: Record<string, string> = {
-  Arcana: '#4e345b',    // Deep purple
-  Blade: '#8b2635',     // Deep red
-  Bone: '#4a4238',      // Dark brown
-  Codex: '#1e3a5f',     // Deep blue
-  Grace: '#7a3654',     // Deep magenta
-  Midnight: '#1a1a2e',  // Near black
-  Sage: '#2d4a3e',      // Deep green
-  Splendor: '#8b6914',  // Deep gold
-  Valor: '#944e1c',     // Deep orange
-}
 
 // Domain icons (simplified geometric versions)
 const DomainIcon = ({ domain, size = 32 }: { domain: string; size?: number }) => {
@@ -88,6 +75,7 @@ export function OfficialCard({
   onClick,
   className = '',
 }: OfficialCardProps) {
+  const basePath = import.meta.env.BASE_URL || '/'
   const domainColor = DOMAIN_COLORS[domain] || '#4e345b'
   const width = CARD_WIDTH * scale
   const height = CARD_HEIGHT * scale
@@ -122,7 +110,7 @@ export function OfficialCard({
         >
           {/* Banner background image */}
           <img
-            src="/images/cards/official/banner.webp"
+            src={`${basePath}images/cards/official/banner.webp`}
             alt=""
             className="block"
             style={{
@@ -219,7 +207,7 @@ export function OfficialCard({
           }}
         >
           <img
-            src="/images/cards/official/subclass-divider.png"
+            src={`${basePath}images/cards/official/divider.png`}
             alt=""
             className="w-full opacity-60"
             style={{ height: 8 * scale }}

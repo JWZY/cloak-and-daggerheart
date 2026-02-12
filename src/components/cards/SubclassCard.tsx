@@ -65,8 +65,8 @@ export function SubclassCard({
   onClick,
 }: SubclassCardProps) {
   const basePath = import.meta.env.BASE_URL || '/'
-  const bannerSrc = `${basePath}images/cards/subclass/banner.webp`
-  const dividerSrc = `${basePath}images/cards/subclass/subclass-divider.png`
+  const bannerSrc = `${basePath}images/cards/subclasses/banner.webp`
+  const dividerSrc = `${basePath}images/cards/subclasses/divider.png`
 
   // Dark background color used in official cards
   const darkBg = 'rgb(30, 32, 31)'

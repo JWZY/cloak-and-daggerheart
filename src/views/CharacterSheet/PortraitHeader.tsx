@@ -11,7 +11,7 @@ interface PortraitHeaderProps {
 function getSubclassImage(subclass: string): string {
   const slug = subclass.toLowerCase().replace(/\s+/g, '-')
   const base = import.meta.env.BASE_URL || '/'
-  return `${base}images/cards/subclass/${slug}.webp`
+  return `${base}images/cards/subclasses/${slug}.webp`
 }
 
 // Spring transition for smooth snapping

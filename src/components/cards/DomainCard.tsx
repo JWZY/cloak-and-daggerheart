@@ -1,18 +1,18 @@
 import { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
-// Domain colors matching the official Daggerheart palette
+// Domain colors — single source of truth (Figma banner = canonical, code fallback for Arcana/Sage)
 // eslint-disable-next-line react-refresh/only-export-components
 export const DOMAIN_COLORS: Record<string, string> = {
-  Arcana: '#4e345b',    // Deep purple
-  Blade: '#8b2635',     // Deep red
-  Bone: '#4a4238',      // Dark brown
-  Codex: '#1e3a5f',     // Deep blue
-  Grace: '#7a3654',     // Deep magenta
-  Midnight: '#1a1a2e',  // Near black
-  Sage: '#2d4a3e',      // Deep green
-  Splendor: '#8b6914',  // Deep gold
-  Valor: '#944e1c',     // Deep orange
+  Arcana: '#4e345b',    // Deep purple (no Figma banner yet, keeping code value)
+  Blade: '#A61118',     // Deep red
+  Bone: '#A3A9A8',      // Silver/gray
+  Codex: '#1D3B61',     // Navy blue
+  Grace: '#BD0C70',     // Magenta
+  Midnight: '#1E1E1E',  // Near-black
+  Sage: '#2d4a3e',      // Deep green (no Figma banner yet, keeping code value)
+  Splendor: '#BEA228',  // Bright gold
+  Valor: '#EB5B00',     // Orange
 }
 
 // Clip paths from the official card creator CSS
@@ -91,8 +91,8 @@ export function DomainCard({
   onClick,
 }: DomainCardProps) {
   const basePath = import.meta.env.BASE_URL || '/'
-  const bannerSrc = `${basePath}images/cards/subclass/banner.webp`
-  const dividerSrc = `${basePath}images/cards/domains/domain-divider.png`
+  const bannerSrc = `${basePath}images/cards/subclasses/banner.webp`
+  const dividerSrc = `${basePath}images/cards/domains/divider.png`
   const domainColor = DOMAIN_COLORS[domain] || '#4e345b'
 
   return (

@@ -12,7 +12,7 @@ interface SubclassStepProps {
 function getSubclassImage(subclassName: string): string {
   const basePath = import.meta.env.BASE_URL || '/'
   const slug = subclassName.toLowerCase().replace(/\s+/g, '-')
-  return `${basePath}images/cards/subclass/${slug}.webp`
+  return `${basePath}images/cards/subclasses/${slug}.webp`
 }
 
 export function SubclassStep({ selected, onSelect }: SubclassStepProps) {
