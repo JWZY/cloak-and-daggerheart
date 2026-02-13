@@ -11,11 +11,12 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Cloak & Daggerheart',
-        short_name: 'Daggerheart',
-        description: 'Native-feeling iOS web app',
-        theme_color: '#000000',
-        background_color: '#000000',
+        short_name: 'C&D',
+        description: 'Daggerheart character companion',
+        theme_color: '#1e201f',
+        background_color: '#1e201f',
         display: 'standalone',
+        orientation: 'portrait',
         icons: [
           {
             src: 'icon-192.png',

@@ -1,0 +1,197 @@
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { TRAIT_NAMES, SUGGESTED_WIZARD_TRAITS, formatTraitValue, getRemainingTraitValues } from '../../core/rules/traits'
+import type { TraitName } from '../../types/character'
+import { SectionHeader } from '../../ui/SectionHeader'
+import { GameBadge } from '../../ui/GameBadge'
+import { useDeckStore } from '../../store/deck-store'
+
+export function AssignTraits() {
+  const storedTraits = useDeckStore((s) => s.traits)
+  const setTraits = useDeckStore((s) => s.setTraits)
+
+  // Local trait assignment state — each trait maps to a value or null (unassigned)
+  const [assignments, setAssignments] = useState<Record<TraitName, number | null>>(() => {
+    if (storedTraits) {
+      // Restore from store
+      return storedTraits as Record<TraitName, number>
+    }
+    // Pre-fill with suggested wizard traits
+    return { ...SUGGESTED_WIZARD_TRAITS }
+  })
+
+  const remaining = getRemainingTraitValues(assignments)
+  const allAssigned = remaining.length === 0
+
+  // Sync to store when all traits are assigned
+  useEffect(() => {
+    if (allAssigned) {
+      const traitValues: Record<string, number> = {}
+      for (const name of TRAIT_NAMES) {
+        traitValues[name] = assignments[name]!
+      }
+      setTraits(traitValues)
+    }
+  }, [allAssigned, assignments, setTraits])
+
+  const handleSlotTap = (traitName: TraitName) => {
+    const currentValue = assignments[traitName]
+    if (currentValue !== null) {
+      // Unassign this slot
+      setAssignments((prev) => ({ ...prev, [traitName]: null }))
+    } else if (remaining.length > 0) {
+      // Assign the first available value
+      setAssignments((prev) => ({ ...prev, [traitName]: remaining[0] }))
+    }
+  }
+
+  const handlePillTap = (value: number, poolIndex: number) => {
+    // Find the first empty slot and assign this value
+    const emptySlot = TRAIT_NAMES.find((name) => assignments[name] === null)
+    if (!emptySlot) return
+
+    // Remove this specific value from the pool by finding it
+    // We need to track which specific pool item was tapped
+    const remainingCopy = [...remaining]
+    let targetIdx = -1
+    let count = 0
+    for (let i = 0; i < remainingCopy.length; i++) {
+      if (remainingCopy[i] === value) {
+        if (count === poolIndex) {
+          targetIdx = i
+          break
+        }
+        count++
+      }
+    }
+    if (targetIdx === -1) return
+
+    setAssignments((prev) => ({ ...prev, [emptySlot]: value }))
+  }
+
+  // Group remaining values and track indices for duplicate handling
+  const pillValues: { value: number; poolIndex: number }[] = []
+  const seenCounts: Record<number, number> = {}
+  for (const v of remaining) {
+    const idx = seenCounts[v] ?? 0
+    pillValues.push({ value: v, poolIndex: idx })
+    seenCounts[v] = idx + 1
+  }
+
+  return (
+    <div className="flex flex-col items-center px-4">
+      <h2 className="w-full max-w-xs mb-2">
+        <SectionHeader>Assign Traits</SectionHeader>
+      </h2>
+      <p
+        style={{
+          fontFamily: "'EB Garamond', serif",
+          fontStyle: 'italic',
+          fontSize: 13,
+          color: 'rgba(231, 186, 144, 0.5)',
+          textAlign: 'center',
+          marginBottom: 24,
+        }}
+      >
+        Tap a trait to unassign, tap a pill to assign
+      </p>
+
+      {/* Available values (pills) */}
+      <div className="flex gap-2 mb-6 justify-center">
+        {pillValues.map(({ value, poolIndex }, i) => (
+          <motion.button
+            key={`${value}-${i}`}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handlePillTap(value, poolIndex)}
+            style={{
+              fontFamily: "'EB Garamond', serif",
+              fontWeight: 600,
+              fontSize: 14,
+              fontVariant: 'small-caps',
+              letterSpacing: '0.04em',
+              background: 'rgba(3, 7, 13, 0.8)',
+              border: '1px solid #e7ba90',
+              color: '#e7ba90',
+              textShadow: '0px 1px 1px #4d381e',
+              borderRadius: 9999,
+              padding: '6px 16px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            {formatTraitValue(value)}
+          </motion.button>
+        ))}
+        {remaining.length === 0 && (
+          <div className="flex flex-col items-center gap-1">
+            <GameBadge>All values assigned</GameBadge>
+            <span
+              style={{
+                fontFamily: "'EB Garamond', serif",
+                fontStyle: 'italic',
+                fontSize: 11,
+                color: 'rgba(231, 186, 144, 0.4)',
+              }}
+            >
+              Suggested traits applied
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Trait slots */}
+      <div className="flex flex-col gap-3 w-full max-w-xs">
+        {TRAIT_NAMES.map((traitName) => {
+          const value = assignments[traitName]
+          const isAssigned = value !== null
+
+          return (
+            <motion.button
+              key={traitName}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => handleSlotTap(traitName)}
+              className="flex items-center justify-between rounded-xl px-4 py-3"
+              style={{
+                background: isAssigned
+                  ? 'rgba(231, 186, 144, 0.06)'
+                  : 'rgba(255, 255, 255, 0.03)',
+                border: isAssigned
+                  ? '1px solid rgba(231, 186, 144, 0.2)'
+                  : '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: isAssigned
+                  ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
+                  : 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "'EB Garamond', serif",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  fontVariant: 'small-caps',
+                  letterSpacing: '0.04em',
+                  color: isAssigned ? '#e7ba90' : 'rgba(212, 207, 199, 0.4)',
+                }}
+              >
+                {traitName}
+              </span>
+              <span
+                style={{
+                  fontFamily: "'Source Sans 3', sans-serif",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: isAssigned ? '#e7ba90' : 'rgba(212, 207, 199, 0.2)',
+                  minWidth: 32,
+                  textAlign: 'right',
+                }}
+              >
+                {isAssigned ? formatTraitValue(value) : '\u2014'}
+              </span>
+            </motion.button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

@@ -82,6 +82,7 @@ export const wizardLevel1Cards = [...level1CodexCards, ...level1SplendorCards]
 // Default starting equipment
 export const leatherArmor = armors.find(a => a.name === 'Leather Armor')!
 export const quarterstaff = weapons.find(w => w.name === 'Quarterstaff')!
+export const greatstaff = weapons.find(w => w.name === 'Greatstaff')!
 
 // Helper to get subclass by name
 export function getSubclass(name: 'School of Knowledge' | 'School of War'): Subclass {

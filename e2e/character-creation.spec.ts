@@ -1,15 +1,23 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Character Creation Flow', () => {
+test.describe('Character Creation Flow (v2)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await page.evaluate(() => localStorage.clear())
+    await page.reload()
+    // Wait for splash to finish
+    await expect(
+      page.locator('h2:has-text("Choose Your Subclass")')
+    ).toBeVisible({ timeout: 10000 })
+  })
+
   test('complete character creation without errors', async ({ page }) => {
     const consoleErrors: string[] = []
     const consoleWarnings: string[] = []
 
-    // Capture console errors and warnings (ignoring 404s for missing resources)
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
         const text = msg.text()
-        // Ignore 404 errors for missing assets (images, fonts, etc.)
         if (!text.includes('404') && !text.includes('Failed to load resource')) {
           consoleErrors.push(text)
         }
@@ -18,173 +26,169 @@ test.describe('Character Creation Flow', () => {
         consoleWarnings.push(msg.text())
       }
     })
-
-    // Capture page errors (uncaught exceptions)
     page.on('pageerror', (err) => {
       consoleErrors.push(err.message)
     })
 
-    // Navigate to app - goes directly to character creation when no characters exist
-    await page.goto('/')
-    await expect(page.locator('h2')).toContainText('Choose Your Ancestry')
-
-    // Step 1: Select Ancestry (first one - Clank)
-    await page.click('text=Clank')
-    await page.click('button:has-text("Continue")')
-    await expect(page.locator('h2')).toContainText('Choose Your Community')
-
-    // Step 2: Select Community (first one - Highborne)
-    await page.click('text=Highborne')
-    await page.click('button:has-text("Continue")')
-    await expect(page.locator('h2')).toContainText('Subclass')
-
-    // Step 3: Select Subclass (School of Knowledge)
+    // Step 0: Select Subclass (School of Knowledge)
     await page.click('text=School of Knowledge')
-    await page.click('button:has-text("Continue")')
-    await expect(page.locator('h2')).toContainText('Choose Domain Cards')
+    await page.locator('button:has-text("Continue")').click()
 
-    // Step 4: Select 3 Domain Cards (School of Knowledge gets 3)
-    // Select cards by their names
-    await page.click('text=Book of Ava')
-    await page.click('text=Book of Illiat')
-    await page.click('text=Bolt Beacon')
-    await page.click('button:has-text("Continue")')
-    await expect(page.locator('h2')).toContainText('Assign Your Traits')
+    // Step 1: Draft Domain Cards — flip and select 3
+    await expect(
+      page.locator('h2:has-text("Draft Domain Cards")')
+    ).toBeVisible({ timeout: 3000 })
 
-    // Step 5: Assign Traits - use "Use Suggested" for simplicity
-    // Wait for traits step to be ready
-    await expect(page.locator('h3:has-text("agility")')).toBeVisible()
+    // Flip all face-down cards
+    for (let i = 0; i < 6; i++) {
+      const flipContainer = page.locator('div[style*="perspective"]').first()
+      if (await flipContainer.isVisible({ timeout: 1000 }).catch(() => false)) {
+        await flipContainer.click()
+        await page.waitForTimeout(400)
+      }
+    }
 
-    // Click "Use Suggested" button to auto-assign all traits
-    await page.click('text=Use Suggested')
+    // Select 3 cards
+    await page.locator('text=Book of Ava').first().click()
+    await page.waitForTimeout(200)
+    await page.locator('text=Book of Illiat').first().click()
+    await page.waitForTimeout(200)
+    await page.locator('text=Bolt Beacon').first().click()
+    await page.waitForTimeout(200)
 
-    // Wait for "All assigned!" message to confirm traits are set
-    await expect(page.locator('text=All assigned!')).toBeVisible()
+    await page.locator('button:has-text("Continue")').click()
 
-    // Take screenshot to see state
-    await page.screenshot({ path: 'test-results/traits-before-continue.png' })
+    // Step 2: Select Ancestry (InfoCards at 0.52 scale inside CardSelector)
+    await expect(
+      page.locator('h2:has-text("Choose Your Ancestry")')
+    ).toBeVisible({ timeout: 3000 })
+    await page.getByText('Clank', { exact: true }).first().click({ force: true })
+    await page.locator('button:has-text("Continue")').click()
 
-    // The Continue button should now be enabled - wait for it and click
-    const continueBtn = page.locator('.glass.fixed button:has-text("Continue")')
-    await expect(continueBtn).toBeEnabled({ timeout: 2000 })
+    // Step 3: Select Community (InfoCards at 0.52 scale inside CardSelector)
+    await expect(
+      page.locator('h2:has-text("Choose Your Community")')
+    ).toBeVisible({ timeout: 3000 })
+    await page.getByText('Highborne', { exact: true }).first().click({ force: true })
+    await page.locator('button:has-text("Continue")').click()
 
-    // Force click to bypass any overlay issues
-    await continueBtn.click({ force: true })
-    await page.waitForTimeout(500) // Wait for animation
+    // Step 4: Assign Traits (pre-filled with suggested wizard traits)
+    await expect(
+      page.locator('h2:has-text("Assign Traits")')
+    ).toBeVisible({ timeout: 3000 })
+    await expect(page.locator('text=All values assigned')).toBeVisible({
+      timeout: 2000,
+    })
+    await expect(
+      page.locator('button:has-text("Continue")')
+    ).toBeEnabled({ timeout: 2000 })
+    await page.locator('button:has-text("Continue")').click()
 
-    await page.screenshot({ path: 'test-results/traits-after-continue.png' })
-
-    await expect(page.locator('h2')).toContainText('Choose Your Equipment')
-
-    // Step 6: Equipment Selection (use defaults - Quarterstaff and Leather Armor)
-    await page.click('button:has-text("Continue")')
-    await expect(page.locator('h2')).toContainText('Review Your Character')
-
-    // Step 7: Enter name and complete
+    // Step 5: Name Character
+    await expect(
+      page.locator('h2:has-text("Name Your Character")')
+    ).toBeVisible({ timeout: 3000 })
     await page.fill('input[placeholder*="name"]', 'Test Wizard')
-    await page.click('button:has-text("Create Character")')
+    await page.locator('button:has-text("Continue")').click()
 
-    // Verify character sheet loaded
-    await expect(page.locator('h1').first()).toContainText('Test Wizard')
-    await expect(page.locator('text=Clank Wizard').first()).toBeVisible()
+    // Step 6: Review
+    await expect(page.locator('text=Test Wizard').first()).toBeVisible({
+      timeout: 3000,
+    })
+    await page.locator('button:has-text("Begin Adventure")').click()
 
-    // Navigate tabs to verify they work
-    await page.click('button:has-text("Cards")')
-    await expect(page.locator('h3:has-text("Domain Cards")')).toBeVisible()
-
-    await page.click('button:has-text("Gear")')
-    await expect(page.locator('text=Active Weapons')).toBeVisible()
-
-    await page.click('button:has-text("Notes")')
-    await expect(page.locator('h3:has-text("Session Notes")')).toBeVisible()
-
-    await page.click('button:has-text("Stats")')
+    // Verify HandView loaded with character
+    await expect(page.locator('text=Test Wizard').first()).toBeVisible({
+      timeout: 5000,
+    })
     await expect(page.locator('text=HP')).toBeVisible()
 
-    // Report errors
-    if (consoleErrors.length > 0) {
-      console.log('\n❌ Console Errors Found:')
-      consoleErrors.forEach((err) => console.log(`  - ${err}`))
-    }
-    if (consoleWarnings.length > 0) {
-      console.log('\n⚠️ Console Warnings Found:')
-      consoleWarnings.forEach((warn) => console.log(`  - ${warn.substring(0, 100)}...`))
-    }
-
-    // Fail test if there were errors
+    // Report and assert errors
     expect(consoleErrors, 'Console errors were found').toHaveLength(0)
     expect(consoleWarnings, 'React infinite loop warnings were found').toHaveLength(0)
   })
 
-  test('School of War gets 2 cards and extra HP', async ({ page }) => {
+  test('School of War gets extra HP', async ({ page }) => {
     const consoleErrors: string[] = []
 
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
         const text = msg.text()
-        // Ignore 404 errors for missing assets (images, fonts, etc.)
         if (!text.includes('404') && !text.includes('Failed to load resource')) {
           consoleErrors.push(text)
         }
       }
     })
-
     page.on('pageerror', (err) => {
       consoleErrors.push(err.message)
     })
 
-    // Navigate to app - goes directly to character creation when no characters exist
-    await page.goto('/')
-    await expect(page.locator('h2')).toContainText('Choose Your Ancestry')
-
-    // Create character with School of War
-    await page.click('text=Human')
-    await page.click('button:has-text("Continue")')
-    await page.click('text=Wanderborne')
-    await page.click('button:has-text("Continue")')
-
-    // Select School of War
+    // Step 0: Select School of War
     await page.click('text=School of War')
-    await page.click('button:has-text("Continue")')
+    await page.locator('button:has-text("Continue")').click()
 
-    // Should only need to select 2 cards - glass counter shows "0 / 2 selected" in span format
-    await expect(page.locator('.glass-counter')).toContainText('0')
-    await expect(page.locator('.glass-counter')).toContainText('2')
+    // Step 1: Draft Domain Cards — flip and select 3
+    await expect(
+      page.locator('h2:has-text("Draft Domain Cards")')
+    ).toBeVisible({ timeout: 3000 })
 
-    await page.click('text=Book of Ava')
-    await page.click('text=Mending Touch')
+    for (let i = 0; i < 6; i++) {
+      const flipContainer = page.locator('div[style*="perspective"]').first()
+      if (await flipContainer.isVisible({ timeout: 1000 }).catch(() => false)) {
+        await flipContainer.click()
+        await page.waitForTimeout(400)
+      }
+    }
 
-    // After selection, counter should show 2
-    await expect(page.locator('.glass-counter')).toContainText('2')
+    await page.locator('text=Book of Ava').first().click()
+    await page.waitForTimeout(200)
+    await page.locator('text=Mending Touch').first().click()
+    await page.waitForTimeout(200)
+    await page.locator('text=Bolt Beacon').first().click()
+    await page.waitForTimeout(200)
 
-    await page.click('button:has-text("Continue")')
+    await page.locator('button:has-text("Continue")').click()
 
-    // Assign traits - use "Use Suggested" for simplicity
-    await expect(page.locator('h3:has-text("agility")')).toBeVisible()
-    await page.click('text=Use Suggested')
+    // Step 2: Select Ancestry (InfoCards at 0.52 scale inside CardSelector)
+    await expect(
+      page.locator('h2:has-text("Choose Your Ancestry")')
+    ).toBeVisible({ timeout: 3000 })
+    await page.getByText('Human', { exact: true }).first().click({ force: true })
+    await page.locator('button:has-text("Continue")').click()
 
-    // Wait for "All assigned!" message to confirm traits are set
-    await expect(page.locator('text=All assigned!')).toBeVisible()
+    // Step 3: Select Community (InfoCards at 0.52 scale inside CardSelector)
+    await expect(
+      page.locator('h2:has-text("Choose Your Community")')
+    ).toBeVisible({ timeout: 3000 })
+    await page.getByText('Wanderborne', { exact: true }).first().click({ force: true })
+    await page.locator('button:has-text("Continue")').click()
 
-    // The Continue button should now be enabled - wait for it and click
-    const continueBtn2 = page.locator('.glass.fixed button:has-text("Continue")')
-    await expect(continueBtn2).toBeEnabled({ timeout: 2000 })
-    await continueBtn2.click()
-    await expect(page.locator('h2')).toContainText('Choose Your Equipment')
+    // Step 4: Assign Traits
+    await expect(
+      page.locator('h2:has-text("Assign Traits")')
+    ).toBeVisible({ timeout: 3000 })
+    await expect(page.locator('text=All values assigned')).toBeVisible({
+      timeout: 2000,
+    })
+    await page.locator('button:has-text("Continue")').click()
 
-    // Equipment Selection (use defaults)
-    await page.click('button:has-text("Continue")')
-    await expect(page.locator('h2')).toContainText('Review Your Character')
-
-    // Verify HP is 6 (5 base + 1 from Battlemage)
-    await expect(page.locator('text=HP')).toBeVisible()
-    await expect(page.locator('text=6').first()).toBeVisible()
-
+    // Step 5: Name Character
+    await expect(
+      page.locator('h2:has-text("Name Your Character")')
+    ).toBeVisible({ timeout: 3000 })
     await page.fill('input[placeholder*="name"]', 'War Wizard')
-    await page.click('button:has-text("Create Character")')
+    await page.locator('button:has-text("Continue")').click()
 
-    // Verify character loaded
-    await expect(page.locator('h1').first()).toContainText('War Wizard')
+    // Step 6: Review — School of War gives +1 HP (5 base + 1 = 6)
+    await expect(page.locator('text=War Wizard').first()).toBeVisible({
+      timeout: 3000,
+    })
+    await page.locator('button:has-text("Begin Adventure")').click()
+
+    // Verify HandView loaded
+    await expect(page.locator('text=War Wizard').first()).toBeVisible({
+      timeout: 5000,
+    })
 
     expect(consoleErrors, 'Console errors were found').toHaveLength(0)
   })

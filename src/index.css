@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 :root {
+  /* iOS Safe Area Insets */
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+
   /* iOS-native colors */
   --ios-blue: #007AFF;
   --ios-gray: #8E8E93;
@@ -16,6 +22,17 @@
   /* iOS-native spring animations */
   --spring-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --spring-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Daggerheart Design Tokens */
+  --gold-light: #f9f8f3;
+  --gold-mid: #e7ba90;
+  --gold-solid: #d4af37;
+  --gold-border: #DBC593;
+  --gold-border-dark: #C29734;
+  --card-bg-dark: #03070d;
+  --card-bg-darkalt: #1e201f;
+  --text-body: rgba(212, 207, 199, 0.9);
+  --shadow-warm: #4d381e;
 
   /* Mouse tracking for glow effect */
   --mouse-x: 50%;
@@ -506,4 +523,89 @@ button, a {
 .glass-input-flat:focus {
   border-color: rgba(255, 255, 255, 0.2);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   Daggerheart Design Tokens
+   Fantasy RPG theme — gold gradients, serif typography, warm shadows
+   ========================================================================== */
+
+/* Gold gradient text */
+.gold-text {
+  background: linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+/* Gold text with shadow (wrap container) */
+.gold-text-shadow {
+  filter: drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5));
+}
+
+.gold-text-shadow-subtle {
+  filter: drop-shadow(0px 1px 1px #4d381e);
+}
+
+/* Engraved text on gold surfaces */
+.engraved-on-gold {
+  color: #4d381e;
+  text-shadow: 0 1px 0 rgba(249, 248, 243, 0.4), 0 -1px 1px rgba(77, 56, 30, 0.3);
+}
+
+/* Typography classes */
+.type-display {
+  font-family: 'EB Garamond', serif;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-variant: small-caps;
+}
+
+.type-subtitle {
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.06em;
+  font-variant: small-caps;
+}
+
+.type-body {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: rgba(212, 207, 199, 0.9);
+  text-shadow: 0px 1px 1px #4d381e;
+}
+
+.type-ui-label {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant: small-caps;
+}
+
+.type-stat-label {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(212, 207, 199, 0.7);
+}
+
+/* Deck Builder preview panel — desktop only */
+.deck-preview-panel {
+  display: none;
+  width: 0;
+}
+
+@media (min-width: 1024px) {
+  .deck-preview-panel {
+    display: block;
+    width: 320px;
+  }
 }
