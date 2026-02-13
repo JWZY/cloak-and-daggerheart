@@ -1,92 +1,64 @@
 import { useEffect } from 'react'
 import { SRDCard } from '../components/cards/SRDCard'
 import { DOMAIN_COLORS } from '../components/cards/DomainCard'
+import { subclasses, getClassForSubclass } from '../data/srd'
 import type { DomainIconName } from '../components/cards/domain-icons'
 
 const basePath = import.meta.env.BASE_URL || '/'
 
-// Subclass card data — class→domain mapping from SRD, feat text from subclasses.json
-const SUBCLASS_CARDS: {
-  name: string
-  className: string
-  domain1: string
-  domain2: string
-  domainIcons: [DomainIconName, DomainIconName]
-  spellcastTrait?: string
-  feats: { name?: string; text: string }[]
-  featList?: string[]
-  illustrationSrc?: string
-}[] = [
-  {
-    name: 'School of Knowledge',
-    className: 'Wizard',
-    domain1: 'Codex',
-    domain2: 'Splendor',
-    domainIcons: ['codex', 'splendor'],
-    spellcastTrait: 'Knowledge',
-    feats: [
-      { name: 'Prepared', text: 'Take an additional domain card of your level or lower from a domain you have access to.' },
-      { name: 'Adept', text: 'When you Utilize an Experience, you can mark a Stress instead of spending a Hope. If you do, double your Experience modifier for that roll.' },
-    ],
-    illustrationSrc: `${basePath}images/cards/subclasses/school-of-knowledge.png`,
-  },
-  {
-    name: 'School of War',
-    className: 'Wizard',
-    domain1: 'Codex',
-    domain2: 'Splendor',
-    domainIcons: ['codex', 'splendor'],
-    spellcastTrait: 'Knowledge',
-    feats: [
-      { name: 'Battlemage', text: "You've focused your studies on becoming an unconquerable force on the battlefield. Gain an additional Hit Point slot." },
-      { name: 'Face Your Fear', text: 'When you succeed with Fear on an attack roll, you deal an extra 1d10 magic damage.' },
-    ],
-    illustrationSrc: `${basePath}images/cards/subclasses/school-of-war.png`,
-  },
-  {
-    name: 'Syndicate',
-    className: 'Rogue',
-    domain1: 'Midnight',
-    domain2: 'Grace',
-    domainIcons: ['midnight', 'grace'],
-    spellcastTrait: 'Finesse',
-    feats: [
-      { name: 'Well-Connected', text: 'When you arrive in a prominent town or environment, you know somebody who calls this place home. Give them a name, note how you think they could be useful, and choose one fact:' },
-    ],
-    featList: [
-      'They owe me a favor, but they\u2019ll be hard to find.',
-      'They\u2019re going to ask for something in exchange.',
-      'They\u2019re always in a great deal of trouble.',
-      'We used to be together. It\u2019s a long story.',
-      'We didn\u2019t part on great terms.',
-    ],
-    illustrationSrc: `${basePath}images/cards/subclasses/syndicate.png`,
-  },
-  {
-    name: 'Call of the Slayer',
-    className: 'Warrior',
-    domain1: 'Blade',
-    domain2: 'Bone',
-    domainIcons: ['blade', 'bone'],
-    feats: [
-      { name: 'Slayer', text: 'You gain a pool of dice called Slayer Dice. On a roll with Hope, you can place a d6 on this card instead of gaining a Hope, adding the die to the pool. You can store a number of Slayer Dice equal to your Proficiency. When you make an attack roll or damage roll, you can spend any number of these Slayer Dice, rolling them and adding their result to the roll. At the end of each session, clear any unspent Slayer Dice on this card and gain a Hope per die cleared.' },
-    ],
-    illustrationSrc: `${basePath}images/cards/subclasses/call-of-the-slayer.png`,
-  },
-  {
-    name: 'Divine Wielder',
-    className: 'Seraph',
-    domain1: 'Splendor',
-    domain2: 'Valor',
-    domainIcons: ['splendor', 'valor'],
-    spellcastTrait: 'Strength',
-    feats: [
-      { name: 'Spirit Weapon', text: 'When you have an equipped weapon with a range of Melee or Very Close, it can fly from your hand to attack an adversary within Close range and then return to you. You can mark a Stress to target an additional adversary within range with the same attack roll.' },
-      { name: 'Sparing Touch', text: 'Once per long rest, touch a creature and clear 2 Hit Points or 2 Stress from them.' },
-    ],
-    illustrationSrc: `${basePath}images/cards/subclasses/divine-wielder.png`,
-  },
+// Only thing specified per card — everything else derived from SRD data
+const FEATURED_SUBCLASSES = [
+  'School of Knowledge',
+  'School of War',
+  'Syndicate',
+  'Call of the Slayer',
+  'Divine Wielder',
 ]
+
+function toSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-')
+}
+
+const subclassCards = FEATURED_SUBCLASSES.map(name => {
+  const subclass = subclasses.find(s => s.name === name)
+  const parentClass = getClassForSubclass(name)
+  if (!subclass || !parentClass) {
+    console.warn(`SRDCardPage: subclass "${name}" not found in SRD data, skipping`)
+    return null
+  }
+
+  // Parse feats, extracting any bullet list from foundation text
+  let featList: string[] | undefined
+  const feats = subclass.foundations.map(f => {
+    const bulletSplit = f.text.indexOf('\n\n- ')
+    if (bulletSplit !== -1 && !featList) {
+      // First feat with bullets: split intro text from bullet items
+      const intro = f.text.slice(0, bulletSplit)
+      const bullets = f.text.slice(bulletSplit)
+        .split('\n')
+        .map(line => line.replace(/^- /, '').trim())
+        .filter(Boolean)
+      featList = bullets
+      return { name: f.name, text: intro }
+    }
+    return { name: f.name, text: f.text }
+  })
+
+  return {
+    name: subclass.name,
+    className: parentClass.name,
+    domain1: parentClass.domain_1,
+    domain2: parentClass.domain_2,
+    domainIcons: [
+      parentClass.domain_1.toLowerCase() as DomainIconName,
+      parentClass.domain_2.toLowerCase() as DomainIconName,
+    ] as [DomainIconName, DomainIconName],
+    spellcastTrait: subclass.spellcast_trait,
+    feats,
+    featList,
+    illustrationSrc: `${basePath}images/cards/subclasses/${toSlug(name)}.png`,
+  }
+}).filter((card): card is NonNullable<typeof card> => card !== null)
 
 export function SRDCardPage() {
   // Override body/root overflow:hidden (set for iOS-native feel) so this page scrolls
@@ -128,7 +100,7 @@ export function SRDCardPage() {
           gap: 32,
           justifyContent: 'center',
         }}>
-          {SUBCLASS_CARDS.map((card) => (
+          {subclassCards.map((card) => (
             <SRDCard
               key={card.name}
               name={card.name}

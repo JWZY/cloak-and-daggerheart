@@ -36,7 +36,7 @@ export interface SubclassFoundation {
 export interface Subclass {
   name: string
   description: string
-  spellcast_trait: string
+  spellcast_trait?: string
   foundations: SubclassFoundation[]
   specializations: SubclassFoundation[]
   masteries: SubclassFoundation[]

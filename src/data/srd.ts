@@ -33,6 +33,13 @@ export { getWizardCardCount } from '../core/rules/wizard'
 export const ancestries = ancestriesData as Ancestry[]
 export const communities = communitiesData as Community[]
 export const abilities = abilitiesData as DomainCard[]
+export const classes = classesData as ClassData[]
+export const subclasses = subclassesData as Subclass[]
+
+// Generic lookups
+export function getClassForSubclass(subclassName: string): ClassData | undefined {
+  return classes.find(c => c.subclass_1 === subclassName || c.subclass_2 === subclassName)
+}
 
 // Equipment data
 export const weapons = weaponsData as Weapon[]

@@ -60,7 +60,7 @@ function MaskedBanner({ color = '#BD0C70', innerColor = '#1E1E1E', uid, domainIc
   }) as React.CSSProperties
 
   return (
-    <div className="absolute z-10" style={{ top: -2, left: 15, width: 44, height: 80 }}>
+    <div className="absolute z-10" style={{ top: -2, left: 15, width: 44, height: 80, transform: 'scale(1.2)', transformOrigin: 'top left' }}>
       {/* Layer 1: Outer trapezoid — masked to pennant */}
       <div className="absolute top-0 left-0 w-[44px] h-[70px]" style={maskAt(0, 0)}>
         <svg viewBox="0 0 44 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -156,40 +156,9 @@ function AutoFitTitle({ children, maxFontSize = 36, style }: {
   )
 }
 
-// Auto-sizing body text that scales down font to fit available height
-function AutoFitBody({ children, maxFontSize = 13, style, className }: {
-  children: React.ReactNode
-  maxFontSize?: number
-  style?: React.CSSProperties
-  className?: string
-}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [fontSize, setFontSize] = useState(maxFontSize)
 
-  const fit = useCallback(() => {
-    const el = containerRef.current
-    if (!el) return
-    let size = maxFontSize
-    el.style.fontSize = `${size}px`
-    while (el.scrollHeight > el.clientHeight && size > 8) {
-      size -= 0.5
-      el.style.fontSize = `${size}px`
-    }
-    setFontSize(size)
-  }, [maxFontSize])
-
-  useEffect(() => { fit() }, [fit, children])
-
-  return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={{ ...style, fontSize, overflow: 'hidden' }}
-    >
-      {children}
-    </div>
-  )
-}
+// Content area baseline height — used to calculate illustration centering offset
+const CONTENT_MIN_HEIGHT = 297
 
 export function SRDCard({
   name,
@@ -225,6 +194,27 @@ export function SRDCard({
   const basePath = import.meta.env.BASE_URL || '/'
   const uid = useId().replace(/:/g, '')
 
+  // Measure content area to dynamically center illustration in visible space
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [illustrationOffset, setIllustrationOffset] = useState(0)
+
+  useEffect(() => {
+    const el = contentRef.current
+    if (!el) return
+    const measure = () => {
+      const contentHeight = el.offsetHeight
+      // Shift illustration up by half the content overshoot so the
+      // focal point stays centered in the visible space above content.
+      // When content is at its minimum (297px), offset is 0 — no change.
+      const overshoot = Math.max(0, contentHeight - CONTENT_MIN_HEIGHT)
+      setIllustrationOffset(overshoot / 2)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [feats, featList])
+
   return (
     <div
       onClick={onClick}
@@ -245,13 +235,17 @@ export function SRDCard({
         WebkitMaskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
         maskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
       }}>
-        {/* Character illustration */}
+        {/* Character illustration — vertically centered in visible space above content */}
         {illustrationSrc && (
           <img
             src={illustrationSrc}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ pointerEvents: 'none', userSelect: 'none' }}
+            style={{
+              pointerEvents: 'none',
+              userSelect: 'none',
+              objectPosition: `center calc(50% - ${illustrationOffset}px)`,
+            }}
             draggable={false}
           />
         )}
@@ -280,11 +274,12 @@ export function SRDCard({
         draggable={false}
       />
 
-      {/* Content area — fixed 297px, pinned to bottom */}
+      {/* Content area — min 297px, pinned to bottom, grows upward */}
       <div
+        ref={contentRef}
         className="absolute bottom-0 left-0 right-0 flex flex-col px-6"
         style={{
-          height: 297,
+          minHeight: 297,
           zIndex: 10,
           background:
             'linear-gradient(180deg, rgba(31, 58, 96, 0) 0%, rgba(3, 7, 13, 0.81) 12%, rgba(3, 7, 13, 0.81) 83%, rgba(19, 36, 60, 0.35) 97%, rgba(31, 58, 96, 0) 100%)',
@@ -357,11 +352,10 @@ export function SRDCard({
           </div>
         </div>
 
-        {/* Body text — auto-shrinks to fit */}
-        <AutoFitBody
-          maxFontSize={bodyFontSize ?? 13.5}
-          className="flex-1 min-h-0"
+        {/* Body text — fixed size, content area grows upward if needed */}
+        <div
           style={{
+            fontSize: bodyFontSize ?? 13.5,
             fontFamily: bodyFontFamily ?? "'Source Sans 3', sans-serif",
             lineHeight: bodyLineHeight ?? '1.4',
             color: 'rgba(212, 207, 199, 0.9)',
@@ -391,7 +385,7 @@ export function SRDCard({
               ))}
             </ul>
           )}
-        </AutoFitBody>
+        </div>
 
         {/* Footer */}
         <div
