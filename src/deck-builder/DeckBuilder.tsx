@@ -6,6 +6,7 @@ import { PickSubclass } from './steps/PickSubclass'
 import { PickDomainCards } from './steps/PickDomainCards'
 import { PickAncestry } from './steps/PickAncestry'
 import { PickCommunity } from './steps/PickCommunity'
+import { PickEquipment } from './steps/PickEquipment'
 import { AssignTraits } from './steps/AssignTraits'
 import { NameCharacter } from './steps/NameCharacter'
 import { ReviewDeck } from './steps/ReviewDeck'
@@ -17,14 +18,15 @@ import {
   ancestries,
   communities,
   wizard,
-  leatherArmor,
-  greatstaff,
+  tier1Armors,
+  tier1PrimaryWeapons,
+  tier1SecondaryWeapons,
   wizardLevel1Cards,
 } from '../data/srd'
 import type { Character, WizardSubclass, Traits, TraitName } from '../types/character'
 import { TRAIT_NAMES } from '../core/rules/traits'
 
-const TOTAL_STEPS = 7
+const TOTAL_STEPS = 8
 const BASE_PATH = import.meta.env.BASE_URL ?? '/'
 
 const slideVariants = {
@@ -72,7 +74,7 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
   }, [canProceed])
 
   const handleNext = useCallback(() => {
-    if (store.currentStep === 6) {
+    if (store.currentStep === 7) {
       // Finalize character
       const character = assembleCharacter(store)
       store.reset()
@@ -93,12 +95,13 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
     <PickDomainCards key="step-1" />,
     <PickAncestry key="step-2" />,
     <PickCommunity key="step-3" />,
-    <AssignTraits key="step-4" />,
-    <NameCharacter key="step-5" />,
-    <ReviewDeck key="step-6" />,
+    <PickEquipment key="step-4" />,
+    <AssignTraits key="step-5" />,
+    <NameCharacter key="step-6" />,
+    <ReviewDeck key="step-7" />,
   ]
 
-  const isReview = store.currentStep === 6
+  const isReview = store.currentStep === 7
   const buttonLabel = isReview ? 'Begin Adventure' : 'Continue'
 
   return (
@@ -228,19 +231,39 @@ function assembleCharacter(
   const baseHP = parseInt(wizard.hp, 10)
   const maxHP = calculateWizardMaxHP(baseHP, subclassName)
 
-  // Calculate armor
-  const armorMax = getArmorScore(leatherArmor)
+  // Look up selected equipment from SRD data
+  const selectedArmor = tier1Armors.find((a) => a.name === store.selectedArmor) ?? tier1Armors.find((a) => a.name === 'Leather Armor')!
+  const selectedPrimary = tier1PrimaryWeapons.find((w) => w.name === store.selectedPrimaryWeapon) ?? tier1PrimaryWeapons.find((w) => w.name === 'Greatstaff')!
+  const selectedSecondary = store.selectedSecondaryWeapon
+    ? tier1SecondaryWeapons.find((w) => w.name === store.selectedSecondaryWeapon) ?? null
+    : null
+
+  // Calculate armor score: base_score + level
+  const level = 1
+  const armorMax = getArmorScore(selectedArmor) + level
+
+  // Calculate evasion with armor modifications
+  let evasion = parseInt(wizard.evasion, 10)
+  const armorFeat = selectedArmor.feat_text ?? ''
+  if (armorFeat.includes('+1 to Evasion')) evasion += 1
+  if (armorFeat.includes('-1 to Evasion')) evasion -= 1
+  if (armorFeat.includes('-2 to Evasion')) evasion -= 2
+
+  // Apply armor trait modifications (e.g. Full Plate: -1 to Agility)
+  if (armorFeat.includes('-1 to Agility')) {
+    traits.agility -= 1
+  }
 
   // Build domain cards from selection
   const domainCards = wizardLevel1Cards.filter((card) =>
     store.selectedDomainCards.includes(card.name)
   )
 
-  // Build equipment — Wizard default: Greatstaff + Leather Armor
+  // Build equipment from selections
   const equipment = {
-    primaryWeapon: greatstaff,
-    secondaryWeapon: null,
-    armor: leatherArmor,
+    primaryWeapon: selectedPrimary,
+    secondaryWeapon: selectedSecondary,
+    armor: selectedArmor,
     items: [],
     consumables: [],
   }
@@ -248,6 +271,7 @@ function assembleCharacter(
   return {
     id: crypto.randomUUID(),
     name: store.characterName.trim(),
+    level,
     ancestry: {
       name: ancestry.name,
       description: ancestry.description,
@@ -266,7 +290,7 @@ function assembleCharacter(
     armorSlots: { current: armorMax, max: armorMax },
     hope: 2,
     stress: { current: 0, max: 6 },
-    evasion: parseInt(wizard.evasion, 10),
+    evasion,
     proficiency: 1,
     domainCards,
     equipment,

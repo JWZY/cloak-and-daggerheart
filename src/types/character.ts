@@ -25,7 +25,6 @@ export interface DomainCard {
   type: string
   recall: string
   text: string
-  used?: boolean
 }
 
 export interface SubclassFoundation {
@@ -121,6 +120,7 @@ export interface Traits {
 export interface Character {
   id: string
   name: string
+  level: number
   ancestry: Ancestry
   community: Community
   class: 'Wizard'

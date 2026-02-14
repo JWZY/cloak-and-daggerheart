@@ -136,7 +136,7 @@ export function DeckPreview() {
                   key={props.title}
                   style={{
                     width: 360 * 0.28,
-                    height: 504 * 0.28,
+                    height: 508 * 0.28,
                     position: 'relative',
                     overflow: 'hidden',
                     borderRadius: 6,
@@ -169,25 +169,13 @@ export function DeckPreview() {
                 const a = ancestries.find(x => x.name === ancestryName)
                 if (!a) return null
                 const cardProps = ancestryToInfoCardProps(a)
-                return (
-                  <div style={{ width: 360 * 0.28, height: 508 * 0.28, position: 'relative', overflow: 'hidden', borderRadius: 6 }}>
-                    <div style={{ transform: 'scale(0.28)', transformOrigin: 'top left' }}>
-                      <InfoCard {...cardProps} />
-                    </div>
-                  </div>
-                )
+                return <InfoCard {...cardProps} scale={0.28} />
               })()}
               {communityName && (() => {
                 const c = communities.find(x => x.name === communityName)
                 if (!c) return null
                 const cardProps = communityToInfoCardProps(c)
-                return (
-                  <div style={{ width: 360 * 0.28, height: 508 * 0.28, position: 'relative', overflow: 'hidden', borderRadius: 6 }}>
-                    <div style={{ transform: 'scale(0.28)', transformOrigin: 'top left' }}>
-                      <InfoCard {...cardProps} />
-                    </div>
-                  </div>
-                )
+                return <InfoCard {...cardProps} scale={0.28} />
               })()}
             </div>
           </motion.div>

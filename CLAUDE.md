@@ -32,26 +32,31 @@ This is a mobile-first PWA for viewing Daggerheart TTRPG content, designed to fe
 
 ```
 src/
+├── app/               # App shell and dev tools
+│   ├── App.tsx        # Root: splash → deck builder → hand view
+│   ├── DesignLab.tsx  # Card delta tool (?cards)
+│   └── DesignSystem.tsx # UI primitives showcase (?components)
 ├── core/              # Pure business logic (no React, no side effects)
 │   ├── character/     # HP calcs, armor, migration, validation
+│   ├── deck/          # Deck-building logic (WIP)
 │   ├── dice/          # Duality roll logic
 │   └── rules/         # Traits, wizard-specific rules
-├── content/           # All user-facing content
-│   └── i18n/          # Translations (en.json + useTranslation hook)
 ├── design-system/     # Tokens and base components
-│   ├── tokens/        # colors.ts, effects.ts, animations.ts
-│   └── theme/         # ThemeContext, themeConfig
-├── components/        # Feature-specific components
-│   ├── ui/            # UI primitives (Button, Card, Sheet)
-│   ├── dice/          # Dice rolling components
-│   ├── cards/         # Domain/subclass card components
-│   └── character/     # Character-specific components
-├── views/             # Page compositions
-│   ├── CharacterSheet/
-│   └── CreateCharacter/
-├── stores/            # Zustand state (thin layer)
-├── contexts/          # React contexts (re-exports from design-system)
-├── data/              # SRD data loaders
+│   └── tokens/        # colors.ts, effects.ts, animations.ts
+├── cards/             # Card components (SRD, Domain, Info, flip/zoom)
+├── deck-builder/      # Character creation wizard
+│   ├── DeckBuilder.tsx
+│   ├── components/    # DeckPreview, StepIndicator
+│   └── steps/         # PickSubclass, PickDomainCards, AssignTraits, etc.
+├── hand/              # In-play hand view
+│   ├── HandView.tsx   # Main hand screen
+│   ├── CardCarousel.tsx
+│   ├── HeroCard.tsx
+│   ├── StatBar.tsx
+│   └── panels/        # Collapsible info panels (Stats, Equipment, Notes)
+├── ui/                # UI primitives (GameButton, GlassPanel, GameInput, etc.)
+├── store/             # Zustand state (character-store, deck-store)
+├── data/              # SRD data loaders and card mappers
 └── types/             # TypeScript definitions
 ```
 
@@ -66,6 +71,8 @@ import { determineDualityResult } from '../core/dice'
 import { TRAIT_NAMES, formatTraitValue } from '../core/rules'
 ```
 
+Note: `core/deck/` exists but is currently empty (deck logic is still in components).
+
 ### Multi-Agent Development
 
 Claude automatically takes the **@orchestrator** role (see Auto-Role above).
@@ -79,17 +86,21 @@ See `.claude/agents/README.md` for details.
 
 ### Navigation Pattern
 
-The app uses a swipe-based navigation system in `App.tsx`:
-- Three views (Home, Explore, Profile) managed via `useState`
-- Framer Motion handles swipe gestures with `drag="x"` and `onDragEnd`
-- `AnimatePresence` with `popLayout` mode for smooth view transitions
-- iOS-native spring physics: `stiffness: 300, damping: 30, mass: 0.8`
+The app uses a card-centric two-phase flow in `src/app/App.tsx`:
+- **Splash screen**: Brief branded loading state with gold glow animation
+- **Deck Builder** (`src/deck-builder/DeckBuilder.tsx`): Multi-step character creation wizard (shown when no characters exist)
+- **Hand View** (`src/hand/HandView.tsx`): In-play card hand with hero card, stat bar, and info panels (shown when a character exists)
+- Framer Motion `AnimatePresence` with `popLayout` mode handles transitions between phases
+- Spring physics for view entrances: `stiffness: 200-260, damping: 28, mass: 0.8-1`
 
 ### Component Patterns
 
-- **Sheet.tsx**: iOS-style bottom sheets using Vaul's `Drawer` component
-- **TabBar.tsx**: Tab navigation with spring-animated active states
-- **Card.tsx**: Reusable card with tap feedback
+- **GameButton** (`src/ui/GameButton.tsx`): Primary/secondary/ghost buttons with gold gradient and engraved text
+- **GlassPanel** (`src/ui/GlassPanel.tsx`): Glass-effect panels with default, gold, and domain-accent variants
+- **SRDCard** (`src/cards/SRDCard.tsx`): Full SRD-style card with auto-fit title, masked illustration, textured frame
+- **DomainCard** (`src/cards/DomainCard.tsx`): Domain card with color system tied to domain colors
+- **CardFlip/CardZoom** (`src/cards/`): Flip animation and pinch-to-zoom interactions
+- **CollapsiblePanel** (`src/hand/panels/`): Expandable info sections in the hand view
 
 ### Styling
 
@@ -110,9 +121,8 @@ Glass variants: `.glass`, `.glass-strong`, `.glass-dark`, `.glass-interactive`
 ### Design Lab Pages
 
 Access via query params on localhost:
-- `?components` → ComponentsLibrary - full design system showcase (atoms, molecules, organisms, tokens)
-- `?cards` or `?designlab` → CardDesignLab
-- `?pickers` → PickerDesignLab
+- `?components` → DesignSystem - UI primitives showcase (colors, typography, buttons, panels, badges, inputs)
+- `?cards` → DesignLab - Card delta tool (placeholder in v2, see `src/app/DesignLab.tsx`)
 
 ### SRD Data
 

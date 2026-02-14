@@ -10,6 +10,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
   return {
     id: 'test-id-1',
     name: 'Test Wizard',
+    level: 1,
     ancestry: {
       name: 'Human',
       description: 'A versatile people.',
@@ -44,7 +45,6 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
         type: 'Spell',
         recall: '2d6',
         text: 'Some ability text.',
-        used: false,
       },
       {
         name: 'Bolt Beacon',
@@ -53,7 +53,6 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
         type: 'Spell',
         recall: '2d8',
         text: 'Another ability text.',
-        used: false,
       },
     ],
     equipment: {
@@ -208,41 +207,6 @@ describe('character-store', () => {
     useCharacterStore.getState().createCharacter(char)
     useCharacterStore.getState().updateStress('test-id-1', 5)
     expect(useCharacterStore.getState().characters[0].stress.current).toBe(6)
-  })
-
-  // -------------------------------------------------------------------------
-  // toggleCardUsed
-  // -------------------------------------------------------------------------
-
-  it('toggleCardUsed marks a card as used', () => {
-    const char = makeCharacter()
-    useCharacterStore.getState().createCharacter(char)
-    useCharacterStore.getState().toggleCardUsed('test-id-1', 'Book of Ava')
-
-    const cards = useCharacterStore.getState().characters[0].domainCards
-    const ava = cards.find((c) => c.name === 'Book of Ava')
-    expect(ava?.used).toBe(true)
-  })
-
-  it('toggleCardUsed toggles card back to unused', () => {
-    const char = makeCharacter()
-    useCharacterStore.getState().createCharacter(char)
-    useCharacterStore.getState().toggleCardUsed('test-id-1', 'Book of Ava')
-    useCharacterStore.getState().toggleCardUsed('test-id-1', 'Book of Ava')
-
-    const cards = useCharacterStore.getState().characters[0].domainCards
-    const ava = cards.find((c) => c.name === 'Book of Ava')
-    expect(ava?.used).toBe(false)
-  })
-
-  it('toggleCardUsed does not affect other cards', () => {
-    const char = makeCharacter()
-    useCharacterStore.getState().createCharacter(char)
-    useCharacterStore.getState().toggleCardUsed('test-id-1', 'Book of Ava')
-
-    const cards = useCharacterStore.getState().characters[0].domainCards
-    const bolt = cards.find((c) => c.name === 'Bolt Beacon')
-    expect(bolt?.used).toBe(false)
   })
 
   // -------------------------------------------------------------------------

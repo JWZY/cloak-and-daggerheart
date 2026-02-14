@@ -13,9 +13,14 @@ export function getWizardCardCount(subclass: WizardSubclass): number {
 
 /**
  * Get the spellcast trait for a Wizard subclass
+ * Both Wizard subclasses use Knowledge as their spellcast trait per SRD
  */
-export function getWizardSpellcastTrait(subclass: WizardSubclass): string {
-  return subclass === 'School of Knowledge' ? 'Knowledge' : 'Presence'
+export function getWizardSpellcastTrait(
+  // Kept for API consistency — may diverge per-subclass in future SRD updates
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _subclass: WizardSubclass
+): string {
+  return 'Knowledge'
 }
 
 /**

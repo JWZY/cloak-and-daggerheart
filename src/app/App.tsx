@@ -64,8 +64,8 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#03070d' }}>
-      <AnimatePresence mode="wait">
+    <div style={{ height: '100dvh', background: '#03070d', overflow: 'hidden' }}>
+      <AnimatePresence mode="popLayout">
         {characters.length === 0 ? (
           <motion.div
             key="builder"

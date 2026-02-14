@@ -34,26 +34,17 @@ test.describe('Character Creation Flow (v2)', () => {
     await page.click('text=School of Knowledge')
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 1: Draft Domain Cards — flip and select 3
+    // Step 1: Choose Domain Cards — tap to select 3 (cards at 0.52 scale)
     await expect(
-      page.locator('h2:has-text("Draft Domain Cards")')
+      page.locator('h2:has-text("Choose Your Domain Cards")')
     ).toBeVisible({ timeout: 3000 })
 
-    // Flip all face-down cards
-    for (let i = 0; i < 6; i++) {
-      const flipContainer = page.locator('div[style*="perspective"]').first()
-      if (await flipContainer.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await flipContainer.click()
-        await page.waitForTimeout(400)
-      }
-    }
-
-    // Select 3 cards
-    await page.locator('text=Book of Ava').first().click()
+    // Select 3 cards (force: true needed due to 0.52 scale transform)
+    await page.locator('text=Book of Ava').first().click({ force: true })
     await page.waitForTimeout(200)
-    await page.locator('text=Book of Illiat').first().click()
+    await page.locator('text=Book of Illiat').first().click({ force: true })
     await page.waitForTimeout(200)
-    await page.locator('text=Bolt Beacon').first().click()
+    await page.locator('text=Bolt Beacon').first().click({ force: true })
     await page.waitForTimeout(200)
 
     await page.locator('button:has-text("Continue")').click()
@@ -72,7 +63,16 @@ test.describe('Character Creation Flow (v2)', () => {
     await page.getByText('Highborne', { exact: true }).first().click({ force: true })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 4: Assign Traits (pre-filled with suggested wizard traits)
+    // Step 4: Choose Equipment (defaults pre-selected: Leather Armor + Greatstaff)
+    await expect(
+      page.locator('h2:has-text("Choose Your Equipment")')
+    ).toBeVisible({ timeout: 3000 })
+    await expect(
+      page.locator('button:has-text("Continue")')
+    ).toBeEnabled({ timeout: 2000 })
+    await page.locator('button:has-text("Continue")').click()
+
+    // Step 5: Assign Traits (pre-filled with suggested wizard traits)
     await expect(
       page.locator('h2:has-text("Assign Traits")')
     ).toBeVisible({ timeout: 3000 })
@@ -84,14 +84,14 @@ test.describe('Character Creation Flow (v2)', () => {
     ).toBeEnabled({ timeout: 2000 })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 5: Name Character
+    // Step 6: Name Character
     await expect(
       page.locator('h2:has-text("Name Your Character")')
     ).toBeVisible({ timeout: 3000 })
     await page.fill('input[placeholder*="name"]', 'Test Wizard')
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 6: Review
+    // Step 7: Review
     await expect(page.locator('text=Test Wizard').first()).toBeVisible({
       timeout: 3000,
     })
@@ -127,24 +127,17 @@ test.describe('Character Creation Flow (v2)', () => {
     await page.click('text=School of War')
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 1: Draft Domain Cards — flip and select 3
+    // Step 1: Choose Domain Cards — tap to select 3 (cards at 0.52 scale)
     await expect(
-      page.locator('h2:has-text("Draft Domain Cards")')
+      page.locator('h2:has-text("Choose Your Domain Cards")')
     ).toBeVisible({ timeout: 3000 })
 
-    for (let i = 0; i < 6; i++) {
-      const flipContainer = page.locator('div[style*="perspective"]').first()
-      if (await flipContainer.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await flipContainer.click()
-        await page.waitForTimeout(400)
-      }
-    }
-
-    await page.locator('text=Book of Ava').first().click()
+    // Select 3 cards (force: true needed due to 0.52 scale transform)
+    await page.locator('text=Book of Ava').first().click({ force: true })
     await page.waitForTimeout(200)
-    await page.locator('text=Mending Touch').first().click()
+    await page.locator('text=Mending Touch').first().click({ force: true })
     await page.waitForTimeout(200)
-    await page.locator('text=Bolt Beacon').first().click()
+    await page.locator('text=Bolt Beacon').first().click({ force: true })
     await page.waitForTimeout(200)
 
     await page.locator('button:has-text("Continue")').click()
@@ -163,7 +156,13 @@ test.describe('Character Creation Flow (v2)', () => {
     await page.getByText('Wanderborne', { exact: true }).first().click({ force: true })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 4: Assign Traits
+    // Step 4: Choose Equipment (accept defaults)
+    await expect(
+      page.locator('h2:has-text("Choose Your Equipment")')
+    ).toBeVisible({ timeout: 3000 })
+    await page.locator('button:has-text("Continue")').click()
+
+    // Step 5: Assign Traits
     await expect(
       page.locator('h2:has-text("Assign Traits")')
     ).toBeVisible({ timeout: 3000 })
@@ -172,14 +171,14 @@ test.describe('Character Creation Flow (v2)', () => {
     })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 5: Name Character
+    // Step 6: Name Character
     await expect(
       page.locator('h2:has-text("Name Your Character")')
     ).toBeVisible({ timeout: 3000 })
     await page.fill('input[placeholder*="name"]', 'War Wizard')
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 6: Review — School of War gives +1 HP (5 base + 1 = 6)
+    // Step 7: Review — School of War gives +1 HP (5 base + 1 = 6)
     await expect(page.locator('text=War Wizard').first()).toBeVisible({
       timeout: 3000,
     })

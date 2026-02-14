@@ -47,28 +47,36 @@ You are the creative director for Cloak & Daggerheart. You design visual aesthet
 ```
 src/design-system/tokens/
 ├── colors.ts      # Color palettes, gradients
-├── spacing.ts     # Spacing scale
 ├── effects.ts     # Shadows, glows, blur
-└── animations.ts  # Spring configs, durations
+├── animations.ts  # Spring configs, durations
+└── index.ts       # Re-exports
 ```
+
+Domain colors live separately in `src/cards/domain-colors.ts`.
 
 ### Color System
 
+Colors represent **domains**, not classes or subclasses. Each class has two domains.
+The canonical mapping lives in `src/cards/domain-colors.ts`:
+
 ```ts
-// Theme colors by subclass
-export const themeColors = {
-  'School of Knowledge': {
-    primary: '#6366f1',    // Indigo
-    gradient: ['#4f46e5', '#7c3aed', '#4f46e5'],
-    glow: 'rgba(99, 102, 241, 0.5)',
-  },
-  'School of War': {
-    primary: '#f59e0b',    // Amber
-    gradient: ['#dc2626', '#f59e0b', '#dc2626'],
-    glow: 'rgba(245, 158, 11, 0.5)',
-  }
+// Domain colors — single source of truth (Figma banner = canonical)
+export const DOMAIN_COLORS: Record<string, string> = {
+  Arcana:   '#4e345b',
+  Blade:    '#A61118',
+  Bone:     '#A3A9A8',
+  Codex:    '#1D3B61',
+  Grace:    '#BD0C70',
+  Midnight: '#1E1E1E',
+  Sage:     '#2d4a3e',
+  Splendor: '#BEA228',
+  Valor:    '#EB5B00',
 }
 ```
+
+Domain colors are used for card banners, card selection UI, and domain-keyed theming.
+Banner outer fill = class's 2nd domain color; inner pennant = 1st domain color (darkened).
+See `context/domain-colors.md` for the full mapping and Figma source values.
 
 ### Animation Presets
 
@@ -115,7 +123,10 @@ export const durations = {
 - `.glass-dark` - For dark backgrounds
 - `.glass-interactive` - Hover/press states
 
-## Theme-Specific Effects
+## Theme-Specific Effects (Aspirational — Not Yet Implemented)
+
+These are design aspirations for future work. None of these particle/glow effects
+exist in the codebase yet.
 
 ### School of Knowledge
 - Indigo/purple gradient
@@ -151,9 +162,10 @@ transition: "box-shadow 0.3s ease"
 |------|---------|
 | `src/index.css` | Global styles, glass variants |
 | `tailwind.config.js` | Theme colors, utilities |
-| `src/design-system/tokens/*.ts` | Design tokens |
-| `src/contexts/themeConfig.ts` | Theme configuration |
-| `src/components/effects/*.tsx` | Visual effects |
+| `src/design-system/tokens/*.ts` | Design tokens (colors, effects, animations) |
+| `src/cards/domain-colors.ts` | Domain color palette (Figma-canonical) |
+| `src/cards/DomainCard.tsx` | Domain card component and visual styling |
+| `src/cards/SRDCard.tsx` | SRD subclass card component |
 
 ## Quality Checklist
 

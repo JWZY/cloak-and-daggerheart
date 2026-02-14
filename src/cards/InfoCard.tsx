@@ -4,6 +4,8 @@
  * diamond separators, EB Garamond typography, atmosphere texture, card frame overlay.
  */
 
+import { motion } from 'framer-motion'
+
 export interface InfoCardFeat {
   name: string
   text: string
@@ -17,6 +19,7 @@ export interface InfoCardProps {
   footerLeft?: string    // e.g. tier or empty
   footerRight?: string   // e.g. note
   accentColor?: string   // top accent line color, default gold
+  scale?: number
   onClick?: () => void
 }
 
@@ -46,13 +49,13 @@ export function InfoCard({
   footerLeft,
   footerRight,
   accentColor,
+  scale = 1,
   onClick,
 }: InfoCardProps) {
   const basePath = import.meta.env.BASE_URL || '/'
 
-  return (
+  const card = (
     <div
-      onClick={onClick}
       className="relative overflow-hidden flex flex-col"
       style={{
         width: 360,
@@ -243,4 +246,33 @@ export function InfoCard({
       />
     </div>
   )
+
+  // Wrap in motion div for scale and interaction
+  if (scale !== 1 || onClick) {
+    return (
+      <motion.div
+        whileTap={onClick ? { scale: 0.98 } : undefined}
+        whileHover={onClick ? { y: -4 } : undefined}
+        onClick={onClick}
+        style={{
+          width: 360 * scale,
+          height: 508 * scale,
+          cursor: onClick ? 'pointer' : 'default',
+        }}
+      >
+        <div
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            width: 360,
+            height: 508,
+          }}
+        >
+          {card}
+        </div>
+      </motion.div>
+    )
+  }
+
+  return card
 }

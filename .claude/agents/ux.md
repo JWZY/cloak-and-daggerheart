@@ -99,11 +99,20 @@ As a [user type], I want [goal] so that [benefit].
 
 | Screen | File | Purpose |
 |--------|------|---------|
-| Character Sheet | `src/views/CharacterSheet/` | Main character view |
-| Create Character | `src/views/CreateCharacter/` | Character wizard |
-| Stats Tab | `CharacterSheet/StatsTab.tsx` | HP, armor, traits |
-| Inventory Tab | `CharacterSheet/InventoryTab.tsx` | Equipment |
-| Cards Tab | `CharacterSheet/CardsTab.tsx` | Domain abilities |
+| App Shell | `src/app/App.tsx` | Splash -> Deck Builder -> Hand View routing |
+| Deck Builder | `src/deck-builder/DeckBuilder.tsx` | Multi-step character creation wizard |
+| Pick Subclass | `src/deck-builder/steps/PickSubclass.tsx` | Choose subclass (step 1) |
+| Pick Domain Cards | `src/deck-builder/steps/PickDomainCards.tsx` | Select domain ability cards (step 2) |
+| Pick Ancestry | `src/deck-builder/steps/PickAncestry.tsx` | Choose ancestry (step 3) |
+| Pick Community | `src/deck-builder/steps/PickCommunity.tsx` | Choose community (step 4) |
+| Assign Traits | `src/deck-builder/steps/AssignTraits.tsx` | Set trait scores (step 5) |
+| Name Character | `src/deck-builder/steps/NameCharacter.tsx` | Name the character (step 6) |
+| Review Deck | `src/deck-builder/steps/ReviewDeck.tsx` | Final review before play (step 7) |
+| Hand View | `src/hand/HandView.tsx` | Card-centric character view (main play screen) |
+| Hero Card | `src/hand/HeroCard.tsx` | Character identity card in the hand |
+| Card Carousel | `src/hand/CardCarousel.tsx` | Swipeable domain card carousel |
+| Stat Bar | `src/hand/StatBar.tsx` | HP, armor, hope, stress display |
+| Collapsible Panels | `src/hand/panels/*.tsx` | Stats, equipment, notes panels |
 
 ## Animation Guidelines
 
@@ -126,6 +135,9 @@ whileTap: { scale: 0.98 }
 ## Reference Patterns
 
 See existing implementations:
-- Sheet behavior: `src/components/ui/Sheet.tsx`
-- Tab switching: `src/App.tsx` (swipe navigation)
-- Card interactions: `src/components/cards/PhysicalCard.tsx`
+- App routing: `src/app/App.tsx` (splash -> deck builder -> hand view)
+- Card interactions: `src/cards/DomainCard.tsx`, `src/cards/CardFlip.tsx`
+- Card zoom overlay: `src/cards/CardZoom.tsx` + `src/cards/useCardZoom.ts`
+- Deck builder wizard: `src/deck-builder/DeckBuilder.tsx` (step-based flow)
+- Hand carousel: `src/hand/CardCarousel.tsx` (swipeable card hand)
+- Collapsible panels: `src/hand/panels/CollapsiblePanel.tsx`

@@ -41,7 +41,7 @@ const TEST_CHARACTER = {
       type: 'Spell',
       recall: '2d6',
       text: '**Arcane Barrage:** Deal 2d6 damage to a target within far range.',
-      used: false,
+
     },
     {
       name: 'Book of Illiat',
@@ -50,7 +50,7 @@ const TEST_CHARACTER = {
       type: 'Spell',
       recall: '2d6',
       text: 'You conjure a protective ward that absorbs damage.',
-      used: false,
+
     },
     {
       name: 'Bolt Beacon',
@@ -59,7 +59,7 @@ const TEST_CHARACTER = {
       type: 'Spell',
       recall: '2d8',
       text: '**Lightning Strike:** Call down a bolt of lightning on a target.',
-      used: false,
+
     },
   ],
   equipment: {
@@ -126,7 +126,7 @@ test.describe('Hand View Interactions', () => {
 
   test('stat bar shows HP, Armor, Hope, Stress labels', async ({ page }) => {
     await expect(page.getByText('HP', { exact: true })).toBeVisible()
-    await expect(page.getByText('Arm', { exact: true })).toBeVisible()
+    await expect(page.getByText('Armor', { exact: true })).toBeVisible()
     await expect(page.getByText('Hope', { exact: true })).toBeVisible()
     await expect(page.getByText('Stress', { exact: true })).toBeVisible()
   })
@@ -139,10 +139,8 @@ test.describe('Hand View Interactions', () => {
     // HP starts at 5/5
     await expect(page.locator('text=5/5').first()).toBeVisible()
 
-    // The HP stat row is in the first grid, first column.
-    // Each StatRow has: label, minus button, pips, count, plus button.
-    // We find the HP label and then navigate to its sibling buttons.
-    const hpRow = page.locator('div.grid-cols-2').first().locator('> div').first()
+    // Find the HP row by its label, then navigate to sibling buttons
+    const hpRow = page.getByText('HP', { exact: true }).locator('..')
 
     // Click minus (first button in the row)
     await hpRow.locator('button').first().click()
@@ -190,32 +188,11 @@ test.describe('Hand View Interactions', () => {
     })
   })
 
-  test('card used toggle works', async ({ page }) => {
-    // Find the "Mark Used" button for the first card
-    const markUsedBtn = page.locator('button:has-text("Mark Used")').first()
-    await expect(markUsedBtn).toBeVisible({ timeout: 3000 })
-    await markUsedBtn.click()
-
-    // Button text should change to "Restore"
-    await expect(
-      page.locator('button:has-text("Restore")').first()
-    ).toBeVisible({ timeout: 2000 })
-
-    // "Used" badge should appear
-    await expect(page.locator('text=Used').first()).toBeVisible()
-
-    // Click Restore to toggle back
-    await page.locator('button:has-text("Restore")').first().click()
-    await expect(
-      page.locator('button:has-text("Mark Used")').first()
-    ).toBeVisible({ timeout: 2000 })
-  })
-
   test('delete character returns to deck builder', async ({ page }) => {
-    // The delete button is positioned top-right with a Trash icon
-    const trashBtn = page.locator('.absolute.top-2.right-3 button')
-    await expect(trashBtn).toBeVisible({ timeout: 2000 })
-    await trashBtn.click()
+    // Click the delete button
+    const deleteBtn = page.getByTestId('delete-character')
+    await expect(deleteBtn).toBeVisible({ timeout: 2000 })
+    await deleteBtn.click()
 
     // After deleting, should show DeckBuilder
     await expect(

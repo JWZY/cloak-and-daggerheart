@@ -32,30 +32,16 @@ test.describe('Deck Builder Flow (v2)', () => {
     await expect(continueBtn).toBeEnabled()
     await continueBtn.click()
 
-    // Step 1: Draft Domain Cards
+    // Step 1: Choose Domain Cards (cards at 0.52 scale in horizontal rail)
     await expect(
-      page.locator('h2:has-text("Draft Domain Cards")')
+      page.locator('h2:has-text("Choose Your Domain Cards")')
     ).toBeVisible({ timeout: 3000 })
     await expect(page.locator('text=0 of 3 selected')).toBeVisible()
 
-    // Domain cards start face-down in CardFlip containers (perspective style).
-    // Clicking a face-down card reveals it (flips to front). Once revealed,
-    // it's rendered inside a CardSelector instead, so the perspective
-    // container disappears. We flip all 6 one at a time.
-
-    // Flip all face-down cards one by one (count decreases after each flip)
-    for (let i = 0; i < 6; i++) {
-      const flipContainer = page.locator('div[style*="perspective"]').first()
-      if (await flipContainer.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await flipContainer.click()
-        await page.waitForTimeout(400)
-      }
-    }
-
-    // All cards are now revealed. Select 3 by clicking their card titles.
+    // Select 3 cards by tapping (force: true needed due to 0.52 scale transform)
     const cardsToSelect = ['Book of Ava', 'Book of Illiat', 'Bolt Beacon']
     for (const name of cardsToSelect) {
-      await page.locator(`text=${name}`).first().click()
+      await page.locator(`text=${name}`).first().click({ force: true })
       await page.waitForTimeout(200)
     }
 
@@ -80,7 +66,16 @@ test.describe('Deck Builder Flow (v2)', () => {
     await page.getByText('Highborne', { exact: true }).first().click({ force: true })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 4: Assign Traits (pre-filled with suggested values)
+    // Step 4: Choose Equipment (defaults pre-selected: Leather Armor + Greatstaff)
+    await expect(
+      page.locator('h2:has-text("Choose Your Equipment")')
+    ).toBeVisible({ timeout: 3000 })
+    await expect(page.locator('button:has-text("Continue")')).toBeEnabled({
+      timeout: 2000,
+    })
+    await page.locator('button:has-text("Continue")').click()
+
+    // Step 5: Assign Traits (pre-filled with suggested values)
     await expect(
       page.locator('h2:has-text("Assign Traits")')
     ).toBeVisible({ timeout: 3000 })
@@ -92,7 +87,7 @@ test.describe('Deck Builder Flow (v2)', () => {
     })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 5: Name Character
+    // Step 6: Name Character
     await expect(
       page.locator('h2:has-text("Name Your Character")')
     ).toBeVisible({ timeout: 3000 })
@@ -101,7 +96,7 @@ test.describe('Deck Builder Flow (v2)', () => {
     await expect(page.locator('button:has-text("Continue")')).toBeEnabled()
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 6: Review — character name visible, "Begin Adventure" button
+    // Step 7: Review — character name visible, "Begin Adventure" button
     await expect(page.locator('text=Merlin the Wise').first()).toBeVisible({
       timeout: 3000,
     })
@@ -138,7 +133,7 @@ test.describe('Deck Builder Flow (v2)', () => {
     await page.locator('button:has-text("Continue")').click()
 
     await expect(
-      page.locator('h2:has-text("Draft Domain Cards")')
+      page.locator('h2:has-text("Choose Your Domain Cards")')
     ).toBeVisible({ timeout: 3000 })
 
     // Back button should be visible on step 1

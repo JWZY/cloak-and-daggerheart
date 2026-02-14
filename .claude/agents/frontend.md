@@ -54,26 +54,29 @@ npm run build         # Production build works
 
 ```
 src/
+├── app/               # App shell (App.tsx, DesignLab, DesignSystem)
+├── cards/             # Card components (DomainCard, SRDCard, CardFlip, etc.)
 ├── core/              # Pure business logic (no React)
-├── content/           # i18n, SRD data, constants
-├── design-system/     # Tokens, theme, primitives
-├── components/        # Feature-specific components
-├── views/             # Page compositions
-├── stores/            # Zustand state (thin layer)
-└── types/             # TypeScript definitions
+├── data/              # SRD data loaders and card mappers
+├── deck-builder/      # Deck builder wizard (steps + components)
+├── design-system/     # Tokens (colors, effects, animations)
+├── hand/              # Hand view (HeroCard, CardCarousel, panels)
+├── store/             # Zustand stores (character-store, deck-store)
+├── types/             # TypeScript definitions
+└── ui/                # UI primitives (GameButton, GlassPanel, etc.)
 ```
 
 ## Patterns to Follow
 
 ### Component Pattern
 ```tsx
-// Feature component in src/components/
-import { Button } from '../design-system/primitives'
+// Feature component in src/hand/ or src/cards/
+import { GameButton } from '../ui'
 import { calculateHP } from '../core/character/hp'
 
 export function MyComponent({ character }: Props) {
   const hp = calculateHP(character)
-  return <Button>{hp}</Button>
+  return <GameButton>{hp}</GameButton>
 }
 ```
 
@@ -110,8 +113,13 @@ npm run test:unit:run # Vitest unit tests
 | Area | Key Files |
 |------|-----------|
 | Character logic | `src/core/character/*.ts` |
-| State management | `src/stores/characterStore.ts` |
-| UI components | `src/design-system/primitives/*.tsx` |
-| Feature components | `src/components/**/*.tsx` |
-| Views/pages | `src/views/**/*.tsx` |
+| State management | `src/store/character-store.ts`, `src/store/deck-store.ts` |
+| UI primitives | `src/ui/*.tsx` (GameButton, GlassPanel, GameInput, etc.) |
+| Card components | `src/cards/*.tsx` (DomainCard, SRDCard, CardFlip, CardZoom) |
+| Hand view | `src/hand/*.tsx` (HandView, HeroCard, CardCarousel, StatBar) |
+| Hand panels | `src/hand/panels/*.tsx` (StatsPanel, EquipmentPanel, NotesPanel) |
+| Deck builder | `src/deck-builder/DeckBuilder.tsx`, `src/deck-builder/steps/*.tsx` |
+| App shell | `src/app/App.tsx` |
+| SRD data | `src/data/srd.ts`, `src/data/card-mapper.ts` |
+| Domain colors | `src/cards/domain-colors.ts` |
 | Types | `src/types/character.ts` |

@@ -13,7 +13,6 @@ interface CharacterStore {
   updateArmor: (id: string, delta: number) => void
   updateHope: (id: string, delta: number) => void
   updateStress: (id: string, delta: number) => void
-  toggleCardUsed: (id: string, cardName: string) => void
   updateNotes: (id: string, notes: string) => void
 }
 
@@ -90,22 +89,6 @@ export const useCharacterStore = create<CharacterStore>()(
                       Math.min(c.stress.current + delta, c.stress.max)
                     ),
                   },
-                }
-              : c
-          ),
-        })),
-
-      toggleCardUsed: (id: string, cardName: string) =>
-        set((state) => ({
-          characters: state.characters.map((c) =>
-            c.id === id
-              ? {
-                  ...c,
-                  domainCards: c.domainCards.map((card) =>
-                    card.name === cardName
-                      ? { ...card, used: !card.used }
-                      : card
-                  ),
                 }
               : c
           ),

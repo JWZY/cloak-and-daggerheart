@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { DomainCard } from '../cards/DomainCard'
-import { domainCardToProps, parseAbilityText } from '../data/card-mapper'
-import { useCharacterStore } from '../store/character-store'
+import { InfoCard } from '../cards/InfoCard'
+import { domainCardToProps, parseAbilityText, ancestryToInfoCardProps, communityToInfoCardProps } from '../data/card-mapper'
 import type { Character } from '../types/character'
 
 export interface CardCarouselProps {
@@ -11,20 +11,11 @@ export interface CardCarouselProps {
 }
 
 export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
-  const toggleCardUsed = useCharacterStore((s) => s.toggleCardUsed)
-
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'center',
     containScroll: 'trimSnaps',
     loop: false,
   })
-
-  const handleToggleUsed = useCallback(
-    (cardName: string) => {
-      toggleCardUsed(character.id, cardName)
-    },
-    [character.id, toggleCardUsed]
-  )
 
   const domainCards = character.domainCards
 
@@ -36,7 +27,6 @@ export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
           {domainCards.map((card) => {
             const mapped = domainCardToProps(card)
             const bodyParts = parseAbilityText(mapped.bodyText)
-            const isUsed = card.used === true
 
             return (
               <div
@@ -44,16 +34,13 @@ export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
                 className="flex-shrink-0"
                 style={{ width: 144 }}
               >
-                {/* Sized wrapper to contain the scaled card in layout */}
                 <div
                   className="relative"
                   style={{
                     width: 144,
-                    height: 134,
+                    height: 200,
                     overflow: 'hidden',
                     borderRadius: 10,
-                    opacity: isUsed ? 0.5 : 1,
-                    transition: 'opacity 0.2s ease',
                   }}
                 >
                   <div style={{ transform: 'scale(0.4)', transformOrigin: 'top left' }}>
@@ -74,51 +61,37 @@ export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
                       ))}
                     </DomainCard>
                   </div>
-
-                  {/* Used badge */}
-                  {isUsed && (
-                    <div className="absolute top-1 right-1 z-50">
-                      <span
-                        className="px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wider"
-                        style={{
-                          background: 'rgba(0, 0, 0, 0.7)',
-                          color: '#94a3b8',
-                          border: '1px solid rgba(148, 163, 184, 0.3)',
-                          fontSize: 9,
-                        }}
-                      >
-                        Used
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Tap to toggle used */}
-                  <button
-                    className="absolute bottom-0 left-0 right-0 z-50 text-center py-1"
-                    style={{
-                      background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                      color: isUsed ? '#d4af37' : 'rgba(212, 207, 199, 0.6)',
-                      fontSize: 9,
-                      fontWeight: 600,
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleUsed(card.name)
-                    }}
-                  >
-                    {isUsed ? 'Restore' : 'Mark Used'}
-                  </button>
                 </div>
               </div>
             )
           })}
+
+          <div
+            key="ancestry"
+            className="flex-shrink-0"
+          >
+            <InfoCard
+              {...ancestryToInfoCardProps(character.ancestry)}
+              scale={0.4}
+              onClick={() => onCardTap('ancestry')}
+            />
+          </div>
+
+          <div
+            key="community"
+            className="flex-shrink-0"
+          >
+            <InfoCard
+              {...communityToInfoCardProps(character.community)}
+              scale={0.4}
+              onClick={() => onCardTap('community')}
+            />
+          </div>
         </div>
       </div>
 
       {/* Dot indicators */}
-      <DotIndicators emblaApi={emblaApi} count={domainCards.length} />
+      <DotIndicators emblaApi={emblaApi} count={domainCards.length + 2} />
     </div>
   )
 }

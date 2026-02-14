@@ -39,7 +39,7 @@ npm run build         # Production build works
 
 <optional body explaining why, not what>
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 ```
 
 **Types:**

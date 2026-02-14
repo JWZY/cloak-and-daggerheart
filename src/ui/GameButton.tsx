@@ -1,6 +1,49 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
+/**
+ * Small diamond rivet ornament for button corners.
+ * Pure CSS — can be replaced with an SVG asset for higher fidelity.
+ */
+function CornerOrnament({ side }: { side: 'left' | 'right' }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        [side]: -1,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: 12,
+        height: 12,
+        pointerEvents: 'none',
+        zIndex: 2,
+      }}
+    >
+      {/* Outer diamond — dark surround */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, #5a5550 0%, #3a3530 100%)',
+          transform: 'rotate(45deg)',
+          borderRadius: 1,
+        }}
+      />
+      {/* Inner diamond — bright metallic center */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 3,
+          background: 'linear-gradient(180deg, #c8c0b4 0%, #8a8078 100%)',
+          transform: 'rotate(45deg)',
+          borderRadius: 0.5,
+          boxShadow: '0 0 2px rgba(200,192,180,0.3)',
+        }}
+      />
+    </div>
+  )
+}
+
 export interface GameButtonProps {
   variant?: 'primary' | 'secondary' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
@@ -54,16 +97,84 @@ export function GameButton({
         className={className}
         style={{
           ...baseStyle,
-          background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
-          border: '1px solid #C29734',
-          color: '#4d381e',
-          textShadow:
-            '0 1px 0 rgba(249, 248, 243, 0.4), 0 -1px 1px rgba(77, 56, 30, 0.3)',
+          background:
+            'linear-gradient(180deg, #8a8d93 0%, #6b6e74 40%, #5a5d63 100%)',
+          border: 'none',
+          borderRadius: 6,
+          padding: 3,
           boxShadow:
-            'inset 0 1px 1px rgba(249, 248, 243, 0.6), 0 2px 8px rgba(0, 0, 0, 0.3)',
+            '0 4px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3)',
+          display: 'block',
+          touchAction: 'manipulation',
+          overflow: 'visible',
         }}
       >
-        {children}
+        {/* Inner surface — dark steel panel */}
+        <div
+          style={{
+            position: 'relative',
+            background:
+              'linear-gradient(180deg, #1a1f2e 0%, #151a24 50%, #0d1018 100%)',
+            borderRadius: 3,
+            border: '1px solid #0a0d14',
+            boxShadow:
+              'inset 0 2px 4px rgba(0,0,0,0.5), inset 0 -1px 1px rgba(255,255,255,0.04)',
+            padding: sizeStyle.padding,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 38,
+          }}
+        >
+          {/* Inner guide lines — faint horizontal engravings */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 5,
+              left: 14,
+              right: 14,
+              height: 1,
+              background:
+                'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 30%, rgba(255,255,255,0.04) 70%, transparent 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 5,
+              left: 14,
+              right: 14,
+              height: 1,
+              background:
+                'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.03) 70%, transparent 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Corner ornaments — diamond rivets at left and right */}
+          <CornerOrnament side="left" />
+          <CornerOrnament side="right" />
+
+          {/* Engraved text */}
+          <span
+            style={{
+              fontFamily: "'EB Garamond', serif",
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+              fontVariant: 'small-caps',
+              fontSize: sizeStyle.fontSize,
+              background:
+                'linear-gradient(180deg, #c8c0b4 0%, #9e978b 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.7))',
+            }}
+          >
+            {children}
+          </span>
+        </div>
       </motion.button>
     )
   }
@@ -78,14 +189,49 @@ export function GameButton({
         className={className}
         style={{
           ...baseStyle,
-          background: 'rgba(3, 7, 13, 0.8)',
-          border: '1px solid #e7ba90',
-          color: '#e7ba90',
-          textShadow: '0px 1px 1px #4d381e',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+          background:
+            'linear-gradient(180deg, #5a5d63 0%, #4a4d53 40%, #3a3d43 100%)',
+          border: 'none',
+          borderRadius: 6,
+          padding: 2,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+          display: 'block',
+          touchAction: 'manipulation',
         }}
       >
-        {children}
+        <div
+          style={{
+            background:
+              'linear-gradient(180deg, #151a24 0%, #0d1018 100%)',
+            borderRadius: 4,
+            border: '1px solid #0a0d14',
+            boxShadow:
+              'inset 0 1px 3px rgba(0,0,0,0.4), inset 0 -1px 1px rgba(255,255,255,0.03)',
+            padding: sizeStyle.padding,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 40,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'EB Garamond', serif",
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+              fontVariant: 'small-caps',
+              fontSize: sizeStyle.fontSize,
+              background:
+                'linear-gradient(180deg, #9e978b 0%, #7a746a 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))',
+            }}
+          >
+            {children}
+          </span>
+        </div>
       </motion.button>
     )
   }

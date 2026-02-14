@@ -66,5 +66,13 @@ export function migrateCharacter(
     }
   }
 
+  // Ensure level field exists (added in SRD audit fix)
+  if (!migrated.level) {
+    migrated = {
+      ...migrated,
+      level: 1,
+    }
+  }
+
   return migrated
 }

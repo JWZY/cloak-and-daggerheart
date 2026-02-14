@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
 import { GameBadge } from '../ui/GameBadge'
 import { useCharacterStore } from '../store/character-store'
+import { parseThresholds } from '../core/character/armor'
 import type { Character } from '../types/character'
 
 export interface StatBarProps {
@@ -88,7 +89,7 @@ function StatRow({
           fontVariant: 'small-caps',
           letterSpacing: '0.04em',
           color: 'rgba(231, 186, 144, 0.5)',
-          width: 40,
+          width: 46,
           flexShrink: 0,
         }}
       >
@@ -183,7 +184,7 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
           onIncrease={() => updateHP(character.id, 1)}
         />
         <StatRow
-          label="Arm"
+          label="Armor"
           icon={Shield}
           current={character.armorSlots.current}
           max={character.armorSlots.max}
@@ -215,9 +216,18 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
         />
       </div>
 
-      {/* Evasion badge */}
-      <div className="flex items-center justify-center pt-1">
+      {/* Evasion & Thresholds */}
+      <div className="flex items-center justify-center gap-2 pt-1">
         <GameBadge color={accentColor}>Evasion {character.evasion}</GameBadge>
+        {character.equipment?.armor && (() => {
+          const thresholds = parseThresholds(character.equipment.armor.base_thresholds)
+          return (
+            <>
+              <GameBadge color={accentColor}>Major {thresholds.major + character.level}</GameBadge>
+              <GameBadge color={accentColor}>Severe {thresholds.severe + character.level}</GameBadge>
+            </>
+          )
+        })()}
       </div>
     </div>
   )

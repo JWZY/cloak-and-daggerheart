@@ -169,10 +169,8 @@ export function getAllCommunities(): CommunityDisplayProps[] {
 
 /** Map an ancestry to InfoCard props for full-size card rendering */
 export function ancestryToInfoCardProps(ancestry: Ancestry): InfoCardProps {
-  // Truncate description to ~120 chars for card display
-  const desc = ancestry.description.length > 150
-    ? ancestry.description.substring(0, 147) + '...'
-    : ancestry.description
+  // First sentence only (matches official card style)
+  const desc = ancestry.description.split('. ')[0] + '.'
   return {
     title: ancestry.name,
     subtitle: 'Ancestry',
@@ -194,9 +192,8 @@ export function getAllAncestryCards(): InfoCardProps[] {
 
 /** Map a community to InfoCard props for full-size card rendering */
 export function communityToInfoCardProps(community: Community): InfoCardProps {
-  const desc = community.description.length > 150
-    ? community.description.substring(0, 147) + '...'
-    : community.description
+  // First sentence only (matches official card style)
+  const desc = community.description.split('. ')[0] + '.'
   return {
     title: community.name,
     subtitle: 'Community',

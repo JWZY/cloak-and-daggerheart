@@ -49,16 +49,14 @@ export function PickCommunity() {
           const isDimmed = communityName !== null && !isSelected
 
           return (
-            <div key={cardProps.title} className="snap-center shrink-0" style={{ width: 360 * 0.52, height: 508 * 0.52 }}>
-              <div style={{ transform: 'scale(0.52)', transformOrigin: 'top left' }}>
-                <CardSelector
-                  selected={isSelected}
-                  dimmed={isDimmed}
-                  onSelect={() => handleTap(cardProps.title)}
-                >
-                  <InfoCard {...cardProps} />
-                </CardSelector>
-              </div>
+            <div key={cardProps.title} className="snap-center shrink-0">
+              <CardSelector
+                selected={isSelected}
+                dimmed={isDimmed}
+                onSelect={() => handleTap(cardProps.title)}
+              >
+                <InfoCard {...cardProps} scale={0.52} />
+              </CardSelector>
             </div>
           )
         })}

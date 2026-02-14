@@ -101,24 +101,12 @@ export function ReviewDeck() {
             {ancestryName && (() => {
               const a = ancestries.find(x => x.name === ancestryName)
               if (!a) return null
-              return (
-                <div style={{ width: 360 * 0.4, height: 508 * 0.4, position: 'relative', overflow: 'hidden', borderRadius: 8 }}>
-                  <div style={{ transform: 'scale(0.4)', transformOrigin: 'top left' }}>
-                    <InfoCard {...ancestryToInfoCardProps(a)} />
-                  </div>
-                </div>
-              )
+              return <InfoCard {...ancestryToInfoCardProps(a)} scale={0.4} />
             })()}
             {communityName && (() => {
               const c = communities.find(x => x.name === communityName)
               if (!c) return null
-              return (
-                <div style={{ width: 360 * 0.4, height: 508 * 0.4, position: 'relative', overflow: 'hidden', borderRadius: 8 }}>
-                  <div style={{ transform: 'scale(0.4)', transformOrigin: 'top left' }}>
-                    <InfoCard {...communityToInfoCardProps(c)} />
-                  </div>
-                </div>
-              )
+              return <InfoCard {...communityToInfoCardProps(c)} scale={0.4} />
             })()}
           </div>
         </div>

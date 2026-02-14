@@ -9,6 +9,9 @@ beforeEach(() => {
     selectedDomainCards: [],
     ancestryName: null,
     communityName: null,
+    selectedArmor: 'Leather Armor',
+    selectedPrimaryWeapon: 'Greatstaff',
+    selectedSecondaryWeapon: null,
     traits: null,
     characterName: '',
   })
@@ -26,6 +29,9 @@ describe('deck-store', () => {
     expect(state.selectedDomainCards).toEqual([])
     expect(state.ancestryName).toBeNull()
     expect(state.communityName).toBeNull()
+    expect(state.selectedArmor).toBe('Leather Armor')
+    expect(state.selectedPrimaryWeapon).toBe('Greatstaff')
+    expect(state.selectedSecondaryWeapon).toBeNull()
     expect(state.traits).toBeNull()
     expect(state.characterName).toBe('')
   })
@@ -50,7 +56,8 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().selectedDomainCards).toEqual([])
   })
 
-  it('toggleDomainCard enforces max 3 cards', () => {
+  it('toggleDomainCard enforces max 3 cards for School of Knowledge', () => {
+    useDeckStore.getState().setSubclass('School of Knowledge')
     const store = useDeckStore.getState()
     store.toggleDomainCard('Card A')
     store.toggleDomainCard('Card B')
@@ -63,6 +70,30 @@ describe('deck-store', () => {
     ])
   })
 
+  it('toggleDomainCard enforces max 2 cards for School of War', () => {
+    useDeckStore.getState().setSubclass('School of War')
+    const store = useDeckStore.getState()
+    store.toggleDomainCard('Card A')
+    store.toggleDomainCard('Card B')
+    store.toggleDomainCard('Card C') // should be ignored
+    expect(useDeckStore.getState().selectedDomainCards).toEqual([
+      'Card A',
+      'Card B',
+    ])
+  })
+
+  it('setSubclass trims domain cards when switching to lower max', () => {
+    useDeckStore.getState().setSubclass('School of Knowledge')
+    useDeckStore.getState().toggleDomainCard('Card A')
+    useDeckStore.getState().toggleDomainCard('Card B')
+    useDeckStore.getState().toggleDomainCard('Card C')
+    expect(useDeckStore.getState().selectedDomainCards).toHaveLength(3)
+
+    // Switch to War (max 2) — should trim to first 2
+    useDeckStore.getState().setSubclass('School of War')
+    expect(useDeckStore.getState().selectedDomainCards).toEqual(['Card A', 'Card B'])
+  })
+
   it('setAncestry updates ancestryName', () => {
     useDeckStore.getState().setAncestry('Human')
     expect(useDeckStore.getState().ancestryName).toBe('Human')
@@ -71,6 +102,27 @@ describe('deck-store', () => {
   it('setCommunity updates communityName', () => {
     useDeckStore.getState().setCommunity('Highborne')
     expect(useDeckStore.getState().communityName).toBe('Highborne')
+  })
+
+  it('setArmor updates selectedArmor', () => {
+    useDeckStore.getState().setArmor('Chainmail Armor')
+    expect(useDeckStore.getState().selectedArmor).toBe('Chainmail Armor')
+  })
+
+  it('setPrimaryWeapon updates selectedPrimaryWeapon', () => {
+    useDeckStore.getState().setPrimaryWeapon('Wand')
+    expect(useDeckStore.getState().selectedPrimaryWeapon).toBe('Wand')
+  })
+
+  it('setSecondaryWeapon updates selectedSecondaryWeapon', () => {
+    useDeckStore.getState().setSecondaryWeapon('Round Shield')
+    expect(useDeckStore.getState().selectedSecondaryWeapon).toBe('Round Shield')
+  })
+
+  it('setSecondaryWeapon can be set to null', () => {
+    useDeckStore.getState().setSecondaryWeapon('Round Shield')
+    useDeckStore.getState().setSecondaryWeapon(null)
+    expect(useDeckStore.getState().selectedSecondaryWeapon).toBeNull()
   })
 
   it('setTraits updates traits', () => {
@@ -93,10 +145,10 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().currentStep).toBe(1)
   })
 
-  it('nextStep clamps at 6', () => {
-    useDeckStore.setState({ currentStep: 6 })
+  it('nextStep clamps at 7', () => {
+    useDeckStore.setState({ currentStep: 7 })
     useDeckStore.getState().nextStep()
-    expect(useDeckStore.getState().currentStep).toBe(6)
+    expect(useDeckStore.getState().currentStep).toBe(7)
   })
 
   it('prevStep decrements currentStep', () => {
@@ -116,11 +168,11 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().currentStep).toBe(4)
   })
 
-  it('goToStep clamps between 0 and 6', () => {
+  it('goToStep clamps between 0 and 7', () => {
     useDeckStore.getState().goToStep(-1)
     expect(useDeckStore.getState().currentStep).toBe(0)
     useDeckStore.getState().goToStep(10)
-    expect(useDeckStore.getState().currentStep).toBe(6)
+    expect(useDeckStore.getState().currentStep).toBe(7)
   })
 
   // -------------------------------------------------------------------------
@@ -137,20 +189,40 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns false when step 1 has fewer than 3 cards', () => {
+  it('canProceed returns false when step 1 has fewer cards than required', () => {
     useDeckStore.setState({
       currentStep: 1,
+      subclass: 'School of Knowledge',
       selectedDomainCards: ['Card A', 'Card B'],
     })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 1 has exactly 3 cards', () => {
+  it('canProceed returns true when step 1 has exactly 3 cards (Knowledge)', () => {
     useDeckStore.setState({
       currentStep: 1,
+      subclass: 'School of Knowledge',
       selectedDomainCards: ['Card A', 'Card B', 'Card C'],
     })
     expect(useDeckStore.getState().canProceed()).toBe(true)
+  })
+
+  it('canProceed returns true when step 1 has exactly 2 cards (War)', () => {
+    useDeckStore.setState({
+      currentStep: 1,
+      subclass: 'School of War',
+      selectedDomainCards: ['Card A', 'Card B'],
+    })
+    expect(useDeckStore.getState().canProceed()).toBe(true)
+  })
+
+  it('canProceed returns false when step 1 has 3 cards but War only needs 2', () => {
+    useDeckStore.setState({
+      currentStep: 1,
+      subclass: 'School of War',
+      selectedDomainCards: ['Card A', 'Card B', 'Card C'],
+    })
+    expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
   it('canProceed returns false when step 2 has no ancestry', () => {
@@ -173,36 +245,59 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns false when step 4 has no traits', () => {
-    useDeckStore.setState({ currentStep: 4, traits: null })
+  // Step 4: Equipment
+  it('canProceed returns false when step 4 has no armor', () => {
+    useDeckStore.setState({ currentStep: 4, selectedArmor: null, selectedPrimaryWeapon: 'Greatstaff' })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 4 has traits', () => {
+  it('canProceed returns false when step 4 has no primary weapon', () => {
+    useDeckStore.setState({ currentStep: 4, selectedArmor: 'Leather Armor', selectedPrimaryWeapon: null })
+    expect(useDeckStore.getState().canProceed()).toBe(false)
+  })
+
+  it('canProceed returns true when step 4 has armor and primary weapon', () => {
     useDeckStore.setState({
       currentStep: 4,
+      selectedArmor: 'Leather Armor',
+      selectedPrimaryWeapon: 'Greatstaff',
+    })
+    expect(useDeckStore.getState().canProceed()).toBe(true)
+  })
+
+  // Step 5: Traits (was step 4)
+  it('canProceed returns false when step 5 has no traits', () => {
+    useDeckStore.setState({ currentStep: 5, traits: null })
+    expect(useDeckStore.getState().canProceed()).toBe(false)
+  })
+
+  it('canProceed returns true when step 5 has traits', () => {
+    useDeckStore.setState({
+      currentStep: 5,
       traits: { agility: 0, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 0 },
     })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns false when step 5 has empty name', () => {
-    useDeckStore.setState({ currentStep: 5, characterName: '' })
+  // Step 6: Name (was step 5)
+  it('canProceed returns false when step 6 has empty name', () => {
+    useDeckStore.setState({ currentStep: 6, characterName: '' })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns false when step 5 has whitespace-only name', () => {
-    useDeckStore.setState({ currentStep: 5, characterName: '   ' })
+  it('canProceed returns false when step 6 has whitespace-only name', () => {
+    useDeckStore.setState({ currentStep: 6, characterName: '   ' })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 5 has a name', () => {
-    useDeckStore.setState({ currentStep: 5, characterName: 'Gandalf' })
+  it('canProceed returns true when step 6 has a name', () => {
+    useDeckStore.setState({ currentStep: 6, characterName: 'Gandalf' })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns true at step 6 (review)', () => {
-    useDeckStore.setState({ currentStep: 6 })
+  // Step 7: Review (was step 6)
+  it('canProceed returns true at step 7 (review)', () => {
+    useDeckStore.setState({ currentStep: 7 })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
@@ -218,6 +313,9 @@ describe('deck-store', () => {
       selectedDomainCards: ['A', 'B', 'C'],
       ancestryName: 'Elf',
       communityName: 'Highborne',
+      selectedArmor: 'Chainmail Armor',
+      selectedPrimaryWeapon: 'Wand',
+      selectedSecondaryWeapon: 'Round Shield',
       traits: { agility: 1, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 2 },
       characterName: 'TestChar',
     })
@@ -230,6 +328,9 @@ describe('deck-store', () => {
     expect(state.selectedDomainCards).toEqual([])
     expect(state.ancestryName).toBeNull()
     expect(state.communityName).toBeNull()
+    expect(state.selectedArmor).toBe('Leather Armor')
+    expect(state.selectedPrimaryWeapon).toBe('Greatstaff')
+    expect(state.selectedSecondaryWeapon).toBeNull()
     expect(state.traits).toBeNull()
     expect(state.characterName).toBe('')
   })

@@ -8,39 +8,37 @@ Prioritized list of features and improvements. Items at top are highest priority
 
 _Goal: A functional, well-crafted level 1 Wizard character creation and play experience._
 
-### Onboarding Flow Redesign
-**Size:** L
-**Description:** Redesign character creation visuals with glass components
-**Notes:**
-- Apply Liquid Glass aesthetic to all onboarding steps
-- Consistent visual language throughout flow
-- iOS-native feel
-
-### Card-Based Selection (Horizontal Rails)
-**Size:** L
-**Description:** Use actual cards in horizontal rails for subclasses, ancestry, community
-**Notes:**
-- Swipeable horizontal card rails
-- Card components for each option
-- Visual preview of what you're selecting
-- Applies to: Subclass, Ancestry, Community steps
-
 ### Item Cards
-**Size:** M
-**Description:** Cards for items (armor, gear, weapons)
+**Size:** M | **Status:** Open
+**Description:** Card-based UI for equipped weapons and armor in the hand view
 **Notes:**
-- Card-based UI for equipment
-- Consistent with other card selections
-- Clear visual hierarchy
+- Weapon/armor cards consistent with SRDCard/DomainCard visual language
+- Could appear in the hand view carousel alongside domain cards
+- Equipment data already loaded from SRD JSON
 
-### Working Calculations
-**Size:** M
-**Description:** Make character calculations actually work
+### Working Calculations — Post-Creation Editing
+**Size:** S | **Status:** Open
+**Description:** Allow changing equipment after character creation
 **Notes:**
-- Changing armor updates damage thresholds
-- Stats flow through correctly
-- Real-time updates as selections change
-- All derived values compute properly
+- All calculations work correctly at creation time (HP, armor score, evasion with armor feats, thresholds + level)
+- Still needed: ability to swap armor/weapons post-creation and have stats recalculate
+- Low priority — players rarely change equipment at L1
+
+---
+
+## Completed on v2-card-centric branch
+
+### Card-Based Selection (Horizontal Rails) -- DONE
+**Completed:** 2026-02-13
+**What shipped:** Deck builder with 7 steps using SRDCard, DomainCard, and InfoCard components. Tap-to-select in horizontal scrollable rails. Domain card pool selection (pick 3 of available).
+
+### Onboarding Flow Redesign -- DONE (core flow)
+**Completed:** 2026-02-13
+**What shipped:** Full card-centric deck builder with dark fantasy aesthetic, spring animations, step indicator, desktop preview panel. Not using Liquid Glass (pivoted to dark forged-metal RPG style).
+
+### SRD Card Components -- DONE
+**Completed:** 2026-02-09 through 2026-02-13
+**What shipped:** SRDCard, DomainCard (rebuilt), InfoCard. All deltas vs Figma reviewed and locked in. Auto-fit titles, masked banners, domain color system.
 
 ---
 
@@ -69,42 +67,18 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 ### Offline Support
 **Size:** M
 **Description:** Full PWA offline capabilities
-**Notes:**
-- Service worker caching
-- Offline-first data sync
-- Handle network errors gracefully
-
-### Dark Mode
-**Size:** M
-**Description:** System dark mode support
-**Notes:**
-- Design tokens already support this
-- Need to test all components
-- Gradient backgrounds may need adjustment
 
 ### Dice History
 **Size:** S
-**Description:** View past dice rolls
-**Notes:**
-- Already tracked in rollHistory
-- Need UI to view history
-- Maybe show stats/trends
+**Description:** View past dice rolls (already tracked in rollHistory, needs UI)
 
 ### Sound Effects
 **Size:** S
-**Description:** Dice roll sounds, UI feedback
-**Notes:**
-- Optional, can be toggled
-- Need small audio files
-- Web Audio API
+**Description:** Dice roll sounds, UI feedback (optional, toggleable)
 
 ### Session Notes
 **Size:** M
-**Description:** Per-session note taking
-**Notes:**
-- Already have notes field
-- Could add session-based organization
-- Link to specific rolls/events
+**Description:** Per-session note taking with organization
 
 ---
 
@@ -112,22 +86,11 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 
 ### Level Up Flow
 **Size:** L
-**Description:** Allow characters to level up
-**Notes:**
-- Need level tracking
-- HP increases
-- New domain cards
-- Proficiency increases
-- Foundation → Specialization → Mastery progression
+**Description:** Allow characters to level up (HP increases, new domain cards, proficiency, Foundation -> Specialization -> Mastery)
 
 ### Multi-class Support
 **Size:** XL
-**Description:** Support character classes beyond Wizard (unlocks at level 5)
-**Notes:**
-- Current code hardcodes 'Wizard' in many places
-- Would need class selection step in character creation
-- Domain cards vary by class
-- HP, evasion calculations are class-specific
+**Description:** Support classes beyond Wizard (currently hardcoded in many places). Requires class selection step, class-specific domain cards, class-specific HP/evasion calcs.
 
 ---
 
@@ -135,17 +98,11 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 
 ### Add Unit Test Coverage
 **Size:** M
-**Notes:**
-- core/ functions should have 100% coverage
-- Current coverage is low
-- Add tests as we extract logic
+**Notes:** core/ functions should have high coverage. card-mapper.ts and srd.ts have tests. Store tests exist.
 
 ### TypeScript Strict Mode
 **Size:** M
-**Notes:**
-- Enable stricter settings
-- Fix remaining `any` types
-- Add missing type annotations
+**Notes:** Enable stricter settings, fix remaining `any` types
 
 ---
 
@@ -156,4 +113,3 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 - Condition tracking
 - NPC quick reference
 - Combat log
-- Spell slot tracking (if other classes added)

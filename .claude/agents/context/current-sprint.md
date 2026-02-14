@@ -1,10 +1,18 @@
 # Current Sprint
 
-Last updated: 2026-02-02
+Last updated: 2026-02-14
+Branch: `v2-card-centric`
 
 ## Active Tasks
 
-_No active tasks - architecture refactor complete!_
+### InfoCard scale prop
+**Size:** S
+**Description:** Add a `scale` prop to InfoCard (like DomainCard already has) for cleaner carousel rendering in HandView. Currently uses manual CSS transform wrapper.
+
+### GameButton redesign
+**Size:** M
+**Description:** Redesign GameButton to forged-metal RPG aesthetic. Spec complete in `context/button-redesign.md`. Pewter frame, engraved text, corner ornaments.
+**Status:** Spec done, implementation not started
 
 ---
 
@@ -12,48 +20,35 @@ _No active tasks - architecture refactor complete!_
 
 _No blocked tasks_
 
-## Recently Completed
+---
 
-### [ARCH-001] Phase 1: Extract Core Logic
-**Agent:** @frontend
-**Status:** done
-**Completed:** 2026-02-02
-**Files created:**
-- `src/core/character/hp.ts`
-- `src/core/character/armor.ts`
-- `src/core/character/migration.ts`
-- `src/core/character/validation.ts`
-- `src/core/dice/duality.ts`
-- `src/core/rules/traits.ts`
-- `src/core/rules/wizard.ts`
+## Recently Completed (v2 branch)
 
-### [ARCH-002] Phase 2: i18n Content Layer
-**Agent:** @frontend
-**Status:** done
-**Completed:** 2026-02-02
-**Files created:**
-- `src/content/i18n/en.json`
-- `src/content/i18n/index.ts` (useTranslation hook)
+### v2 Card-Centric Rebuild
+**Completed:** 2026-02-13
+**Summary:** Full rebuild of the app around a card-centric metaphor.
 
-### [ARCH-003] Phase 3: Design System Extraction
-**Agent:** @frontend
-**Status:** done
-**Completed:** 2026-02-02
-**Files created:**
-- `src/design-system/tokens/colors.ts`
-- `src/design-system/tokens/effects.ts`
-- `src/design-system/tokens/animations.ts`
-- `src/design-system/theme/` (moved from contexts/)
+Built:
+- **Deck Builder** — 7-step wizard: PickSubclass, PickDomainCards, PickAncestry, PickCommunity, AssignTraits, NameCharacter, ReviewDeck
+- **Hand View** — HeroCard + CardCarousel (mobile) / grid (desktop) + StatBar + collapsible panels
+- **Card components** — SRDCard, DomainCard (rebuilt), InfoCard, CardFlip, CardBack, CardZoom
+- **UI kit** — GameButton, GameBadge, GameInput, GlassPanel, SectionHeader
+- **Data layer** — card-mapper.ts, srd.ts, deck-store.ts
+- **App flow** — Splash -> DeckBuilder -> HandView with Framer Motion transitions
+- **E2E tests** — 14 tests across 4 spec files, all passing
 
-### [ARCH-004] characterStore Refactor
-**Agent:** @frontend
-**Status:** done
-**Completed:** 2026-02-02
-**Result:** Reduced from 460 to 411 lines by extracting business logic to core/
+### SRD Card Delta Review
+**Completed:** 2026-02-13
+**Summary:** All 13 Figma deltas reviewed and locked in. Typography, layout, shadows, frame overlay all finalized. Delta comparison tool at `?cards` page.
 
 ---
 
-## Notes
+## Historical (pre-v2, archived)
 
-- All tests pass: `npm run lint && npm run test:unit:run && npm run build`
-- Ready for next feature work
+The following were completed on `main` before the v2 branch:
+- [ARCH-001] Extract core logic to `src/core/`
+- [ARCH-002] i18n content layer (`src/content/i18n/`)
+- [ARCH-003] Design system extraction (`src/design-system/tokens/`)
+- [ARCH-004] characterStore refactor (460 -> 411 lines)
+
+All completed 2026-02-02. Details in git history.

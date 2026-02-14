@@ -92,17 +92,15 @@
 html, body {
   height: 100%;
   width: 100%;
+  margin: 0;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: #0f172a;
+  background-color: #03070d;
   color: #1c1c1e;
   overflow: hidden;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  /* Prevent iOS bounce effect on body */
+  /* Each view manages its own scroll — body never scrolls */
   overscroll-behavior: none;
   /* Disable text selection for native feel */
   user-select: none;
