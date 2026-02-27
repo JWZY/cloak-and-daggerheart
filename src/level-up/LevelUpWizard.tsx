@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronRight, ChevronLeft, Check, Sparkles } from 'lucide-react'
 import { useLevelUpStore } from '../store/level-up-store'
 import { useCharacterStore } from '../store/character-store'
-import { getProficiency, getAdvancementCost, getAvailableAdvancementTypes } from '../core/rules/advancement'
+import { getProficiency, getTier, getAdvancementCost, getAvailableAdvancementTypes, getAdvancementPickLimit } from '../core/rules/advancement'
 import { getDomainCardsUpToLevel } from '../data/srd'
 import { getClassForSubclass } from '../data/srd'
 import { TRAIT_NAMES, formatTraitValue } from '../core/rules/traits'
@@ -176,6 +176,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -direction * 50 }}
             transition={{ duration: 0.2 }}
+            className="max-w-xs mx-auto"
           >
             {store.currentStep === 0 && (
               <StepAutoGains
@@ -409,11 +410,30 @@ function StepAdvancements({
   const [selectedExpIndices, setSelectedExpIndices] = useState<number[]>([])
 
   const newLevel = character.level + 1
-  const availableTypes = getAvailableAdvancementTypes(1) // tier 1 for now
+  const tier = getTier(newLevel)
+  const availableTypes = getAvailableAdvancementTypes(tier)
+
+  // Count how many times each type was picked in this tier (past advancements + current picks)
+  const tierPickCounts = useMemo(() => {
+    const counts: Partial<Record<AdvancementType, number>> = {}
+    // Count past advancements in the same tier
+    for (const a of character.advancements) {
+      if (getTier(a.level) === tier) {
+        counts[a.type] = (counts[a.type] ?? 0) + 1
+      }
+    }
+    // Count current level-up picks
+    for (const a of advancements) {
+      counts[a.type] = (counts[a.type] ?? 0) + 1
+    }
+    return counts
+  }, [character.advancements, advancements, tier])
 
   const handleSelectAdvancement = (type: AdvancementType) => {
     const cost = getAdvancementCost(type)
     if (!canAdd(cost)) return
+    const picksUsed = tierPickCounts[type] ?? 0
+    if (picksUsed >= getAdvancementPickLimit(type)) return
 
     if (type === 'increase_traits') {
       setSelectedTraits([])
@@ -667,22 +687,50 @@ function StepAdvancements({
           {availableTypes.map(type => {
             const cost = getAdvancementCost(type)
             const canAfford = canAdd(cost)
+            const pickLimit = getAdvancementPickLimit(type)
+            const picksUsed = tierPickCounts[type] ?? 0
+            const atTierLimit = picksUsed >= pickLimit
+            const isDisabled = !canAfford || atTierLimit
             return (
               <button
                 key={type}
                 onClick={() => handleSelectAdvancement(type)}
-                disabled={!canAfford}
+                disabled={isDisabled}
                 className="flex flex-col px-3 py-2.5 rounded-xl text-left transition-all"
                 style={{
-                  background: canAfford ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
+                  background: !isDisabled ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
                   border: '1px solid rgba(231, 186, 144, 0.1)',
-                  opacity: canAfford ? 1 : 0.35,
+                  opacity: isDisabled ? 0.35 : 1,
                 }}
               >
                 <div className="flex items-center justify-between w-full">
-                  <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, fontWeight: 600, color: '#D4CFC7' }}>
-                    {ADVANCEMENT_LABELS[type]}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, fontWeight: 600, color: '#D4CFC7' }}>
+                      {ADVANCEMENT_LABELS[type]}
+                    </span>
+                    {/* Per-tier pick limit checkboxes */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: pickLimit }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="rounded-sm"
+                          style={{
+                            width: 10,
+                            height: 10,
+                            background: i < picksUsed
+                              ? 'linear-gradient(180deg, #f9f8f3, #e7ba90)'
+                              : 'transparent',
+                            border: i < picksUsed
+                              ? '1px solid #e7ba90'
+                              : '1px solid rgba(231, 186, 144, 0.3)',
+                            boxShadow: i < picksUsed
+                              ? '0 0 4px rgba(231, 186, 144, 0.3)'
+                              : 'none',
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                   <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, color: 'rgba(231, 186, 144, 0.5)' }}>
                     {cost} {cost === 1 ? 'slot' : 'slots'}
                   </span>

@@ -5,6 +5,7 @@ import {
   getAdvancementSlots,
   getAdvancementCost,
   getAvailableAdvancementTypes,
+  getAdvancementPickLimit,
   validateAdvancements,
 } from './advancement'
 
@@ -70,8 +71,28 @@ describe('getAdvancementCost', () => {
 })
 
 describe('getAvailableAdvancementTypes', () => {
-  it('returns all advancement types', () => {
+  it('returns only 6 basic types for tier 1', () => {
     const types = getAvailableAdvancementTypes(1)
+    expect(types).toContain('increase_traits')
+    expect(types).toContain('add_hp')
+    expect(types).toContain('add_stress')
+    expect(types).toContain('boost_experiences')
+    expect(types).toContain('add_domain_card')
+    expect(types).toContain('increase_evasion')
+    expect(types).not.toContain('upgrade_subclass')
+    expect(types).not.toContain('increase_proficiency')
+    expect(types).toHaveLength(6)
+  })
+
+  it('returns only 6 basic types for tier 2', () => {
+    const types = getAvailableAdvancementTypes(2)
+    expect(types).toHaveLength(6)
+    expect(types).not.toContain('upgrade_subclass')
+    expect(types).not.toContain('increase_proficiency')
+  })
+
+  it('returns all 8 types for tier 3', () => {
+    const types = getAvailableAdvancementTypes(3)
     expect(types).toContain('increase_traits')
     expect(types).toContain('add_hp')
     expect(types).toContain('add_stress')
@@ -81,6 +102,40 @@ describe('getAvailableAdvancementTypes', () => {
     expect(types).toContain('upgrade_subclass')
     expect(types).toContain('increase_proficiency')
     expect(types).toHaveLength(8)
+  })
+
+  it('returns all 8 types for tier 4', () => {
+    const types = getAvailableAdvancementTypes(4)
+    expect(types).toHaveLength(8)
+    expect(types).toContain('upgrade_subclass')
+    expect(types).toContain('increase_proficiency')
+  })
+})
+
+describe('getAdvancementPickLimit', () => {
+  it('returns 3 for increase_traits', () => {
+    expect(getAdvancementPickLimit('increase_traits')).toBe(3)
+  })
+  it('returns 2 for add_hp', () => {
+    expect(getAdvancementPickLimit('add_hp')).toBe(2)
+  })
+  it('returns 2 for add_stress', () => {
+    expect(getAdvancementPickLimit('add_stress')).toBe(2)
+  })
+  it('returns 1 for boost_experiences', () => {
+    expect(getAdvancementPickLimit('boost_experiences')).toBe(1)
+  })
+  it('returns 1 for add_domain_card', () => {
+    expect(getAdvancementPickLimit('add_domain_card')).toBe(1)
+  })
+  it('returns 1 for increase_evasion', () => {
+    expect(getAdvancementPickLimit('increase_evasion')).toBe(1)
+  })
+  it('returns 1 for upgrade_subclass', () => {
+    expect(getAdvancementPickLimit('upgrade_subclass')).toBe(1)
+  })
+  it('returns 2 for increase_proficiency', () => {
+    expect(getAdvancementPickLimit('increase_proficiency')).toBe(2)
   })
 })
 

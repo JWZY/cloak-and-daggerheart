@@ -182,15 +182,28 @@ Rename card components to match their game concepts (not implementation details)
 
 **Evergreen (game mechanics — do not change):**
 - When a player picks "Add Domain Card" as an advancement (can be picked multiple times), the domain card step must let them pick that many ADDITIONAL cards beyond the mandatory 1. Total cards to pick = 1 mandatory + N from "add domain card" advancements.
-- "Increase Proficiency" (2 slots) IS available at Level 2 — confirmed by SRD. Costs 2 advancement slots.
-- "Upgrade Subclass" (Foundation → Specialization) IS available at Level 2 — confirmed by SRD. Costs 2 advancement slots.
-- Specialization → Mastery upgrade only available at Level 5+.
+- "Increase Proficiency" is Tier 3+ only (Level 5+). NOT available at Tier 2 (Levels 2-4). Costs 2 advancement slots.
+- "Upgrade Subclass" (Foundation → Specialization) is Tier 3+ only (Level 5+). NOT available at Tier 2 (Levels 2-4). Costs 1 advancement slot.
+- Specialization → Mastery upgrade only available at Tier 4 (Level 8+).
 - Tier achievements (proficiency bump, new experience) are automatic — separate from advancement slot choices.
 
 **UX (current version — may evolve):**
 - Current wizard UX is placeholder — will be refined in a future pass
 - Core flow (4 steps: auto gains, advancements, domain card, review) is correct
 - Visual polish and interaction design TBD
+
+### Per-Tier Advancement Pick Limits (from official character sheet)
+
+Each advancement can only be picked a limited number of times within a single tier:
+- Increase 2 Traits: 3 times per tier
+- +1 HP Slot: 2 times per tier
+- +1 Stress Slot: 2 times per tier
+- Boost 2 Experiences: 1 time per tier
+- +1 Domain Card: 1 time per tier
+- +1 Evasion: 1 time per tier
+- Upgrade Subclass: 1 time per tier (Tier 3+ only)
+- Increase Proficiency: 2 times per tier (Tier 3+ only)
+- Multiclass: 2 times per tier (Tier 3+ only, mutually exclusive with Upgrade Subclass)
 
 ## Domain Color System
 - Colors represent DOMAINS, not classes

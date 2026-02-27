@@ -33,9 +33,8 @@ export function getAdvancementCost(type: AdvancementType): number {
 }
 
 // Which types are available based on tier
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getAvailableAdvancementTypes(_tier: number): AdvancementType[] {
-  // All basic advancements available at all tiers
+export function getAvailableAdvancementTypes(tier: number): AdvancementType[] {
+  // Basic advancements available at all tiers
   const types: AdvancementType[] = [
     'increase_traits',
     'add_hp',
@@ -43,10 +42,36 @@ export function getAvailableAdvancementTypes(_tier: number): AdvancementType[] {
     'boost_experiences',
     'add_domain_card',
     'increase_evasion',
-    'upgrade_subclass',
-    'increase_proficiency',
   ]
+
+  // Tier 3+ unlocks upgrade_subclass and increase_proficiency
+  if (tier >= 3) {
+    types.push('upgrade_subclass', 'increase_proficiency')
+  }
+
   return types
+}
+
+// Per-tier pick limits (how many times each advancement can be picked within one tier)
+export function getAdvancementPickLimit(type: AdvancementType): number {
+  switch (type) {
+    case 'increase_traits':
+      return 3
+    case 'add_hp':
+      return 2
+    case 'add_stress':
+      return 2
+    case 'boost_experiences':
+      return 1
+    case 'add_domain_card':
+      return 1
+    case 'increase_evasion':
+      return 1
+    case 'upgrade_subclass':
+      return 1
+    case 'increase_proficiency':
+      return 2
+  }
 }
 
 // Validate that a set of advancements uses exactly the right number of slots
