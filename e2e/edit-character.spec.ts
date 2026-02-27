@@ -7,6 +7,7 @@ import { test, expect, Page } from '@playwright/test'
 const TEST_CHARACTER = {
   id: 'persist-test-1',
   name: 'Persist Wizard',
+  level: 1,
   ancestry: {
     name: 'Human',
     description: 'Versatile.',
@@ -62,7 +63,11 @@ const TEST_CHARACTER = {
   },
   gold: 10,
   notes: '',
+  advancements: [],
+  markedTraits: [],
+  subclassTier: 'foundation',
   backgroundAnswers: [],
+  experiences: [],
   connectionAnswers: [],
   createdAt: Date.now(),
 }
@@ -74,8 +79,8 @@ async function injectCharacterAndWait(page: Page) {
       state: { characters: [charData] },
       version: 0,
     }
-    localStorage.setItem('cloak-characters-v2', JSON.stringify(storeData))
-    localStorage.removeItem('cloak-deck-draft-v1')
+    localStorage.setItem('cloak-characters-v3', JSON.stringify(storeData))
+    localStorage.removeItem('cloak-deck-draft-v2')
   }, TEST_CHARACTER)
   await page.reload()
   await expect(page.locator('text=Persist Wizard').first()).toBeVisible({

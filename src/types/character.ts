@@ -108,6 +108,25 @@ export interface Equipment {
 
 export type TraitName = 'agility' | 'strength' | 'finesse' | 'instinct' | 'presence' | 'knowledge'
 
+export type AdvancementType =
+  | 'increase_traits'
+  | 'add_hp'
+  | 'add_stress'
+  | 'boost_experiences'
+  | 'add_domain_card'
+  | 'increase_evasion'
+  | 'upgrade_subclass'
+  | 'increase_proficiency'
+
+export interface Advancement {
+  level: number
+  type: AdvancementType
+  traits?: [TraitName, TraitName]
+  experienceIndices?: [number, number]
+  cardName?: string
+  subclassFeature?: string
+}
+
 export interface Traits {
   agility: number
   strength: number
@@ -123,8 +142,8 @@ export interface Character {
   level: number
   ancestry: Ancestry
   community: Community
-  class: 'Wizard'
-  subclass: 'School of Knowledge' | 'School of War'
+  class: string
+  subclass: string
   traits: Traits
   hp: { current: number; max: number }
   armorSlots: { current: number; max: number }
@@ -136,7 +155,11 @@ export interface Character {
   equipment: Equipment
   gold: number
   notes: string
+  advancements: Advancement[]
+  markedTraits: TraitName[]
+  subclassTier: 'foundation' | 'specialization' | 'mastery'
   backgroundAnswers: string[]
+  experiences: { text: string; bonus: number }[]
   connectionAnswers: string[]
   createdAt: number
 }
@@ -150,5 +173,3 @@ export interface DiceRoll {
   result: 'hope' | 'fear' | 'critical'
   timestamp: number
 }
-
-export type WizardSubclass = 'School of Knowledge' | 'School of War'

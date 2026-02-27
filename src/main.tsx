@@ -1,16 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './app/App'
+import DesignSystemPage from './app/DesignSystem'
 import DesignLab from './app/DesignLab'
-import DesignSystem from './app/DesignSystem'
+import PickerLab from './app/PickerLab'
 import './index.css'
 
 const params = new URLSearchParams(window.location.search)
-const Root = params.has('components')
-  ? DesignSystem
+const Root = params.has('components') || params.has('audit')
+  ? DesignSystemPage
   : params.has('cards')
     ? DesignLab
-    : App
+    : params.has('pickers')
+      ? PickerLab
+      : App
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

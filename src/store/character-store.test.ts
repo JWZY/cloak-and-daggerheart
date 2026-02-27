@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useCharacterStore } from './character-store'
 import type { Character } from '../types/character'
+import type { LevelUpChoices } from '../core/character/level-up'
 
 // ---------------------------------------------------------------------------
 // Helper: build a minimal valid Character for testing
@@ -64,7 +65,11 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     },
     gold: 10,
     notes: '',
+    advancements: [],
+    markedTraits: [],
+    subclassTier: 'foundation',
     backgroundAnswers: [],
+    experiences: [],
     connectionAnswers: [],
     createdAt: Date.now(),
     ...overrides,
@@ -229,5 +234,79 @@ describe('character-store', () => {
     useCharacterStore.getState().updateNotes('test-id-1', '')
 
     expect(useCharacterStore.getState().characters[0].notes).toBe('')
+  })
+
+  // -------------------------------------------------------------------------
+  // levelUp
+  // -------------------------------------------------------------------------
+
+  it('levelUp applies level up to the correct character', () => {
+    const char = makeCharacter({
+      id: 'char-1',
+      name: 'Hero',
+      experiences: [
+        { text: 'Studied magic', bonus: 2 },
+        { text: 'Fought monsters', bonus: 2 },
+      ],
+    })
+    useCharacterStore.getState().createCharacter(char)
+
+    const choices: LevelUpChoices = {
+      advancements: [
+        { level: 2, type: 'add_hp' },
+        { level: 2, type: 'add_stress' },
+      ],
+      newDomainCards: [{
+        name: 'Test Card',
+        level: '2',
+        domain: 'Arcana',
+        type: 'Ability',
+        recall: '10',
+        text: 'Test text',
+      }],
+      newExperience: { text: 'New adventure' },
+    }
+
+    useCharacterStore.getState().levelUp('char-1', choices)
+
+    const updated = useCharacterStore.getState().characters[0]
+    expect(updated.level).toBe(2)
+    expect(updated.hp.max).toBe(6) // 5 + 1 from add_hp
+    expect(updated.stress.max).toBe(7) // 6 + 1 from add_stress
+    expect(updated.experiences).toHaveLength(3)
+    expect(updated.domainCards).toHaveLength(3) // 2 existing + 1 new
+  })
+
+  it('levelUp does not affect other characters', () => {
+    const char1 = makeCharacter({ id: 'char-1', name: 'Hero One' })
+    const char2 = makeCharacter({
+      id: 'char-2',
+      name: 'Hero Two',
+      hp: { current: 8, max: 8 },
+    })
+    useCharacterStore.getState().createCharacter(char1)
+    useCharacterStore.getState().createCharacter(char2)
+
+    const choices: LevelUpChoices = {
+      advancements: [
+        { level: 2, type: 'add_hp' },
+        { level: 2, type: 'add_stress' },
+      ],
+      newDomainCards: [{
+        name: 'Test Card',
+        level: '2',
+        domain: 'Arcana',
+        type: 'Ability',
+        recall: '10',
+        text: 'Test text',
+      }],
+      newExperience: { text: 'New adventure' },
+    }
+
+    useCharacterStore.getState().levelUp('char-1', choices)
+
+    const hero2 = useCharacterStore.getState().characters[1]
+    expect(hero2.level).toBe(1)
+    expect(hero2.hp.max).toBe(8) // unchanged
   })
 })

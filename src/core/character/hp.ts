@@ -1,14 +1,13 @@
 // HP calculation logic for characters
 // Pure functions - no React, no side effects
 
-import type { WizardSubclass } from '../../types/character'
+import { getSubclassBonusHP } from '../rules/class-rules'
 
 /**
- * Calculate max HP for a Wizard based on subclass
- * School of War (Battlemage) gets +1 HP
+ * Calculate max HP for a character based on their subclass
  */
-export function calculateWizardMaxHP(baseHP: number, subclass: WizardSubclass): number {
-  return subclass === 'School of War' ? baseHP + 1 : baseHP
+export function calculateMaxHP(baseHP: number, subclassName: string): number {
+  return baseHP + getSubclassBonusHP(subclassName)
 }
 
 /**

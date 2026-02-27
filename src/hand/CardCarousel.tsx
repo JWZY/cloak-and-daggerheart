@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { DomainCard } from '../cards/DomainCard'
-import { InfoCard } from '../cards/InfoCard'
-import { domainCardToProps, parseAbilityText, ancestryToInfoCardProps, communityToInfoCardProps } from '../data/card-mapper'
+import { AncestryCard } from '../cards/AncestryCard'
+import { CommunityCard } from '../cards/CommunityCard'
+import { domainCardToProps, parseAbilityText } from '../data/card-mapper'
 import type { Character } from '../types/character'
 
 export interface CardCarouselProps {
@@ -70,8 +71,8 @@ export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
             key="ancestry"
             className="flex-shrink-0"
           >
-            <InfoCard
-              {...ancestryToInfoCardProps(character.ancestry)}
+            <AncestryCard
+              ancestry={character.ancestry}
               scale={0.4}
               onClick={() => onCardTap('ancestry')}
             />
@@ -81,8 +82,8 @@ export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
             key="community"
             className="flex-shrink-0"
           >
-            <InfoCard
-              {...communityToInfoCardProps(character.community)}
+            <CommunityCard
+              community={character.community}
               scale={0.4}
               onClick={() => onCardTap('community')}
             />

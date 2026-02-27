@@ -1,4 +1,5 @@
 import { TRAIT_NAMES, formatTraitValue } from '../../core/rules/traits'
+import { getSubclassByName } from '../../data/srd'
 import { GameBadge } from '../../ui/GameBadge'
 import type { Character } from '../../types/character'
 
@@ -17,11 +18,8 @@ const traitLabels: Record<string, string> = {
 
 export function StatsPanel({ character }: StatsPanelProps) {
   // Determine spellcast trait from subclass data
-  const spellcastTrait = character.subclass === 'School of Knowledge'
-    ? 'Knowledge'
-    : character.subclass === 'School of War'
-      ? 'Instinct'
-      : undefined
+  const subclassData = getSubclassByName(character.subclass)
+  const spellcastTrait = subclassData.spellcast_trait
 
   return (
     <div className="flex flex-col gap-3">
@@ -60,7 +58,7 @@ export function StatsPanel({ character }: StatsPanelProps) {
                     className="ml-1"
                     style={{
                       fontFamily: "'Source Sans 3', sans-serif",
-                      fontSize: 9,
+                      fontSize: 11,
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
                       color: 'rgba(231, 186, 144, 0.5)',
@@ -74,7 +72,7 @@ export function StatsPanel({ character }: StatsPanelProps) {
               <span
                 style={{
                   fontFamily: "'Source Sans 3', sans-serif",
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums',
                   color: value > 0

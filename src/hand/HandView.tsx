@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { BarChart3, Sword, StickyNote, X } from 'lucide-react'
+import { LevelUpWizard } from '../level-up/LevelUpWizard'
 import { HeroCard } from './HeroCard'
 import { CardCarousel } from './CardCarousel'
 import { StatBar } from './StatBar'
@@ -10,10 +11,11 @@ import { NotesPanel } from './panels/NotesPanel'
 import { CardZoom } from '../cards/CardZoom'
 import { SRDCard } from '../cards/SRDCard'
 import { DomainCard } from '../cards/DomainCard'
-import { InfoCard } from '../cards/InfoCard'
+import { AncestryCard } from '../cards/AncestryCard'
+import { CommunityCard } from '../cards/CommunityCard'
 import { useCardZoom } from '../cards/useCardZoom'
-import { subclassToCardProps, domainCardToProps, parseAbilityText, ancestryToInfoCardProps, communityToInfoCardProps } from '../data/card-mapper'
-import { getSubclass, getClassForSubclass } from '../data/srd'
+import { subclassToCardProps, domainCardToProps, parseAbilityText } from '../data/card-mapper'
+import { getSubclassByName, getClassForSubclass } from '../data/srd'
 import { DOMAIN_COLORS } from '../cards/domain-colors'
 import { useCharacterStore } from '../store/character-store'
 import type { Character } from '../types/character'
@@ -50,6 +52,7 @@ export function HandView({ character }: HandViewProps) {
   const deleteCharacter = useCharacterStore((s) => s.deleteCharacter)
   const { zoomedCard, openZoom, closeZoom } = useCardZoom()
   const [openPanel, setOpenPanel] = useState<PanelId>(null)
+  const [showLevelUp, setShowLevelUp] = useState(false)
   const isDesktop = useIsDesktop()
 
   const accentColor = useMemo(() => getAccentColor(character), [character])
@@ -154,13 +157,13 @@ export function HandView({ character }: HandViewProps) {
   // Desktop ancestry + community row
   const infoCardsRow = (
     <div className="grid grid-cols-2 gap-3">
-      <InfoCard
-        {...ancestryToInfoCardProps(character.ancestry)}
+      <AncestryCard
+        ancestry={character.ancestry}
         scale={0.5}
         onClick={() => handleCardTap('ancestry')}
       />
-      <InfoCard
-        {...communityToInfoCardProps(character.community)}
+      <CommunityCard
+        community={character.community}
         scale={0.5}
         onClick={() => handleCardTap('community')}
       />
@@ -174,7 +177,7 @@ export function HandView({ character }: HandViewProps) {
         <CardZoom layoutId="hero-card" onClose={closeZoom}>
           <SRDCard
             {...subclassToCardProps(
-              getSubclass(character.subclass),
+              getSubclassByName(character.subclass),
               getClassForSubclass(character.subclass)!
             )}
           />
@@ -207,13 +210,13 @@ export function HandView({ character }: HandViewProps) {
 
       {zoomedCard === 'ancestry' && (
         <CardZoom layoutId="ancestry" onClose={closeZoom}>
-          <InfoCard {...ancestryToInfoCardProps(character.ancestry)} />
+          <AncestryCard ancestry={character.ancestry} />
         </CardZoom>
       )}
 
       {zoomedCard === 'community' && (
         <CardZoom layoutId="community" onClose={closeZoom}>
-          <InfoCard {...communityToInfoCardProps(character.community)} />
+          <CommunityCard community={character.community} />
         </CardZoom>
       )}
     </>
@@ -268,7 +271,7 @@ export function HandView({ character }: HandViewProps) {
                 <span
                   style={{
                     fontFamily: "'EB Garamond', serif",
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: 500,
                     fontVariant: 'small-caps',
                     background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
@@ -283,7 +286,7 @@ export function HandView({ character }: HandViewProps) {
                 <span
                   style={{
                     fontFamily: "'EB Garamond', serif",
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: 600,
                     fontVariant: 'small-caps',
                     color: '#e7ba90',
@@ -291,9 +294,30 @@ export function HandView({ character }: HandViewProps) {
                     textAlign: 'center',
                   }}
                 >
-                  {character.subclass} Wizard
+                  {character.subclass} {character.class}
                 </span>
               </div>
+
+              {/* Level Up button (desktop) */}
+              {character.level < 2 && (
+                <div className="flex justify-center pb-4">
+                  <button
+                    onClick={() => setShowLevelUp(true)}
+                    className="px-4 py-1.5 rounded-full text-sm transition-all"
+                    style={{
+                      fontFamily: "'EB Garamond', serif",
+                      fontWeight: 600,
+                      fontVariant: 'small-caps',
+                      letterSpacing: '0.04em',
+                      background: 'linear-gradient(180deg, rgba(249,248,243,0.12) 0%, rgba(231,186,144,0.12) 100%)',
+                      border: '1px solid rgba(231, 186, 144, 0.3)',
+                      color: '#e7ba90',
+                    }}
+                  >
+                    Level Up
+                  </button>
+                </div>
+              )}
 
               {/* Hero card at 0.85 scale */}
               <div style={{ width: 360 * 0.85, height: 508 * 0.85, position: 'relative', flexShrink: 0 }}>
@@ -341,7 +365,7 @@ export function HandView({ character }: HandViewProps) {
             <span
               style={{
                 fontFamily: "'EB Garamond', serif",
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 fontVariant: 'small-caps',
                 color: '#e7ba90',
@@ -349,9 +373,30 @@ export function HandView({ character }: HandViewProps) {
                 textAlign: 'center',
               }}
             >
-              {character.subclass} Wizard
+              {character.subclass} {character.class}
             </span>
           </div>
+
+          {/* Level Up button */}
+          {character.level < 2 && (
+            <div className="flex justify-center pb-2">
+              <button
+                onClick={() => setShowLevelUp(true)}
+                className="px-4 py-1.5 rounded-full text-sm transition-all"
+                style={{
+                  fontFamily: "'EB Garamond', serif",
+                  fontWeight: 600,
+                  fontVariant: 'small-caps',
+                  letterSpacing: '0.04em',
+                  background: 'linear-gradient(180deg, rgba(249,248,243,0.12) 0%, rgba(231,186,144,0.12) 100%)',
+                  border: '1px solid rgba(231, 186, 144, 0.3)',
+                  color: '#e7ba90',
+                }}
+              >
+                Level Up
+              </button>
+            </div>
+          )}
 
           {/* Hero Card — natural height, centered */}
           <div className="flex items-center justify-center px-4 py-3">
@@ -376,6 +421,14 @@ export function HandView({ character }: HandViewProps) {
 
       {/* Card Zoom Overlays (shared) */}
       {zoomOverlays}
+
+      {/* Level Up Wizard Overlay */}
+      {showLevelUp && (
+        <LevelUpWizard
+          character={character}
+          onClose={() => setShowLevelUp(false)}
+        />
+      )}
     </div>
   )
 }

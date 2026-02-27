@@ -34,8 +34,8 @@ This is a mobile-first PWA for viewing Daggerheart TTRPG content, designed to fe
 src/
 ├── app/               # App shell and dev tools
 │   ├── App.tsx        # Root: splash → deck builder → hand view
-│   ├── DesignLab.tsx  # Card delta tool (?cards)
-│   └── DesignSystem.tsx # UI primitives showcase (?components)
+│   ├── DesignSystem.tsx # Design System page (?components)
+│   └── DesignLab.tsx  # Card delta tool (?cards)
 ├── core/              # Pure business logic (no React, no side effects)
 │   ├── character/     # HP calcs, armor, migration, validation
 │   ├── deck/          # Deck-building logic (WIP)
@@ -47,7 +47,8 @@ src/
 ├── deck-builder/      # Character creation wizard
 │   ├── DeckBuilder.tsx
 │   ├── components/    # DeckPreview, StepIndicator
-│   └── steps/         # PickSubclass, PickDomainCards, AssignTraits, etc.
+│   └── steps/         # PickClass, PickSubclass, PickDomainCards, AssignTraits, etc.
+├── level-up/          # Level-up wizard (LevelUpWizard.tsx)
 ├── hand/              # In-play hand view
 │   ├── HandView.tsx   # Main hand screen
 │   ├── CardCarousel.tsx
@@ -55,7 +56,7 @@ src/
 │   ├── StatBar.tsx
 │   └── panels/        # Collapsible info panels (Stats, Equipment, Notes)
 ├── ui/                # UI primitives (GameButton, GlassPanel, GameInput, etc.)
-├── store/             # Zustand state (character-store, deck-store)
+├── store/             # Zustand state (character-store, deck-store, level-up-store)
 ├── data/              # SRD data loaders and card mappers
 └── types/             # TypeScript definitions
 ```
@@ -121,7 +122,7 @@ Glass variants: `.glass`, `.glass-strong`, `.glass-dark`, `.glass-interactive`
 ### Design Lab Pages
 
 Access via query params on localhost:
-- `?components` → DesignSystem - UI primitives showcase (colors, typography, buttons, panels, badges, inputs)
+- `?components` → Design System - Full living style reference (typography, colors, components, architecture notes). Source: `src/app/DesignSystem.tsx`
 - `?cards` → DesignLab - Card delta tool (placeholder in v2, see `src/app/DesignLab.tsx`)
 
 ### SRD Data

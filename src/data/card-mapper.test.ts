@@ -3,12 +3,13 @@ import {
   parseAbilityText,
   subclassToCardProps,
   domainCardToProps,
-  getWizardSubclassCards,
-  getWizardDomainCards,
+  getSubclassCards,
+  getDomainCards,
+  getDomainCardsUpToLevel,
   getAllAncestries,
   getAllCommunities,
 } from './card-mapper'
-import { wizard, wizardSubclasses, wizardLevel1Cards } from './srd'
+import { getClassByName, getSubclassesForClass, getLevel1DomainCards } from './srd'
 
 // ---------------------------------------------------------------------------
 // parseAbilityText
@@ -75,6 +76,8 @@ describe('parseAbilityText', () => {
 // ---------------------------------------------------------------------------
 
 describe('subclassToCardProps', () => {
+  const wizardSubclasses = getSubclassesForClass('Wizard')
+  const wizard = getClassByName('Wizard')
   const schoolOfKnowledge = wizardSubclasses.find(
     (s) => s.name === 'School of Knowledge'
   )!
@@ -127,7 +130,7 @@ describe('subclassToCardProps', () => {
   it('generates correct illustration path', () => {
     const props = subclassToCardProps(schoolOfKnowledge, wizard)
     expect(props.illustrationSrc).toContain('school-of-knowledge')
-    expect(props.illustrationSrc).toContain('.png')
+    expect(props.illustrationSrc).toContain('.avif')
   })
 })
 
@@ -136,6 +139,8 @@ describe('subclassToCardProps', () => {
 // ---------------------------------------------------------------------------
 
 describe('domainCardToProps', () => {
+  const wizardLevel1Cards = getLevel1DomainCards('Wizard')
+
   it('maps a Codex domain card correctly', () => {
     const codexCard = wizardLevel1Cards.find((c) => c.domain === 'Codex')!
     const mapped = domainCardToProps(codexCard)
@@ -164,41 +169,55 @@ describe('domainCardToProps', () => {
 })
 
 // ---------------------------------------------------------------------------
-// getWizardSubclassCards
+// getSubclassCards
 // ---------------------------------------------------------------------------
 
-describe('getWizardSubclassCards', () => {
-  it('returns exactly 2 cards', () => {
-    const cards = getWizardSubclassCards()
+describe('getSubclassCards', () => {
+  it('returns exactly 2 Wizard cards', () => {
+    const cards = getSubclassCards('Wizard')
     expect(cards).toHaveLength(2)
   })
 
-  it('both are Wizard class', () => {
-    const cards = getWizardSubclassCards()
+  it('Wizard cards are both Wizard class', () => {
+    const cards = getSubclassCards('Wizard')
     cards.forEach((card) => {
       expect(card.className).toBe('Wizard')
     })
   })
 
-  it('one is School of Knowledge, one is School of War', () => {
-    const cards = getWizardSubclassCards()
+  it('Wizard: one is School of Knowledge, one is School of War', () => {
+    const cards = getSubclassCards('Wizard')
     const names = cards.map((c) => c.name).sort()
     expect(names).toEqual(['School of Knowledge', 'School of War'])
+  })
+
+  it('returns exactly 2 Seraph cards', () => {
+    const cards = getSubclassCards('Seraph')
+    expect(cards).toHaveLength(2)
+    const names = cards.map((c) => c.name).sort()
+    expect(names).toEqual(['Divine Wielder', 'Winged Sentinel'])
+  })
+
+  it('returns exactly 2 Druid cards', () => {
+    const cards = getSubclassCards('Druid')
+    expect(cards).toHaveLength(2)
+    const names = cards.map((c) => c.name).sort()
+    expect(names).toEqual(['Warden of Renewal', 'Warden of the Elements'])
   })
 })
 
 // ---------------------------------------------------------------------------
-// getWizardDomainCards
+// getDomainCards
 // ---------------------------------------------------------------------------
 
-describe('getWizardDomainCards', () => {
-  it('returns exactly 6 cards', () => {
-    const cards = getWizardDomainCards()
+describe('getDomainCards', () => {
+  it('returns exactly 6 Wizard cards', () => {
+    const cards = getDomainCards('Wizard')
     expect(cards).toHaveLength(6)
   })
 
-  it('has 3 Codex cards and 3 Splendor cards', () => {
-    const cards = getWizardDomainCards()
+  it('Wizard has 3 Codex cards and 3 Splendor cards', () => {
+    const cards = getDomainCards('Wizard')
     const codex = cards.filter((c) => c.props.domain === 'Codex')
     const splendor = cards.filter((c) => c.props.domain === 'Splendor')
     expect(codex).toHaveLength(3)
@@ -206,11 +225,25 @@ describe('getWizardDomainCards', () => {
   })
 
   it('each has bodyText with content', () => {
-    const cards = getWizardDomainCards()
+    const cards = getDomainCards('Wizard')
     cards.forEach((card) => {
       expect(card.bodyText).toBeTruthy()
       expect(card.bodyText.length).toBeGreaterThan(0)
     })
+  })
+
+  it('Seraph returns Splendor + Valor level 1 cards', () => {
+    const cards = getDomainCards('Seraph')
+    const domains = [...new Set(cards.map((c) => c.props.domain))].sort()
+    expect(domains).toEqual(['Splendor', 'Valor'])
+    expect(cards.length).toBeGreaterThan(0)
+  })
+
+  it('Druid returns Sage + Arcana level 1 cards', () => {
+    const cards = getDomainCards('Druid')
+    const domains = [...new Set(cards.map((c) => c.props.domain))].sort()
+    expect(domains).toEqual(['Arcana', 'Sage'])
+    expect(cards.length).toBeGreaterThan(0)
   })
 })
 
@@ -251,5 +284,42 @@ describe('getAllCommunities', () => {
       expect(community.description).toBeTruthy()
       expect(community.feats.length).toBeGreaterThan(0)
     })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// getDomainCardsUpToLevel
+// ---------------------------------------------------------------------------
+
+describe('getDomainCardsUpToLevel', () => {
+  it('returns level 1 and 2 cards for Wizard', () => {
+    const cards = getDomainCardsUpToLevel('Wizard', 2)
+    expect(cards.length).toBeGreaterThan(0)
+    // All returned cards should be level 1 or 2
+    cards.forEach((card) => {
+      const level = parseInt(String(card.props.level))
+      expect(level).toBeLessThanOrEqual(2)
+    })
+  })
+
+  it('returns only level 1 cards when maxLevel is 1', () => {
+    const cards = getDomainCardsUpToLevel('Wizard', 1)
+    cards.forEach((card) => {
+      expect(card.props.level).toBe('1')
+    })
+  })
+
+  it('returns more cards at higher levels', () => {
+    const level1Cards = getDomainCardsUpToLevel('Wizard', 1)
+    const level3Cards = getDomainCardsUpToLevel('Wizard', 3)
+    expect(level3Cards.length).toBeGreaterThanOrEqual(level1Cards.length)
+  })
+
+  it('returns cards from both class domains', () => {
+    const cards = getDomainCardsUpToLevel('Wizard', 2)
+    const domains = [...new Set(cards.map((c) => c.props.domain))]
+    // Wizard has Codex + Splendor
+    expect(domains).toContain('Codex')
+    expect(domains).toContain('Splendor')
   })
 })

@@ -1,11 +1,57 @@
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { SectionHeader } from '../../ui/SectionHeader'
+import { StepInstruction } from '../../ui/StepInstruction'
+import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
 import { useDeckStore } from '../../store/deck-store'
-import { tier1Armors, tier1PrimaryWeapons, tier1SecondaryWeapons } from '../../data/srd'
+import { tier1Armors, tier1PrimaryWeapons, tier1SecondaryWeapons, getSuggestedEquipment } from '../../data/srd'
 import { parseThresholds } from '../../core/character/armor'
 import type { Armor, Weapon } from '../../types/character'
+
+// ---------------------------------------------------------------------------
+// Diamond pip indicator (smaller version of GameButton's CornerOrnament)
+// ---------------------------------------------------------------------------
+
+function DiamondPip() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        right: -1,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: 16,
+        height: 16,
+        flexShrink: 0,
+        zIndex: 2,
+      }}
+    >
+      {/* Outer diamond -- dark surround */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, #5a5550 0%, #3a3530 100%)',
+          transform: 'rotate(45deg)',
+          borderRadius: 1.5,
+        }}
+      />
+      {/* Inner diamond -- bright metallic center */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 3.5,
+          background: 'linear-gradient(180deg, #c8c0b4 0%, #8a8078 100%)',
+          transform: 'rotate(45deg)',
+          borderRadius: 1,
+          boxShadow:
+            '0 0 3px rgba(200,192,180,0.4), 0 0 8px rgba(231,186,144,0.4)',
+        }}
+      />
+    </div>
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Weapon grouping helpers
@@ -46,36 +92,27 @@ function ArmorOption({
   armor,
   isSelected,
   isDimmed,
+  isDisabled,
   onSelect,
 }: {
   armor: Armor
   isSelected: boolean
   isDimmed: boolean
+  isDisabled?: boolean
   onSelect: () => void
 }) {
   const thresholds = parseThresholds(armor.base_thresholds)
   const score = parseInt(armor.base_score, 10)
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.97 }}
+    <SelectableOption
+      selected={isSelected}
+      dimmed={isDimmed}
+      disabled={isDisabled}
       onClick={onSelect}
-      className="w-full text-left rounded-xl px-4 py-3"
-      style={{
-        background: isSelected
-          ? 'rgba(231, 186, 144, 0.08)'
-          : 'rgba(255, 255, 255, 0.03)',
-        border: isSelected
-          ? '1px solid rgba(231, 186, 144, 0.3)'
-          : '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: isSelected
-          ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
-          : 'none',
-        opacity: isDimmed ? 0.4 : 1,
-        cursor: 'pointer',
-        transition: 'opacity 0.2s',
-      }}
     >
+      {isSelected && <DiamondPip />}
+
       {/* Name row */}
       <div className="flex items-center justify-between mb-1">
         <span
@@ -90,7 +127,6 @@ function ArmorOption({
         >
           {armor.name}
         </span>
-        {isSelected && <GameBadge>Selected</GameBadge>}
       </div>
 
       {/* Stats row */}
@@ -98,20 +134,30 @@ function ArmorOption({
         className="flex gap-3 flex-wrap"
         style={{
           fontFamily: "'Source Sans 3', sans-serif",
-          fontSize: 12,
+          fontSize: 11,
           color: 'rgba(212, 207, 199, 0.5)',
         }}
       >
         <span>Major {thresholds.major}</span>
         <span>Severe {thresholds.severe}</span>
         <span>Slots {score}</span>
-        {armor.feat_name && (
-          <span style={{ color: isSelected ? '#e7ba90' : 'rgba(231, 186, 144, 0.5)' }}>
-            {armor.feat_text}
-          </span>
-        )}
       </div>
-    </motion.button>
+
+      {/* Feat description */}
+      {armor.feat_text && (
+        <p
+          style={{
+            fontFamily: "'Source Sans 3', sans-serif",
+            fontSize: 13.5,
+            color: isSelected ? '#e7ba90' : 'rgba(231, 186, 144, 0.5)',
+            marginTop: 4,
+            lineHeight: 1.35,
+          }}
+        >
+          {armor.feat_text}
+        </p>
+      )}
+    </SelectableOption>
   )
 }
 
@@ -119,35 +165,26 @@ function WeaponOption({
   weapon,
   isSelected,
   isDimmed,
+  isDisabled,
   onSelect,
   isSuggested,
 }: {
   weapon: Weapon
   isSelected: boolean
   isDimmed: boolean
+  isDisabled?: boolean
   onSelect: () => void
   isSuggested?: boolean
 }) {
   return (
-    <motion.button
-      whileTap={{ scale: 0.97 }}
+    <SelectableOption
+      selected={isSelected}
+      dimmed={isDimmed}
+      disabled={isDisabled}
       onClick={onSelect}
-      className="w-full text-left rounded-xl px-4 py-3"
-      style={{
-        background: isSelected
-          ? 'rgba(231, 186, 144, 0.08)'
-          : 'rgba(255, 255, 255, 0.03)',
-        border: isSelected
-          ? '1px solid rgba(231, 186, 144, 0.3)'
-          : '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: isSelected
-          ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
-          : 'none',
-        opacity: isDimmed ? 0.4 : 1,
-        cursor: 'pointer',
-        transition: 'opacity 0.2s',
-      }}
     >
+      {isSelected && <DiamondPip />}
+
       {/* Name row */}
       <div className="flex items-center justify-between mb-1">
         <span
@@ -162,9 +199,8 @@ function WeaponOption({
         >
           {weapon.name}
         </span>
-        <div className="flex gap-1">
+        <div className="flex items-center gap-2">
           {isSuggested && !isSelected && <GameBadge color="rgba(212, 207, 199, 0.5)">Suggested</GameBadge>}
-          {isSelected && <GameBadge>Selected</GameBadge>}
         </div>
       </div>
 
@@ -173,7 +209,7 @@ function WeaponOption({
         className="flex gap-3 flex-wrap"
         style={{
           fontFamily: "'Source Sans 3', sans-serif",
-          fontSize: 12,
+          fontSize: 11,
           color: 'rgba(212, 207, 199, 0.5)',
         }}
       >
@@ -181,27 +217,51 @@ function WeaponOption({
         <span>{weapon.range}</span>
         <span>{weapon.damage}</span>
         <span>{weapon.burden}</span>
-        {weapon.feat_name && (
-          <span style={{ color: isSelected ? '#e7ba90' : 'rgba(231, 186, 144, 0.5)' }}>
-            {weapon.feat_name}
-          </span>
-        )}
       </div>
-    </motion.button>
+
+      {/* Feat description */}
+      {weapon.feat_text && (
+        <p
+          style={{
+            fontFamily: "'Source Sans 3', sans-serif",
+            fontSize: 13.5,
+            color: isSelected ? '#e7ba90' : 'rgba(231, 186, 144, 0.5)',
+            marginTop: 4,
+            lineHeight: 1.35,
+          }}
+        >
+          {weapon.feat_name && (
+            <span style={{ fontWeight: 600 }}>{weapon.feat_name}: </span>
+          )}
+          {weapon.feat_text}
+        </p>
+      )}
+    </SelectableOption>
   )
 }
+
+// ---------------------------------------------------------------------------
+// Section type for accordion state
+// ---------------------------------------------------------------------------
+
+type SectionKey = 'armor' | 'primary' | 'secondary'
 
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
 export function PickEquipment() {
+  const selectedClass = useDeckStore((s) => s.selectedClass)
+  const suggested = selectedClass ? getSuggestedEquipment(selectedClass) : null
   const selectedArmor = useDeckStore((s) => s.selectedArmor)
   const selectedPrimaryWeapon = useDeckStore((s) => s.selectedPrimaryWeapon)
   const selectedSecondaryWeapon = useDeckStore((s) => s.selectedSecondaryWeapon)
   const setArmor = useDeckStore((s) => s.setArmor)
   const setPrimaryWeapon = useDeckStore((s) => s.setPrimaryWeapon)
   const setSecondaryWeapon = useDeckStore((s) => s.setSecondaryWeapon)
+
+  // Accordion state: which section is currently expanded (null = all collapsed)
+  const [expandedSection, setExpandedSection] = useState<SectionKey | null>(null)
 
   // Determine if primary weapon is one-handed (allows secondary)
   const primaryWeapon = tier1PrimaryWeapons.find((w) => w.name === selectedPrimaryWeapon)
@@ -214,28 +274,55 @@ export function PickEquipment() {
     if (weapon?.burden === 'Two-Handed') {
       setSecondaryWeapon(null)
     }
+    // Collapse after selection
+    setExpandedSection(null)
   }
+
+  const handleArmorSelect = (name: string) => {
+    setArmor(name)
+    // Collapse after selection
+    setExpandedSection(null)
+  }
+
+  const handleSecondarySelect = (name: string) => {
+    setSecondaryWeapon(selectedSecondaryWeapon === name ? null : name)
+    // Collapse after selection (only if we just selected, not deselected)
+    if (selectedSecondaryWeapon !== name) {
+      setExpandedSection(null)
+    }
+  }
+
+  const toggleSection = (section: SectionKey) => {
+    setExpandedSection((prev) => (prev === section ? null : section))
+  }
+
+  // Determine if a section should show all items
+  const isArmorExpanded = selectedArmor === null || expandedSection === 'armor'
+  const isPrimaryExpanded = selectedPrimaryWeapon === null || expandedSection === 'primary'
+  const isSecondaryExpanded = selectedSecondaryWeapon === null || expandedSection === 'secondary'
+
+  // Determine secondary section state
+  const secondaryDisabledReason: string | null = !selectedPrimaryWeapon
+    ? 'Choose a primary weapon first'
+    : !allowSecondary
+      ? 'Requires a one-handed primary weapon'
+      : null
+  const isSecondaryDisabled = secondaryDisabledReason !== null
 
   const primaryGroups = useMemo(() => groupWeapons(tier1PrimaryWeapons), [])
   const secondaryGroups = useMemo(() => groupWeapons(tier1SecondaryWeapons), [])
+
+  // Find selected items for collapsed view
+  const selectedArmorData = tier1Armors.find((a) => a.name === selectedArmor)
+  const selectedPrimaryData = tier1PrimaryWeapons.find((w) => w.name === selectedPrimaryWeapon)
+  const selectedSecondaryData = tier1SecondaryWeapons.find((w) => w.name === selectedSecondaryWeapon)
 
   return (
     <div className="flex flex-col items-center px-4">
       <h2 className="w-full max-w-sm mb-2">
         <SectionHeader>Choose Your Equipment</SectionHeader>
       </h2>
-      <p
-        style={{
-          fontFamily: "'EB Garamond', serif",
-          fontStyle: 'italic',
-          fontSize: 13,
-          color: 'rgba(231, 186, 144, 0.5)',
-          textAlign: 'center',
-          marginBottom: 24,
-        }}
-      >
-        Wizard suggested build pre-selected
-      </p>
+      <StepInstruction>{selectedClass ?? 'Class'} suggested build pre-selected</StepInstruction>
 
       {/* ----------------------------------------------------------------- */}
       {/* Armor Section                                                     */}
@@ -247,7 +334,7 @@ export function PickEquipment() {
         <p
           style={{
             fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 12,
+            fontSize: 13.5,
             color: 'rgba(212, 207, 199, 0.4)',
             textAlign: 'center',
             marginBottom: 12,
@@ -256,15 +343,46 @@ export function PickEquipment() {
           Heavier armor raises damage thresholds and armor slots but lowers evasion
         </p>
         <div className="flex flex-col gap-2">
-          {tier1Armors.map((armor) => (
-            <ArmorOption
-              key={armor.name}
-              armor={armor}
-              isSelected={selectedArmor === armor.name}
-              isDimmed={selectedArmor !== null && selectedArmor !== armor.name}
-              onSelect={() => setArmor(armor.name)}
-            />
-          ))}
+          <AnimatePresence mode="popLayout" initial={false}>
+            {isArmorExpanded ? (
+              /* Expanded: show all armors */
+              tier1Armors.map((armor) => (
+                <motion.div
+                  key={armor.name}
+                  layout
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                >
+                  <ArmorOption
+                    armor={armor}
+                    isSelected={selectedArmor === armor.name}
+                    isDimmed={selectedArmor !== null && selectedArmor !== armor.name}
+                    onSelect={() => handleArmorSelect(armor.name)}
+                  />
+                </motion.div>
+              ))
+            ) : selectedArmorData ? (
+              /* Collapsed: show only selected */
+              <motion.div
+                key={`collapsed-armor-${selectedArmorData.name}`}
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+              >
+                <ArmorOption
+                  armor={selectedArmorData}
+                  isSelected
+                  isDimmed={false}
+                  onSelect={() => toggleSection('armor')}
+
+                />
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -275,50 +393,99 @@ export function PickEquipment() {
         <div className="mb-3">
           <SectionHeader>Primary Weapon</SectionHeader>
         </div>
-        {primaryGroups.map((group) => (
-          <div key={group.label} className="mb-4">
-            <p
-              style={{
-                fontFamily: "'EB Garamond', serif",
-                fontSize: 12,
-                fontWeight: 600,
-                fontVariant: 'small-caps',
-                letterSpacing: '0.06em',
-                color: 'rgba(212, 207, 199, 0.35)',
-                marginBottom: 8,
-                paddingLeft: 4,
-              }}
+        <AnimatePresence mode="popLayout" initial={false}>
+          {isPrimaryExpanded ? (
+            /* Expanded: show all weapon groups */
+            primaryGroups.map((group) => (
+              <motion.div
+                key={group.label}
+                layout
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                className="mb-4"
+              >
+                <p
+                  style={{
+                    fontFamily: "'EB Garamond', serif",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    fontVariant: 'small-caps',
+                    letterSpacing: '0.06em',
+                    color: 'rgba(212, 207, 199, 0.35)',
+                    marginBottom: 8,
+                    paddingLeft: 4,
+                  }}
+                >
+                  {group.label}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {group.weapons.map((weapon) => (
+                    <WeaponOption
+                      key={weapon.name}
+                      weapon={weapon}
+                      isSelected={selectedPrimaryWeapon === weapon.name}
+                      isDimmed={selectedPrimaryWeapon !== null && selectedPrimaryWeapon !== weapon.name}
+                      onSelect={() => handlePrimarySelect(weapon.name)}
+                      isSuggested={weapon.name === suggested?.primary}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            ))
+          ) : selectedPrimaryData ? (
+            /* Collapsed: show only selected */
+            <motion.div
+              key={`collapsed-primary-${selectedPrimaryData.name}`}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
             >
-              {group.label}
-            </p>
-            <div className="flex flex-col gap-2">
-              {group.weapons.map((weapon) => (
-                <WeaponOption
-                  key={weapon.name}
-                  weapon={weapon}
-                  isSelected={selectedPrimaryWeapon === weapon.name}
-                  isDimmed={selectedPrimaryWeapon !== null && selectedPrimaryWeapon !== weapon.name}
-                  onSelect={() => handlePrimarySelect(weapon.name)}
-                  isSuggested={weapon.name === 'Greatstaff'}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+              <WeaponOption
+                weapon={selectedPrimaryData}
+                isSelected
+                isDimmed={false}
+                onSelect={() => toggleSection('primary')}
+
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
 
       {/* ----------------------------------------------------------------- */}
-      {/* Secondary Weapon Section (only if one-handed primary)             */}
+      {/* Secondary Weapon Section (always visible)                         */}
       {/* ----------------------------------------------------------------- */}
-      {allowSecondary && (
-        <div className="w-full max-w-sm mb-6">
-          <div className="mb-3">
-            <SectionHeader>Secondary Weapon</SectionHeader>
-          </div>
+      <div className="w-full max-w-sm mb-6">
+        <div className="mb-3">
+          <SectionHeader>Secondary Weapon</SectionHeader>
+        </div>
+
+        {/* Disabled reason note */}
+        {isSecondaryDisabled && (
           <p
             style={{
               fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 12,
+              fontSize: 13.5,
+              color: 'rgba(212, 207, 199, 0.3)',
+              textAlign: 'center',
+              fontStyle: 'italic',
+              marginBottom: 12,
+            }}
+          >
+            {secondaryDisabledReason}
+          </p>
+        )}
+
+        {/* Enabled helper text */}
+        {!isSecondaryDisabled && (
+          <p
+            style={{
+              fontFamily: "'Source Sans 3', sans-serif",
+              fontSize: 13.5,
               color: 'rgba(212, 207, 199, 0.4)',
               textAlign: 'center',
               marginBottom: 12,
@@ -326,57 +493,70 @@ export function PickEquipment() {
           >
             Optional -- your free hand allows a secondary weapon
           </p>
-          {secondaryGroups.map((group) => (
-            <div key={group.label} className="mb-4">
-              <p
-                style={{
-                  fontFamily: "'EB Garamond', serif",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  fontVariant: 'small-caps',
-                  letterSpacing: '0.06em',
-                  color: 'rgba(212, 207, 199, 0.35)',
-                  marginBottom: 8,
-                  paddingLeft: 4,
-                }}
-              >
-                {group.label}
-              </p>
-              <div className="flex flex-col gap-2">
-                {group.weapons.map((weapon) => (
-                  <WeaponOption
-                    key={weapon.name}
-                    weapon={weapon}
-                    isSelected={selectedSecondaryWeapon === weapon.name}
-                    isDimmed={selectedSecondaryWeapon !== null && selectedSecondaryWeapon !== weapon.name}
-                    onSelect={() =>
-                      setSecondaryWeapon(
-                        selectedSecondaryWeapon === weapon.name ? null : weapon.name
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        )}
 
-      {!allowSecondary && selectedPrimaryWeapon && (
-        <div className="w-full max-w-sm mb-6">
-          <p
-            style={{
-              fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 12,
-              color: 'rgba(212, 207, 199, 0.3)',
-              textAlign: 'center',
-              fontStyle: 'italic',
-            }}
-          >
-            Two-handed weapon equipped -- no secondary weapon available
-          </p>
-        </div>
-      )}
+        <AnimatePresence mode="popLayout" initial={false}>
+          {isSecondaryExpanded || isSecondaryDisabled ? (
+            /* Expanded (or disabled -- show all, grayed out) */
+            secondaryGroups.map((group) => (
+              <motion.div
+                key={group.label}
+                layout
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                className="mb-4"
+              >
+                <p
+                  style={{
+                    fontFamily: "'EB Garamond', serif",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    fontVariant: 'small-caps',
+                    letterSpacing: '0.06em',
+                    color: 'rgba(212, 207, 199, 0.35)',
+                    marginBottom: 8,
+                    paddingLeft: 4,
+                  }}
+                >
+                  {group.label}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {group.weapons.map((weapon) => (
+                    <WeaponOption
+                      key={weapon.name}
+                      weapon={weapon}
+                      isSelected={selectedSecondaryWeapon === weapon.name}
+                      isDimmed={!isSecondaryDisabled && selectedSecondaryWeapon !== null && selectedSecondaryWeapon !== weapon.name}
+                      isDisabled={isSecondaryDisabled}
+                      onSelect={() => handleSecondarySelect(weapon.name)}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            ))
+          ) : selectedSecondaryData ? (
+            /* Collapsed: show only selected */
+            <motion.div
+              key={`collapsed-secondary-${selectedSecondaryData.name}`}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+            >
+              <WeaponOption
+                weapon={selectedSecondaryData}
+                isSelected
+                isDimmed={false}
+                onSelect={() => toggleSection('secondary')}
+
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

@@ -5,12 +5,13 @@ import { useDeckStore } from './deck-store'
 beforeEach(() => {
   useDeckStore.setState({
     currentStep: 0,
+    selectedClass: null,
     subclass: null,
     selectedDomainCards: [],
     ancestryName: null,
     communityName: null,
-    selectedArmor: 'Leather Armor',
-    selectedPrimaryWeapon: 'Greatstaff',
+    selectedArmor: null,
+    selectedPrimaryWeapon: null,
     selectedSecondaryWeapon: null,
     traits: null,
     characterName: '',
@@ -25,12 +26,13 @@ describe('deck-store', () => {
   it('has null selections and step 0 initially', () => {
     const state = useDeckStore.getState()
     expect(state.currentStep).toBe(0)
+    expect(state.selectedClass).toBeNull()
     expect(state.subclass).toBeNull()
     expect(state.selectedDomainCards).toEqual([])
     expect(state.ancestryName).toBeNull()
     expect(state.communityName).toBeNull()
-    expect(state.selectedArmor).toBe('Leather Armor')
-    expect(state.selectedPrimaryWeapon).toBe('Greatstaff')
+    expect(state.selectedArmor).toBeNull()
+    expect(state.selectedPrimaryWeapon).toBeNull()
     expect(state.selectedSecondaryWeapon).toBeNull()
     expect(state.traits).toBeNull()
     expect(state.characterName).toBe('')
@@ -39,6 +41,30 @@ describe('deck-store', () => {
   // -------------------------------------------------------------------------
   // Actions
   // -------------------------------------------------------------------------
+
+  it('setClass updates selectedClass and sets suggested equipment', () => {
+    useDeckStore.getState().setClass('Wizard')
+    const state = useDeckStore.getState()
+    expect(state.selectedClass).toBe('Wizard')
+    expect(state.selectedArmor).toBe('Leather Armor')
+    expect(state.selectedPrimaryWeapon).toBe('Greatstaff')
+    expect(state.selectedSecondaryWeapon).toBeNull()
+  })
+
+  it('setClass resets subclass and domain cards', () => {
+    useDeckStore.getState().setClass('Wizard')
+    useDeckStore.getState().setSubclass('School of Knowledge')
+    useDeckStore.getState().toggleDomainCard('Card A')
+
+    // Switch class — should reset subclass and cards
+    useDeckStore.getState().setClass('Seraph')
+    const state = useDeckStore.getState()
+    expect(state.selectedClass).toBe('Seraph')
+    expect(state.subclass).toBeNull()
+    expect(state.selectedDomainCards).toEqual([])
+    expect(state.selectedArmor).toBe('Chainmail Armor')
+    expect(state.selectedPrimaryWeapon).toBe('Hallowed Axe')
+  })
 
   it('setSubclass updates subclass', () => {
     useDeckStore.getState().setSubclass('School of Knowledge')
@@ -145,10 +171,10 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().currentStep).toBe(1)
   })
 
-  it('nextStep clamps at 7', () => {
-    useDeckStore.setState({ currentStep: 7 })
+  it('nextStep clamps at 11', () => {
+    useDeckStore.setState({ currentStep: 11 })
     useDeckStore.getState().nextStep()
-    expect(useDeckStore.getState().currentStep).toBe(7)
+    expect(useDeckStore.getState().currentStep).toBe(11)
   })
 
   it('prevStep decrements currentStep', () => {
@@ -168,136 +194,194 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().currentStep).toBe(4)
   })
 
-  it('goToStep clamps between 0 and 7', () => {
+  it('goToStep clamps between 0 and 11', () => {
     useDeckStore.getState().goToStep(-1)
     expect(useDeckStore.getState().currentStep).toBe(0)
-    useDeckStore.getState().goToStep(10)
-    expect(useDeckStore.getState().currentStep).toBe(7)
+    useDeckStore.getState().goToStep(15)
+    expect(useDeckStore.getState().currentStep).toBe(11)
   })
 
   // -------------------------------------------------------------------------
   // canProceed
   // -------------------------------------------------------------------------
 
-  it('canProceed returns false when step 0 requirements are not met', () => {
-    useDeckStore.setState({ currentStep: 0, subclass: null })
+  it('canProceed returns false when step 0 has no class selected', () => {
+    useDeckStore.setState({ currentStep: 0, selectedClass: null })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 0 requirements are met', () => {
-    useDeckStore.setState({ currentStep: 0, subclass: 'School of Knowledge' })
+  it('canProceed returns true when step 0 has a class selected', () => {
+    useDeckStore.setState({ currentStep: 0, selectedClass: 'Wizard' })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns false when step 1 has fewer cards than required', () => {
+  it('canProceed returns false when step 1 requirements are not met', () => {
+    useDeckStore.setState({ currentStep: 1, subclass: null })
+    expect(useDeckStore.getState().canProceed()).toBe(false)
+  })
+
+  it('canProceed returns true when step 1 requirements are met', () => {
+    useDeckStore.setState({ currentStep: 1, subclass: 'School of Knowledge' })
+    expect(useDeckStore.getState().canProceed()).toBe(true)
+  })
+
+  it('canProceed returns false when step 2 has fewer cards than required', () => {
     useDeckStore.setState({
-      currentStep: 1,
+      currentStep: 2,
       subclass: 'School of Knowledge',
       selectedDomainCards: ['Card A', 'Card B'],
     })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 1 has exactly 3 cards (Knowledge)', () => {
+  it('canProceed returns true when step 2 has exactly 3 cards (Knowledge)', () => {
     useDeckStore.setState({
-      currentStep: 1,
+      currentStep: 2,
       subclass: 'School of Knowledge',
       selectedDomainCards: ['Card A', 'Card B', 'Card C'],
     })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns true when step 1 has exactly 2 cards (War)', () => {
+  it('canProceed returns true when step 2 has exactly 2 cards (War)', () => {
     useDeckStore.setState({
-      currentStep: 1,
+      currentStep: 2,
       subclass: 'School of War',
       selectedDomainCards: ['Card A', 'Card B'],
     })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns false when step 1 has 3 cards but War only needs 2', () => {
+  it('canProceed returns false when step 2 has 3 cards but War only needs 2', () => {
     useDeckStore.setState({
-      currentStep: 1,
+      currentStep: 2,
       subclass: 'School of War',
       selectedDomainCards: ['Card A', 'Card B', 'Card C'],
     })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns false when step 2 has no ancestry', () => {
-    useDeckStore.setState({ currentStep: 2, ancestryName: null })
+  it('canProceed returns false when step 3 has no ancestry', () => {
+    useDeckStore.setState({ currentStep: 3, ancestryName: null })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 2 has ancestry', () => {
-    useDeckStore.setState({ currentStep: 2, ancestryName: 'Human' })
+  it('canProceed returns true when step 3 has ancestry', () => {
+    useDeckStore.setState({ currentStep: 3, ancestryName: 'Human' })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  it('canProceed returns false when step 3 has no community', () => {
-    useDeckStore.setState({ currentStep: 3, communityName: null })
+  it('canProceed returns false when step 4 has no community', () => {
+    useDeckStore.setState({ currentStep: 4, communityName: null })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 3 has community', () => {
-    useDeckStore.setState({ currentStep: 3, communityName: 'Highborne' })
+  it('canProceed returns true when step 4 has community', () => {
+    useDeckStore.setState({ currentStep: 4, communityName: 'Highborne' })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  // Step 4: Equipment
-  it('canProceed returns false when step 4 has no armor', () => {
-    useDeckStore.setState({ currentStep: 4, selectedArmor: null, selectedPrimaryWeapon: 'Greatstaff' })
+  // Step 5: Equipment
+  it('canProceed returns false when step 5 has no armor', () => {
+    useDeckStore.setState({ currentStep: 5, selectedArmor: null, selectedPrimaryWeapon: 'Greatstaff' })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns false when step 4 has no primary weapon', () => {
-    useDeckStore.setState({ currentStep: 4, selectedArmor: 'Leather Armor', selectedPrimaryWeapon: null })
+  it('canProceed returns false when step 5 has no primary weapon', () => {
+    useDeckStore.setState({ currentStep: 5, selectedArmor: 'Leather Armor', selectedPrimaryWeapon: null })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 4 has armor and primary weapon', () => {
+  it('canProceed returns true when step 5 has armor and primary weapon', () => {
     useDeckStore.setState({
-      currentStep: 4,
+      currentStep: 5,
       selectedArmor: 'Leather Armor',
       selectedPrimaryWeapon: 'Greatstaff',
     })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  // Step 5: Traits (was step 4)
-  it('canProceed returns false when step 5 has no traits', () => {
-    useDeckStore.setState({ currentStep: 5, traits: null })
+  // Step 6: Traits
+  it('canProceed returns false when step 6 has no traits', () => {
+    useDeckStore.setState({ currentStep: 6, traits: null })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 5 has traits', () => {
+  it('canProceed returns true when step 6 has traits', () => {
     useDeckStore.setState({
-      currentStep: 5,
+      currentStep: 6,
       traits: { agility: 0, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 0 },
     })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  // Step 6: Name (was step 5)
-  it('canProceed returns false when step 6 has empty name', () => {
-    useDeckStore.setState({ currentStep: 6, characterName: '' })
+  // Step 7: Experiences
+  it('canProceed returns false when step 7 has no experiences', () => {
+    useDeckStore.setState({ currentStep: 7, experiences: [] })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns false when step 6 has whitespace-only name', () => {
-    useDeckStore.setState({ currentStep: 6, characterName: '   ' })
+  it('canProceed returns false when step 7 has only 1 experience', () => {
+    useDeckStore.setState({
+      currentStep: 7,
+      experiences: [{ text: 'Arcane Scholar', bonus: 2 }],
+    })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 6 has a name', () => {
-    useDeckStore.setState({ currentStep: 6, characterName: 'Gandalf' })
+  it('canProceed returns true when step 7 has 2 experiences', () => {
+    useDeckStore.setState({
+      currentStep: 7,
+      experiences: [
+        { text: 'Arcane Scholar', bonus: 2 },
+        { text: 'War Survivor', bonus: 2 },
+      ],
+    })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
-  // Step 7: Review (was step 6)
-  it('canProceed returns true at step 7 (review)', () => {
-    useDeckStore.setState({ currentStep: 7 })
+  it('canProceed returns false when step 7 experiences are whitespace-only', () => {
+    useDeckStore.setState({
+      currentStep: 7,
+      experiences: [
+        { text: '  ', bonus: 2 },
+        { text: '', bonus: 2 },
+      ],
+    })
+    expect(useDeckStore.getState().canProceed()).toBe(false)
+  })
+
+  // Step 8: Background (optional)
+  it('canProceed returns true at step 8 (background is optional)', () => {
+    useDeckStore.setState({ currentStep: 8 })
+    expect(useDeckStore.getState().canProceed()).toBe(true)
+  })
+
+  // Step 9: Connections (optional)
+  it('canProceed returns true at step 9 (connections are optional)', () => {
+    useDeckStore.setState({ currentStep: 9 })
+    expect(useDeckStore.getState().canProceed()).toBe(true)
+  })
+
+  // Step 10: Name
+  it('canProceed returns false when step 10 has empty name', () => {
+    useDeckStore.setState({ currentStep: 10, characterName: '' })
+    expect(useDeckStore.getState().canProceed()).toBe(false)
+  })
+
+  it('canProceed returns false when step 10 has whitespace-only name', () => {
+    useDeckStore.setState({ currentStep: 10, characterName: '   ' })
+    expect(useDeckStore.getState().canProceed()).toBe(false)
+  })
+
+  it('canProceed returns true when step 10 has a name', () => {
+    useDeckStore.setState({ currentStep: 10, characterName: 'Gandalf' })
+    expect(useDeckStore.getState().canProceed()).toBe(true)
+  })
+
+  // Step 11: Review
+  it('canProceed returns true at step 11 (review)', () => {
+    useDeckStore.setState({ currentStep: 11 })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 
@@ -309,6 +393,7 @@ describe('deck-store', () => {
     // Populate with data
     useDeckStore.setState({
       currentStep: 5,
+      selectedClass: 'Wizard',
       subclass: 'School of War',
       selectedDomainCards: ['A', 'B', 'C'],
       ancestryName: 'Elf',
@@ -324,12 +409,13 @@ describe('deck-store', () => {
 
     const state = useDeckStore.getState()
     expect(state.currentStep).toBe(0)
+    expect(state.selectedClass).toBeNull()
     expect(state.subclass).toBeNull()
     expect(state.selectedDomainCards).toEqual([])
     expect(state.ancestryName).toBeNull()
     expect(state.communityName).toBeNull()
-    expect(state.selectedArmor).toBe('Leather Armor')
-    expect(state.selectedPrimaryWeapon).toBe('Greatstaff')
+    expect(state.selectedArmor).toBeNull()
+    expect(state.selectedPrimaryWeapon).toBeNull()
     expect(state.selectedSecondaryWeapon).toBeNull()
     expect(state.traits).toBeNull()
     expect(state.characterName).toBe('')

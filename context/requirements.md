@@ -117,11 +117,10 @@ Rename card components to match their game concepts (not implementation details)
 - Cards shown face-up in horizontal scrollable rail at 0.52 scale
 - Tap to select, tap selected to zoom — that's it
 
-### Equipment Selection (MVP Simplified)
-- The SRD has full equipment selection as Step 5, with 4 Tier 1 armor options and ~25 Tier 1 weapon options (see Armor table above)
-- **For MVP:** auto-assign Wizard suggested build — Greatstaff (primary) + Leather Armor
-- No inventory management in MVP
-- **Known simplification to revisit:** equipment selection with armor-evasion tradeoffs is mechanically important for the full experience (armor choice affects damage thresholds AND evasion)
+### Equipment Selection
+- v2 now has full equipment selection step (PickEquipment) — 4 Tier 1 armor, ~25 Tier 1 weapons
+- Wizard suggested build (Greatstaff + Leather) pre-selected as defaults
+- Armor feats modify evasion at creation time
 
 ## Hand View Requirements
 
@@ -145,19 +144,53 @@ Rename card components to match their game concepts (not implementation details)
 
 ## Deck Builder Flow
 
-### Steps (in order)
-0. Pick Subclass (2 SRDCards, tap to select)
-1. Choose Domain Cards (tap-to-select, 2 required — or 3 for School of Knowledge)
-2. Pick Ancestry (InfoCards, single select)
-3. Pick Community (InfoCards, single select)
-4. Assign Traits (pre-filled with suggested values)
-5. Name Character (text input)
-6. Review Deck (all selections shown, "Begin Adventure" confirms)
+### Steps (canonical order — do not change between versions)
+0. Pick Class
+1. Pick Subclass (SRDCards, tap to select)
+2. Choose Domain Cards (tap-to-select, 2 required — or 3 for School of Knowledge)
+3. Pick Ancestry (full-size cards, single select)
+4. Pick Community (full-size cards, single select)
+5. Pick Equipment (armor + weapon selection, class defaults pre-selected)
+6. Assign Traits (pre-filled with suggested values)
+7. Create Experiences — 2 Experiences at +2 each, player writes custom words/phrases
+8. Create Background — answer background questions from class data (narrative, no mechanical effect)
+9. Create Connections — establish relationships with other PCs (optional per SRD)
+10. Name Character (text input — last step before review)
+11. Review Deck (all selections shown, "Begin Adventure" confirms)
 
-### Selection patterns
-- Continue button disabled until selection made
+### Card Selection UX (canonical — applies to all card picker steps)
+
+**Card sizing:**
+- Domain cards, Ancestry cards, and Community cards must be displayed at **full size** in their selection steps — same scale as subclass cards in step 1
+- On desktop: cards stacked vertically, scrollable. Hover brings card to forefront.
+- Cards should never be tiny/thumbnail-sized in selection steps. The player needs to read them.
+
+**Selection behavior:**
+- Tap/click to **toggle select** — clicking a selected card **deselects** it
+- Must always be able to deselect cards. No one-way selection.
+- Double-click (or dedicated button) to expand/zoom for details
+
+**Domain cards specifically:**
+- Counter shows "X of N selected" where N depends on subclass (2 for most, 3 for School of Knowledge)
+- Cards filtered to class's two domains
+
+### General selection patterns
+- Continue button disabled until required selection made
 - Back button visible on steps 1+
-- Domain cards: counter shows "X of N selected" where N depends on subclass (2 for War, 3 for Knowledge)
+
+### Level-Up Wizard
+
+**Evergreen (game mechanics — do not change):**
+- When a player picks "Add Domain Card" as an advancement (can be picked multiple times), the domain card step must let them pick that many ADDITIONAL cards beyond the mandatory 1. Total cards to pick = 1 mandatory + N from "add domain card" advancements.
+- "Increase Proficiency" (2 slots) IS available at Level 2 — confirmed by SRD. Costs 2 advancement slots.
+- "Upgrade Subclass" (Foundation → Specialization) IS available at Level 2 — confirmed by SRD. Costs 2 advancement slots.
+- Specialization → Mastery upgrade only available at Level 5+.
+- Tier achievements (proficiency bump, new experience) are automatic — separate from advancement slot choices.
+
+**UX (current version — may evolve):**
+- Current wizard UX is placeholder — will be refined in a future pass
+- Core flow (4 steps: auto gains, advancements, domain card, review) is correct
+- Visual polish and interaction design TBD
 
 ## Domain Color System
 - Colors represent DOMAINS, not classes

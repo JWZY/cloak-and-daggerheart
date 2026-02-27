@@ -1,21 +1,18 @@
-import { AnimatePresence } from 'framer-motion'
-import { getAllAncestryCards } from '../../data/card-mapper'
-import { InfoCard } from '../../cards/InfoCard'
+import { AncestryCard } from '../../cards/AncestryCard'
+import { ancestries } from '../../data/srd'
 import { CardSelector } from '../../cards/CardSelector'
-import { CardZoom } from '../../cards/CardZoom'
-import { useCardZoom } from '../../cards/useCardZoom'
+import { CardHand } from '../../cards/CardHand'
 import { SectionHeader } from '../../ui/SectionHeader'
+import { StepInstruction } from '../../ui/StepInstruction'
 import { useDeckStore } from '../../store/deck-store'
 
 export function PickAncestry() {
   const ancestryName = useDeckStore((s) => s.ancestryName)
   const setAncestry = useDeckStore((s) => s.setAncestry)
-  const ancestryCards = getAllAncestryCards()
-  const { zoomedCard, openZoom, closeZoom } = useCardZoom()
 
   const handleTap = (name: string) => {
     if (ancestryName === name) {
-      openZoom(`ancestry-${name}`)
+      useDeckStore.setState({ ancestryName: null })
     } else {
       setAncestry(name)
     }
@@ -26,55 +23,26 @@ export function PickAncestry() {
       <h2 className="w-full max-w-xs mb-2 px-4">
         <SectionHeader>Choose Your Ancestry</SectionHeader>
       </h2>
-      <p
-        style={{
-          fontFamily: "'EB Garamond', serif",
-          fontStyle: 'italic',
-          fontSize: 13,
-          color: 'rgba(231, 186, 144, 0.5)',
-          textAlign: 'center',
-          marginBottom: 24,
-        }}
-      >
-        Tap to select — tap again to zoom
-      </p>
+      <StepInstruction>Tap to select or deselect</StepInstruction>
 
-      {/* Horizontal scrollable card rail */}
-      <div
-        className="flex gap-3 overflow-x-auto w-full px-4 pb-4 snap-x snap-mandatory"
-        style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
-      >
-        {ancestryCards.map((cardProps) => {
-          const isSelected = ancestryName === cardProps.title
+      {/* Hand-of-cards layout — 18 ancestries need tighter overlap and smaller scale */}
+      <CardHand scale={0.48} overlap={-90} mobileScale={0.38}>
+        {ancestries.map((ancestry) => {
+          const isSelected = ancestryName === ancestry.name
           const isDimmed = ancestryName !== null && !isSelected
 
           return (
-            <div key={cardProps.title} className="snap-center shrink-0">
-              <CardSelector
-                selected={isSelected}
-                dimmed={isDimmed}
-                onSelect={() => handleTap(cardProps.title)}
-              >
-                <InfoCard {...cardProps} scale={0.52} />
-              </CardSelector>
-            </div>
+            <CardSelector
+              key={ancestry.name}
+              selected={isSelected}
+              dimmed={isDimmed}
+              onSelect={() => handleTap(ancestry.name)}
+            >
+              <AncestryCard ancestry={ancestry} />
+            </CardSelector>
           )
         })}
-      </div>
-
-      {/* Card Zoom */}
-      <AnimatePresence>
-        {zoomedCard?.startsWith('ancestry-') && (() => {
-          const name = zoomedCard.replace('ancestry-', '')
-          const cardProps = ancestryCards.find((c) => c.title === name)
-          if (!cardProps) return null
-          return (
-            <CardZoom layoutId={zoomedCard} onClose={closeZoom}>
-              <InfoCard {...cardProps} />
-            </CardZoom>
-          )
-        })()}
-      </AnimatePresence>
+      </CardHand>
     </div>
   )
 }

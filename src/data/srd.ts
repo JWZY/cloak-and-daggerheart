@@ -17,6 +17,7 @@ import type {
   DomainCard,
   ClassData,
   Subclass,
+  SubclassFoundation,
   Weapon,
   Armor,
   Item,
@@ -26,8 +27,8 @@ import type {
 // Re-export armor functions from core for backwards compatibility
 export { getArmorScore, parseThresholds } from '../core/character/armor'
 
-// Re-export wizard rules from core for backwards compatibility
-export { getWizardCardCount } from '../core/rules/wizard'
+// Re-export class rules from core for backwards compatibility
+export { getSubclassCardCount } from '../core/rules/class-rules'
 
 // Type assertions for imported JSON
 export const ancestries = ancestriesData as Ancestry[]
@@ -57,35 +58,63 @@ export const tier1SecondaryWeapons = weapons.filter(w => w.tier === '1' && w.pri
 // Filter armor by tier
 export const tier1Armors = armors.filter(a => a.tier === '1')
 
-// Wizard-specific data
-export const wizard = (classesData as ClassData[]).find(c => c.name === 'Wizard')!
+// ---------------------------------------------------------------------------
+// Generic class/subclass lookups
+// ---------------------------------------------------------------------------
 
-export const wizardSubclasses = (subclassesData as Subclass[]).filter(
-  s => s.name === 'School of Knowledge' || s.name === 'School of War'
-)
+/** Look up a class by name */
+export function getClassByName(name: string): ClassData {
+  const cls = classes.find(c => c.name === name)
+  if (!cls) throw new Error(`Unknown class: ${name}`)
+  return cls
+}
 
-export const schoolOfKnowledge = wizardSubclasses.find(s => s.name === 'School of Knowledge')!
-export const schoolOfWar = wizardSubclasses.find(s => s.name === 'School of War')!
+/** Get subclasses for a given class */
+export function getSubclassesForClass(className: string): Subclass[] {
+  const cls = getClassByName(className)
+  return subclasses.filter(s => s.name === cls.subclass_1 || s.name === cls.subclass_2)
+}
 
-// Domain cards filtered for Wizard (Codex + Splendor)
-export const level1CodexCards = abilities.filter(
-  a => a.domain === 'Codex' && a.level === '1'
-)
+/** Get level 1 domain cards for a given class */
+export function getLevel1DomainCards(className: string): DomainCard[] {
+  const cls = getClassByName(className)
+  return abilities.filter(
+    a => (a.domain === cls.domain_1 || a.domain === cls.domain_2) && a.level === '1'
+  )
+}
 
-export const level1SplendorCards = abilities.filter(
-  a => a.domain === 'Splendor' && a.level === '1'
-)
+/** Look up a subclass by name */
+export function getSubclassByName(name: string): Subclass {
+  const sub = subclasses.find(s => s.name === name)
+  if (!sub) throw new Error(`Unknown subclass: ${name}`)
+  return sub
+}
 
-// Combined level 1 cards for Wizard
-export const wizardLevel1Cards = [...level1CodexCards, ...level1SplendorCards]
+/** Get suggested starting equipment names for a class */
+export function getSuggestedEquipment(className: string): { armor: string; primary: string; secondary: string | null } {
+  const cls = getClassByName(className)
+  return {
+    armor: cls.suggested_armor,
+    primary: cls.suggested_primary,
+    secondary: cls.suggested_secondary ?? null,
+  }
+}
 
-// Default starting equipment
-export const leatherArmor = armors.find(a => a.name === 'Leather Armor')!
-export const quarterstaff = weapons.find(w => w.name === 'Quarterstaff')!
-export const greatstaff = weapons.find(w => w.name === 'Greatstaff')!
+/** Get domain cards up to a given level for a class's domains */
+export function getDomainCardsUpToLevel(className: string, maxLevel: number): DomainCard[] {
+  const cls = getClassByName(className)
+  return abilities.filter(
+    a => (a.domain === cls.domain_1 || a.domain === cls.domain_2) && parseInt(a.level) <= maxLevel
+  )
+}
 
-// Helper to get subclass by name
-export function getSubclass(name: 'School of Knowledge' | 'School of War'): Subclass {
-  return name === 'School of Knowledge' ? schoolOfKnowledge : schoolOfWar
+/** Get specialization features for a subclass */
+export function getSpecializations(subclassName: string): SubclassFoundation[] {
+  return getSubclassByName(subclassName).specializations
+}
+
+/** Get mastery features for a subclass */
+export function getMasteries(subclassName: string): SubclassFoundation[] {
+  return getSubclassByName(subclassName).masteries
 }
 

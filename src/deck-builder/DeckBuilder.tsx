@@ -2,31 +2,35 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { StepIndicator } from './components/StepIndicator'
 import { DeckPreview } from './components/DeckPreview'
+import { PickClass } from './steps/PickClass'
 import { PickSubclass } from './steps/PickSubclass'
 import { PickDomainCards } from './steps/PickDomainCards'
 import { PickAncestry } from './steps/PickAncestry'
 import { PickCommunity } from './steps/PickCommunity'
 import { PickEquipment } from './steps/PickEquipment'
 import { AssignTraits } from './steps/AssignTraits'
+import { CreateBackground } from './steps/CreateBackground'
+import { CreateExperiences } from './steps/CreateExperiences'
 import { NameCharacter } from './steps/NameCharacter'
+import { CreateConnections } from './steps/CreateConnections'
 import { ReviewDeck } from './steps/ReviewDeck'
 import { GameButton } from '../ui/GameButton'
 import { useDeckStore } from '../store/deck-store'
-import { calculateWizardMaxHP } from '../core/character/hp'
+import { calculateMaxHP } from '../core/character/hp'
 import { getArmorScore } from '../core/character/armor'
 import {
   ancestries,
   communities,
-  wizard,
+  getClassByName,
+  getLevel1DomainCards,
   tier1Armors,
   tier1PrimaryWeapons,
   tier1SecondaryWeapons,
-  wizardLevel1Cards,
 } from '../data/srd'
-import type { Character, WizardSubclass, Traits, TraitName } from '../types/character'
+import type { Character, Traits, TraitName } from '../types/character'
 import { TRAIT_NAMES } from '../core/rules/traits'
 
-const TOTAL_STEPS = 8
+const TOTAL_STEPS = 12
 const BASE_PATH = import.meta.env.BASE_URL ?? '/'
 
 const slideVariants = {
@@ -74,7 +78,7 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
   }, [canProceed])
 
   const handleNext = useCallback(() => {
-    if (store.currentStep === 7) {
+    if (store.currentStep === 11) {
       // Finalize character
       const character = assembleCharacter(store)
       store.reset()
@@ -91,17 +95,21 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
   }, [store])
 
   const stepComponents = [
-    <PickSubclass key="step-0" />,
-    <PickDomainCards key="step-1" />,
-    <PickAncestry key="step-2" />,
-    <PickCommunity key="step-3" />,
-    <PickEquipment key="step-4" />,
-    <AssignTraits key="step-5" />,
-    <NameCharacter key="step-6" />,
-    <ReviewDeck key="step-7" />,
+    <PickClass key="step-0" />,
+    <PickSubclass key="step-1" />,
+    <PickDomainCards key="step-2" />,
+    <PickAncestry key="step-3" />,
+    <PickCommunity key="step-4" />,
+    <PickEquipment key="step-5" />,
+    <AssignTraits key="step-6" />,
+    <CreateExperiences key="step-7" />,
+    <CreateBackground key="step-8" />,
+    <CreateConnections key="step-9" />,
+    <NameCharacter key="step-10" />,
+    <ReviewDeck key="step-11" />,
   ]
 
-  const isReview = store.currentStep === 7
+  const isReview = store.currentStep === 11
   const buttonLabel = isReview ? 'Begin Adventure' : 'Continue'
 
   return (
@@ -215,9 +223,10 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
 function assembleCharacter(
   store: ReturnType<typeof useDeckStore.getState>
 ): Character {
-  const subclassName = store.subclass as WizardSubclass
+  const subclassName = store.subclass!
   const ancestry = ancestries.find((a) => a.name === store.ancestryName)!
   const community = communities.find((c) => c.name === store.communityName)!
+  const classData = getClassByName(store.selectedClass!)
 
   // Build traits object
   const traits: Traits = { agility: 0, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 0 }
@@ -228,8 +237,8 @@ function assembleCharacter(
   }
 
   // Calculate HP
-  const baseHP = parseInt(wizard.hp, 10)
-  const maxHP = calculateWizardMaxHP(baseHP, subclassName)
+  const baseHP = parseInt(classData.hp, 10)
+  const maxHP = calculateMaxHP(baseHP, subclassName)
 
   // Look up selected equipment from SRD data
   const selectedArmor = tier1Armors.find((a) => a.name === store.selectedArmor) ?? tier1Armors.find((a) => a.name === 'Leather Armor')!
@@ -243,7 +252,7 @@ function assembleCharacter(
   const armorMax = getArmorScore(selectedArmor) + level
 
   // Calculate evasion with armor modifications
-  let evasion = parseInt(wizard.evasion, 10)
+  let evasion = parseInt(classData.evasion, 10)
   const armorFeat = selectedArmor.feat_text ?? ''
   if (armorFeat.includes('+1 to Evasion')) evasion += 1
   if (armorFeat.includes('-1 to Evasion')) evasion -= 1
@@ -255,7 +264,7 @@ function assembleCharacter(
   }
 
   // Build domain cards from selection
-  const domainCards = wizardLevel1Cards.filter((card) =>
+  const domainCards = getLevel1DomainCards(store.selectedClass!).filter((card) =>
     store.selectedDomainCards.includes(card.name)
   )
 
@@ -283,7 +292,7 @@ function assembleCharacter(
       note: community.note,
       feats: community.feats,
     },
-    class: 'Wizard',
+    class: store.selectedClass!,
     subclass: subclassName,
     traits,
     hp: { current: maxHP, max: maxHP },
@@ -296,8 +305,12 @@ function assembleCharacter(
     equipment,
     gold: 0,
     notes: '',
-    backgroundAnswers: [],
-    connectionAnswers: [],
+    advancements: [],
+    markedTraits: [],
+    subclassTier: 'foundation',
+    backgroundAnswers: store.backgroundAnswers,
+    experiences: store.experiences,
+    connectionAnswers: store.connectionAnswers,
     createdAt: Date.now(),
   }
 }

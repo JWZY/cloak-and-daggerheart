@@ -35,7 +35,7 @@ export const GameInput = forwardRef<HTMLInputElement, GameInputProps>(
             borderRadius: 8,
             color: 'rgba(212, 207, 199, 0.9)',
             fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 14,
+            fontSize: 13.5,
             outline: 'none',
             transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
             caretColor: '#e7ba90',

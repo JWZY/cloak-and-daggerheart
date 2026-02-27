@@ -7,6 +7,7 @@ import { test, expect, Page } from '@playwright/test'
 const TEST_CHARACTER = {
   id: 'e2e-test-char-1',
   name: 'Elara the Wise',
+  level: 1,
   ancestry: {
     name: 'Human',
     description: 'Versatile and ambitious.',
@@ -85,7 +86,11 @@ const TEST_CHARACTER = {
   },
   gold: 10,
   notes: '',
+  advancements: [],
+  markedTraits: [],
+  subclassTier: 'foundation',
   backgroundAnswers: [],
+  experiences: [],
   connectionAnswers: [],
   createdAt: Date.now(),
 }
@@ -101,8 +106,8 @@ async function injectCharacterAndWait(page: Page) {
       state: { characters: [charData] },
       version: 0,
     }
-    localStorage.setItem('cloak-characters-v2', JSON.stringify(storeData))
-    localStorage.removeItem('cloak-deck-draft-v1')
+    localStorage.setItem('cloak-characters-v3', JSON.stringify(storeData))
+    localStorage.removeItem('cloak-deck-draft-v2')
   }, TEST_CHARACTER)
   await page.reload()
   // Wait for splash screen to finish and HandView to appear
@@ -194,9 +199,9 @@ test.describe('Hand View Interactions', () => {
     await expect(deleteBtn).toBeVisible({ timeout: 2000 })
     await deleteBtn.click()
 
-    // After deleting, should show DeckBuilder
+    // After deleting, should show DeckBuilder (step 0 is now PickClass)
     await expect(
-      page.locator('h2:has-text("Choose Your Subclass")')
+      page.locator('h2:has-text("Choose Your Class")')
     ).toBeVisible({ timeout: 10000 })
   })
 })

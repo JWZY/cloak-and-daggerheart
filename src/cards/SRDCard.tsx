@@ -1,5 +1,18 @@
-import { useId, useRef, useEffect, useState, useCallback } from 'react'
+import { useId, useRef, useEffect, useState } from 'react'
 import { type DomainIconName, getDomainIconPath } from './domain-icons'
+import { AutoFitTitle } from '../ui/AutoFitTitle'
+import {
+  goldGradientStyle,
+  subtitleStyle,
+  CARD_WIDTH,
+  CARD_HEIGHT,
+  CARD_BORDER_RADIUS,
+  CARD_BG,
+  GOLD_DROP_SHADOW,
+  CARD_FRAME_OPACITY,
+  CONTENT_OVERLAY_GRADIENT,
+  ILLUSTRATION_MASK,
+} from './card-tokens'
 
 export interface SRDCardFeat {
   name?: string  // if omitted, no bold prefix
@@ -101,60 +114,6 @@ function MaskedBanner({ color = '#BD0C70', innerColor = '#1E1E1E', uid, domainIc
   )
 }
 
-// Gold gradient style shared across title elements
-const goldGradientStyle = {
-  background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  textShadow: 'none', // text-shadow doesn't work with background-clip: text
-} as const
-
-
-// Shared subtitle style — used by class name and footer
-const subtitleStyle = {
-  fontFamily: "'EB Garamond', serif",
-  fontSize: 13,
-  fontWeight: 600,
-  lineHeight: 'normal' as const,
-  letterSpacing: '0.06em',
-  fontVariant: 'small-caps' as const,
-  ...goldGradientStyle,
-}
-
-// Auto-sizing title that scales down to fit on one line
-function AutoFitTitle({ children, maxFontSize = 36, style }: {
-  children: React.ReactNode
-  maxFontSize?: number
-  style?: React.CSSProperties
-}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const textRef = useRef<HTMLHeadingElement>(null)
-  const [fontSize, setFontSize] = useState(maxFontSize)
-
-  const fit = useCallback(() => {
-    const container = containerRef.current
-    const text = textRef.current
-    if (!container || !text) return
-    let size = maxFontSize
-    text.style.fontSize = `${size}px`
-    while (text.scrollWidth > container.clientWidth && size > 12) {
-      size -= 0.5
-      text.style.fontSize = `${size}px`
-    }
-    setFontSize(size)
-  }, [maxFontSize])
-
-  useEffect(() => { fit() }, [fit, children])
-
-  return (
-    <div ref={containerRef} style={{ width: '100%', overflow: 'hidden' }}>
-      <h1 ref={textRef} style={{ ...style, fontSize, whiteSpace: 'nowrap' }}>
-        {children}
-      </h1>
-    </div>
-  )
-}
 
 
 // Content area baseline height — used to calculate illustration centering offset
@@ -220,10 +179,10 @@ export function SRDCard({
       onClick={onClick}
       className="relative overflow-hidden flex flex-col"
       style={{
-        width: 360,
-        height: 508,
-        borderRadius: 12,
-        background: '#03070d',
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        borderRadius: CARD_BORDER_RADIUS,
+        background: CARD_BG,
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
@@ -232,8 +191,8 @@ export function SRDCard({
         height: 288,
         flexShrink: 0,
         zIndex: 2,
-        WebkitMaskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
-        maskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
+        WebkitMaskImage: ILLUSTRATION_MASK,
+        maskImage: ILLUSTRATION_MASK,
       }}>
         {/* Character illustration — vertically centered in visible space above content */}
         {illustrationSrc && (
@@ -281,15 +240,14 @@ export function SRDCard({
         style={{
           minHeight: 297,
           zIndex: 10,
-          background:
-            'linear-gradient(180deg, rgba(31, 58, 96, 0) 0%, rgba(3, 7, 13, 0.81) 12%, rgba(3, 7, 13, 0.81) 83%, rgba(19, 36, 60, 0.35) 97%, rgba(31, 58, 96, 0) 100%)',
+          background: CONTENT_OVERLAY_GRADIENT,
           ...(contentLayout === 'figma' ? { gap: 12, paddingTop: 24, paddingBottom: 18 } : {}),
         }}
       >
         {/* Title section */}
         <div className={contentLayout === 'figma' ? 'flex flex-col items-center text-center' : 'flex flex-col items-center text-center pt-2'}>
           {/* Subclass name */}
-          <div style={{ filter: titleShadowStyle === 'subtle' ? 'drop-shadow(0px 1px 1px #4d381e)' : 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))', width: '100%' }}>
+          <div style={{ filter: titleShadowStyle === 'subtle' ? 'drop-shadow(0px 1px 1px #4d381e)' : GOLD_DROP_SHADOW, width: '100%' }}>
             <AutoFitTitle
               maxFontSize={titleFontSize ?? 36}
               style={{
@@ -327,7 +285,7 @@ export function SRDCard({
             </div>
 
             {/* Class name */}
-            <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
+            <div style={{ filter: GOLD_DROP_SHADOW }}>
               <span style={subtitleStyle}>
                 {className}
               </span>
@@ -391,7 +349,7 @@ export function SRDCard({
         {/* Footer */}
         <div
           className={contentLayout === 'figma' ? 'flex items-center justify-between' : 'flex items-center justify-between py-3'}
-          style={{ flexShrink: 0, filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}
+          style={{ flexShrink: 0, filter: GOLD_DROP_SHADOW }}
         >
           <span style={subtitleStyle}>
             {tier}
@@ -411,7 +369,7 @@ export function SRDCard({
           src={`${basePath}images/cards/frame.svg`}
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none z-20"
-          style={{ opacity: 0.6 }}
+          style={{ opacity: CARD_FRAME_OPACITY }}
           draggable={false}
         />
       )}

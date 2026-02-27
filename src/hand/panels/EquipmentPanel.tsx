@@ -36,7 +36,7 @@ function EquipmentRow({
           <span
             style={{
               fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
@@ -143,7 +143,7 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
         <span
           style={{
             fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 600,
             textTransform: 'uppercase',
             letterSpacing: '0.05em',

@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Character } from '../types/character'
 import { clampHP } from '../core/character/hp'
+import { applyLevelUp } from '../core/character/level-up'
+import type { LevelUpChoices } from '../core/character/level-up'
 
 interface CharacterStore {
   characters: Character[]
@@ -14,6 +16,7 @@ interface CharacterStore {
   updateHope: (id: string, delta: number) => void
   updateStress: (id: string, delta: number) => void
   updateNotes: (id: string, notes: string) => void
+  levelUp: (id: string, choices: LevelUpChoices) => void
 }
 
 export const useCharacterStore = create<CharacterStore>()(
@@ -100,9 +103,16 @@ export const useCharacterStore = create<CharacterStore>()(
             c.id === id ? { ...c, notes } : c
           ),
         })),
+
+      levelUp: (id: string, choices: LevelUpChoices) =>
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === id ? applyLevelUp(c, choices) : c
+          ),
+        })),
     }),
     {
-      name: 'cloak-characters-v2',
+      name: 'cloak-characters-v3',
     }
   )
 )

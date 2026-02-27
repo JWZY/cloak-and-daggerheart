@@ -6,8 +6,8 @@ import type { InfoCardProps } from '../cards/InfoCard'
 import type { DomainCardProps } from '../cards/DomainCard'
 import type { DomainIconName } from '../cards/domain-icons'
 import type { Subclass, ClassData, DomainCard, Ancestry, Community } from '../types/character'
-import { DOMAIN_COLORS } from '../cards/domain-colors'
-import { wizard, wizardSubclasses, wizardLevel1Cards, ancestries, communities } from './srd'
+import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from '../cards/domain-colors'
+import { getClassByName, getSubclassesForClass, getLevel1DomainCards, getDomainCardsUpToLevel as srdGetDomainCardsUpToLevel, ancestries, communities } from './srd'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -70,10 +70,10 @@ export function subclassToCardProps(subclass: Subclass, classData: ClassData): S
     tier: 'Foundation',
     spellcastTrait: subclass.spellcast_trait,
     feats,
-    bannerColor: DOMAIN_COLORS[classData.domain_2],
+    bannerColor: DOMAIN_COLORS_MUTED[classData.domain_2],
     bannerInnerColor: DOMAIN_COLORS[classData.domain_1],
     domainIcons: [toDomainIconName(classData.domain_1), toDomainIconName(classData.domain_2)],
-    illustrationSrc: `${BASE_URL}images/cards/subclasses/${kebabCase(subclass.name)}.png`,
+    illustrationSrc: `${BASE_URL}images/cards/subclasses/${kebabCase(subclass.name)}.avif`,
   }
 }
 
@@ -102,17 +102,19 @@ export function domainCardToProps(card: DomainCard): MappedDomainCard {
 }
 
 // ---------------------------------------------------------------------------
-// Convenience: Wizard-specific accessors
+// Convenience: Class-generic accessors
 // ---------------------------------------------------------------------------
 
-/** Get all wizard subclass card props (both School of Knowledge and School of War) */
-export function getWizardSubclassCards(): SRDCardProps[] {
-  return wizardSubclasses.map(sub => subclassToCardProps(sub, wizard))
+/** Get subclass card props for a given class */
+export function getSubclassCards(className: string): SRDCardProps[] {
+  const classData = getClassByName(className)
+  const subs = getSubclassesForClass(className)
+  return subs.map(sub => subclassToCardProps(sub, classData))
 }
 
-/** Get all wizard level 1 domain card props (Codex + Splendor) */
-export function getWizardDomainCards(): MappedDomainCard[] {
-  return wizardLevel1Cards.map(domainCardToProps)
+/** Get level 1 domain card props for a given class */
+export function getDomainCards(className: string): MappedDomainCard[] {
+  return getLevel1DomainCards(className).map(domainCardToProps)
 }
 
 // ---------------------------------------------------------------------------
@@ -178,6 +180,7 @@ export function ancestryToInfoCardProps(ancestry: Ancestry): InfoCardProps {
     feats: ancestry.feats.map(f => ({ name: f.name, text: f.text })),
     footerLeft: 'Ancestry',
     footerRight: `${ancestry.feats.length} feat${ancestry.feats.length > 1 ? 's' : ''}`,
+    illustrationSrc: `${BASE_URL}images/cards/ancestries/${kebabCase(ancestry.name)}.avif`,
   }
 }
 
@@ -201,10 +204,20 @@ export function communityToInfoCardProps(community: Community): InfoCardProps {
     feats: community.feats.map(f => ({ name: f.name, text: f.text })),
     footerLeft: 'Community',
     footerRight: `${community.feats.length} feat${community.feats.length > 1 ? 's' : ''}`,
+    illustrationSrc: `${BASE_URL}images/cards/communities/${kebabCase(community.name)}.avif`,
   }
 }
 
 /** Get all communities as InfoCard props */
 export function getAllCommunityCards(): InfoCardProps[] {
   return communities.map(communityToInfoCardProps)
+}
+
+// ---------------------------------------------------------------------------
+// Level-Up: Domain cards by level
+// ---------------------------------------------------------------------------
+
+/** Get domain card props up to a given level for a class (for level-up picker) */
+export function getDomainCardsUpToLevel(className: string, maxLevel: number): MappedDomainCard[] {
+  return srdGetDomainCardsUpToLevel(className, maxLevel).map(domainCardToProps)
 }

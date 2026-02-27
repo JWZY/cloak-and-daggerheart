@@ -1,16 +1,17 @@
 // Character validation logic
 // Pure functions for validating character data
 
-import type { Ancestry, Community, DomainCard, Traits, WizardSubclass, Equipment } from '../../types/character'
+import type { Ancestry, Community, DomainCard, Traits, Equipment } from '../../types/character'
 
 /**
  * Draft character during creation
  */
 export interface DraftCharacter {
   name?: string
+  class?: string
   ancestry?: Ancestry
   community?: Community
-  subclass?: WizardSubclass
+  subclass?: string
   domainCards?: DomainCard[]
   traits?: Traits
   equipment?: Partial<Equipment>

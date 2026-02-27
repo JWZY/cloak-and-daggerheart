@@ -1,14 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { SRDCard } from '../../cards/SRDCard'
 import { DomainCard } from '../../cards/DomainCard'
-import { InfoCard } from '../../cards/InfoCard'
+import { AncestryCard } from '../../cards/AncestryCard'
+import { CommunityCard } from '../../cards/CommunityCard'
 import { SectionHeader } from '../../ui/SectionHeader'
 import { GameBadge } from '../../ui/GameBadge'
-import { getWizardSubclassCards, getWizardDomainCards, parseAbilityText, ancestryToInfoCardProps, communityToInfoCardProps } from '../../data/card-mapper'
+import { getSubclassCards, getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { ancestries, communities } from '../../data/srd'
 import { TRAIT_NAMES, formatTraitValue } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
 import { useDeckStore } from '../../store/deck-store'
+import { getSubclassCardCount } from '../../core/rules/class-rules'
 
 const fadeIn = {
   initial: { opacity: 0, y: 8 },
@@ -24,6 +26,7 @@ const fadeIn = {
 export function DeckPreview() {
   const {
     subclass,
+    selectedClass,
     selectedDomainCards,
     ancestryName,
     communityName,
@@ -31,8 +34,8 @@ export function DeckPreview() {
     characterName,
   } = useDeckStore()
 
-  const subclassCards = getWizardSubclassCards()
-  const domainCards = getWizardDomainCards()
+  const subclassCards = getSubclassCards(selectedClass ?? 'Wizard')
+  const domainCards = getDomainCards(selectedClass ?? 'Wizard')
 
   const heroCard = subclassCards.find((c) => c.name === subclass)
   const selectedDomains = domainCards.filter((d) =>
@@ -59,7 +62,7 @@ export function DeckPreview() {
           className="gold-text"
           style={{
             fontFamily: "'EB Garamond', serif",
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: 600,
             fontVariant: 'small-caps',
             letterSpacing: '0.06em',
@@ -168,14 +171,12 @@ export function DeckPreview() {
               {ancestryName && (() => {
                 const a = ancestries.find(x => x.name === ancestryName)
                 if (!a) return null
-                const cardProps = ancestryToInfoCardProps(a)
-                return <InfoCard {...cardProps} scale={0.28} />
+                return <AncestryCard ancestry={a} scale={0.28} />
               })()}
               {communityName && (() => {
                 const c = communities.find(x => x.name === communityName)
                 if (!c) return null
-                const cardProps = communityToInfoCardProps(c)
-                return <InfoCard {...cardProps} scale={0.28} />
+                return <CommunityCard community={c} scale={0.28} />
               })()}
             </div>
           </motion.div>
@@ -194,7 +195,7 @@ export function DeckPreview() {
                     style={{
                       display: 'block',
                       fontFamily: "'Source Sans 3', sans-serif",
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: 700,
                       color: '#e7ba90',
                     }}
@@ -204,7 +205,7 @@ export function DeckPreview() {
                   <span
                     style={{
                       fontFamily: "'EB Garamond', serif",
-                      fontSize: 10,
+                      fontSize: 11,
                       fontVariant: 'small-caps',
                       letterSpacing: '0.04em',
                       color: 'rgba(212, 207, 199, 0.4)',
@@ -219,9 +220,9 @@ export function DeckPreview() {
         )}
 
         {/* Domain card count badge */}
-        {selectedDomainCards.length > 0 && selectedDomainCards.length < 3 && (
+        {selectedDomainCards.length > 0 && selectedDomainCards.length < getSubclassCardCount(subclass ?? '') && (
           <motion.div key="domain-count" {...fadeIn} style={{ textAlign: 'center', marginBottom: 12 }}>
-            <GameBadge>{selectedDomainCards.length} of 3 cards</GameBadge>
+            <GameBadge>{selectedDomainCards.length} of {getSubclassCardCount(subclass ?? '')} cards</GameBadge>
           </motion.div>
         )}
       </AnimatePresence>

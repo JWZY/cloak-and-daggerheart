@@ -34,15 +34,16 @@ export const TRAIT_DESCRIPTIONS: Record<TraitName, string> = {
 export const AVAILABLE_TRAIT_VALUES = [-1, 0, 0, 1, 1, 2] as const
 
 /**
- * Suggested trait assignments for Wizard
+ * Parse a suggested_traits string (e.g. "-1, 0, 0, +1, +1, +2") into a Traits object.
+ * Values are mapped to trait names in standard order: agility, strength, finesse, instinct, presence, knowledge.
  */
-export const SUGGESTED_WIZARD_TRAITS: Traits = {
-  agility: -1,
-  strength: 0,
-  finesse: 0,
-  instinct: 1,
-  presence: 1,
-  knowledge: 2,
+export function parseSuggestedTraits(traitString: string): Traits {
+  const values = traitString.split(',').map(s => parseInt(s.trim(), 10))
+  const traits: Traits = { agility: 0, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 0 }
+  TRAIT_NAMES.forEach((name, i) => {
+    traits[name] = values[i] ?? 0
+  })
+  return traits
 }
 
 /**

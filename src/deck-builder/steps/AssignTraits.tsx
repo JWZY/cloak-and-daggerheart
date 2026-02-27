@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { TRAIT_NAMES, SUGGESTED_WIZARD_TRAITS, formatTraitValue, getRemainingTraitValues } from '../../core/rules/traits'
+import { TRAIT_NAMES, parseSuggestedTraits, formatTraitValue, getRemainingTraitValues } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
 import { SectionHeader } from '../../ui/SectionHeader'
+import { StepInstruction } from '../../ui/StepInstruction'
+import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
 import { useDeckStore } from '../../store/deck-store'
+import { getClassByName } from '../../data/srd'
 
 export function AssignTraits() {
   const storedTraits = useDeckStore((s) => s.traits)
   const setTraits = useDeckStore((s) => s.setTraits)
+  const selectedClass = useDeckStore((s) => s.selectedClass)
 
   // Local trait assignment state — each trait maps to a value or null (unassigned)
   const [assignments, setAssignments] = useState<Record<TraitName, number | null>>(() => {
@@ -16,8 +20,12 @@ export function AssignTraits() {
       // Restore from store
       return storedTraits as Record<TraitName, number>
     }
-    // Pre-fill with suggested wizard traits
-    return { ...SUGGESTED_WIZARD_TRAITS }
+    // Pre-fill with suggested traits for the selected class
+    const classData = selectedClass ? getClassByName(selectedClass) : null
+    const suggestedTraits = classData ? parseSuggestedTraits(classData.suggested_traits) : null
+    return suggestedTraits
+      ? { ...suggestedTraits }
+      : Object.fromEntries(TRAIT_NAMES.map(n => [n, null])) as Record<TraitName, number | null>
   })
 
   const remaining = getRemainingTraitValues(assignments)
@@ -83,18 +91,7 @@ export function AssignTraits() {
       <h2 className="w-full max-w-xs mb-2">
         <SectionHeader>Assign Traits</SectionHeader>
       </h2>
-      <p
-        style={{
-          fontFamily: "'EB Garamond', serif",
-          fontStyle: 'italic',
-          fontSize: 13,
-          color: 'rgba(231, 186, 144, 0.5)',
-          textAlign: 'center',
-          marginBottom: 24,
-        }}
-      >
-        Tap a trait to unassign, tap a pill to assign
-      </p>
+      <StepInstruction>Tap a trait to unassign, tap a pill to assign</StepInstruction>
 
       {/* Available values (pills) */}
       <div className="flex gap-2 mb-6 justify-center">
@@ -106,7 +103,7 @@ export function AssignTraits() {
             style={{
               fontFamily: "'EB Garamond', serif",
               fontWeight: 600,
-              fontSize: 14,
+              fontSize: 15,
               fontVariant: 'small-caps',
               letterSpacing: '0.04em',
               background: 'rgba(3, 7, 13, 0.8)',
@@ -146,11 +143,12 @@ export function AssignTraits() {
           const isAssigned = value !== null
 
           return (
-            <motion.button
+            <SelectableOption
               key={traitName}
-              whileTap={{ scale: 0.97 }}
+              selected={isAssigned}
               onClick={() => handleSlotTap(traitName)}
-              className="flex items-center justify-between rounded-xl px-4 py-3"
+              layout={false}
+              className="flex items-center justify-between"
               style={{
                 background: isAssigned
                   ? 'rgba(231, 186, 144, 0.06)'
@@ -158,10 +156,6 @@ export function AssignTraits() {
                 border: isAssigned
                   ? '1px solid rgba(231, 186, 144, 0.2)'
                   : '1px solid rgba(255, 255, 255, 0.08)',
-                boxShadow: isAssigned
-                  ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
-                  : 'none',
-                cursor: 'pointer',
               }}
             >
               <span
@@ -179,7 +173,7 @@ export function AssignTraits() {
               <span
                 style={{
                   fontFamily: "'Source Sans 3', sans-serif",
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: 700,
                   color: isAssigned ? '#e7ba90' : 'rgba(212, 207, 199, 0.2)',
                   minWidth: 32,
@@ -188,7 +182,7 @@ export function AssignTraits() {
               >
                 {isAssigned ? formatTraitValue(value) : '\u2014'}
               </span>
-            </motion.button>
+            </SelectableOption>
           )
         })}
       </div>

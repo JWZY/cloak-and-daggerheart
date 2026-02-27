@@ -8,6 +8,37 @@ Prioritized list of features and improvements. Items at top are highest priority
 
 _Goal: A functional, well-crafted level 1 Wizard character creation and play experience._
 
+### Create Background Step ⚠️ CORE MVP
+**Size:** M | **Status:** Not started
+**Description:** Add background questions step to deck builder (SRD Step 6)
+**Notes:**
+- Each class has background questions in `classes.json` — Wizard has 3 questions
+- Player answers free-form text for each question
+- No mechanical effect, but critical for character identity/roleplay
+- `Character.backgroundAnswers: string[]` already exists in the type — just needs a UI step
+- SRD says this can be "left more ambiguous for the time being" but should still be offered
+
+### Create Experiences Step ⚠️ CORE MVP
+**Size:** M | **Status:** Not started
+**Description:** Add experiences step to deck builder (SRD Step 7)
+**Notes:**
+- Player creates 2 custom Experiences at +2 bonus each
+- Experiences are player-authored words/phrases (e.g. "Arcane Scholar", "Survivor of the War")
+- **Mechanically important** — Experiences add bonuses to relevant action rolls
+- `Character` type needs an `experiences: { text: string; bonus: number }[]` field (currently missing)
+- At creation: always 2 experiences, always +2. At level-up: gain new experiences, increase existing ones.
+- SRD example experiences per class in `classes.json`
+
+### Create Connections Step ⚠️ CORE MVP
+**Size:** S | **Status:** Not started
+**Description:** Add connections step to deck builder (SRD Step 9)
+**Notes:**
+- Establish relationships with other PCs via prompted questions
+- Connection questions come from `classes.json` — Wizard has specific prompts
+- SRD explicitly allows skipping: "it's okay if there isn't an established connection between every pair of PCs"
+- `Character.connectionAnswers: string[]` already exists in the type — just needs a UI step
+- Can be skippable/optional in the UI (Continue enabled even if empty)
+
 ### Item Cards
 **Size:** M | **Status:** Open
 **Description:** Card-based UI for equipped weapons and armor in the hand view

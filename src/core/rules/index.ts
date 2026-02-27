@@ -1,3 +1,4 @@
 // Core rules exports
 export * from './traits'
-export * from './wizard'
+export * from './class-rules'
+export * from './advancement'

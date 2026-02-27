@@ -1,26 +1,32 @@
 import { motion } from 'framer-motion'
-import { getWizardSubclassCards, getWizardDomainCards, parseAbilityText, ancestryToInfoCardProps, communityToInfoCardProps } from '../../data/card-mapper'
+import { getSubclassCards, getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { SRDCard } from '../../cards/SRDCard'
 import { DomainCard } from '../../cards/DomainCard'
-import { InfoCard } from '../../cards/InfoCard'
+import { AncestryCard } from '../../cards/AncestryCard'
+import { CommunityCard } from '../../cards/CommunityCard'
 import { ancestries, communities } from '../../data/srd'
 import { TRAIT_NAMES, formatTraitValue } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
+import { GameBadge } from '../../ui/GameBadge'
 import { SectionHeader } from '../../ui/SectionHeader'
 import { useDeckStore } from '../../store/deck-store'
 
 export function ReviewDeck() {
   const {
     subclass,
+    selectedClass,
     selectedDomainCards,
     ancestryName,
     communityName,
     traits,
+    backgroundAnswers,
+    experiences,
     characterName,
+    connectionAnswers,
   } = useDeckStore()
 
-  const subclassCards = getWizardSubclassCards()
-  const domainCards = getWizardDomainCards()
+  const subclassCards = getSubclassCards(selectedClass ?? 'Wizard')
+  const domainCards = getDomainCards(selectedClass ?? 'Wizard')
 
   const heroCard = subclassCards.find((c) => c.name === subclass)
   const selectedDomains = domainCards.filter((d) =>
@@ -39,7 +45,7 @@ export function ReviewDeck() {
           className="gold-text"
           style={{
             fontFamily: "'EB Garamond', serif",
-            fontSize: 32,
+            fontSize: 24,
             fontWeight: 500,
             fontVariant: 'small-caps',
             textAlign: 'center',
@@ -51,7 +57,7 @@ export function ReviewDeck() {
       <p
         style={{
           fontFamily: "'EB Garamond', serif",
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: 600,
           letterSpacing: '0.06em',
           fontVariant: 'small-caps',
@@ -60,7 +66,7 @@ export function ReviewDeck() {
           marginBottom: 24,
         }}
       >
-        {subclass} Wizard
+        {subclass} {selectedClass}
       </p>
 
       {/* Hero subclass card */}
@@ -101,12 +107,12 @@ export function ReviewDeck() {
             {ancestryName && (() => {
               const a = ancestries.find(x => x.name === ancestryName)
               if (!a) return null
-              return <InfoCard {...ancestryToInfoCardProps(a)} scale={0.4} />
+              return <AncestryCard ancestry={a} scale={0.4} />
             })()}
             {communityName && (() => {
               const c = communities.find(x => x.name === communityName)
               if (!c) return null
-              return <InfoCard {...communityToInfoCardProps(c)} scale={0.4} />
+              return <CommunityCard community={c} scale={0.4} />
             })()}
           </div>
         </div>
@@ -127,7 +133,7 @@ export function ReviewDeck() {
                     className="block"
                     style={{
                       fontFamily: "'Source Sans 3', sans-serif",
-                      fontSize: 18,
+                      fontSize: 15,
                       fontWeight: 700,
                       color: '#e7ba90',
                     }}
@@ -137,7 +143,7 @@ export function ReviewDeck() {
                   <span
                     style={{
                       fontFamily: "'EB Garamond', serif",
-                      fontSize: 12,
+                      fontSize: 13,
                       fontVariant: 'small-caps',
                       letterSpacing: '0.04em',
                       color: 'rgba(212, 207, 199, 0.5)',
@@ -147,6 +153,96 @@ export function ReviewDeck() {
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Experiences */}
+        {experiences.filter((e) => e.text.trim()).length > 0 && (
+          <div className="mt-2">
+            <div className="mb-3">
+              <SectionHeader>Experiences</SectionHeader>
+            </div>
+            <div className="flex flex-col gap-2">
+              {experiences
+                .filter((e) => e.text.trim())
+                .map((exp, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between"
+                    style={{
+                      padding: '8px 12px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      borderRadius: 8,
+                      border: '1px solid rgba(231, 186, 144, 0.1)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'Source Sans 3', sans-serif",
+                        fontSize: 13.5,
+                        color: 'rgba(212, 207, 199, 0.9)',
+                      }}
+                    >
+                      {exp.text}
+                    </span>
+                    <GameBadge>+{exp.bonus}</GameBadge>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Background */}
+        {backgroundAnswers.filter((a) => a?.trim()).length > 0 && (
+          <div className="mt-2">
+            <div className="mb-3">
+              <SectionHeader>Background</SectionHeader>
+            </div>
+            <div className="flex flex-col gap-2">
+              {backgroundAnswers
+                .filter((a) => a?.trim())
+                .map((answer, i) => (
+                  <p
+                    key={i}
+                    style={{
+                      fontFamily: "'Source Sans 3', sans-serif",
+                      fontSize: 13.5,
+                      lineHeight: 1.4,
+                      color: 'rgba(212, 207, 199, 0.9)',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {answer}
+                  </p>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Connections */}
+        {connectionAnswers.filter((a) => a?.trim()).length > 0 && (
+          <div className="mt-2">
+            <div className="mb-3">
+              <SectionHeader>Connections</SectionHeader>
+            </div>
+            <div className="flex flex-col gap-2">
+              {connectionAnswers
+                .filter((a) => a?.trim())
+                .map((answer, i) => (
+                  <p
+                    key={i}
+                    style={{
+                      fontFamily: "'Source Sans 3', sans-serif",
+                      fontSize: 13.5,
+                      lineHeight: 1.4,
+                      color: 'rgba(212, 207, 199, 0.9)',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {answer}
+                  </p>
+                ))}
             </div>
           </div>
         )}

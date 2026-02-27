@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
+import { GlassPanel } from '../../ui/GlassPanel'
 
 export interface CollapsiblePanelProps {
   title: string
@@ -20,19 +21,12 @@ export function CollapsiblePanel({
   children,
 }: CollapsiblePanelProps) {
   return (
-    <div
-      className="rounded-xl overflow-hidden"
+    <GlassPanel
+      className="overflow-hidden"
       style={{
-        background: `linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.05) 0%,
-          rgba(255, 255, 255, 0.02) 50%,
-          rgba(0, 0, 0, 0.01) 100%
-        )`,
-        backdropFilter: 'blur(2px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(2px) saturate(150%)',
+        borderRadius: 12,
+        padding: 0,
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.375), inset 0 -1px 1px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.25)',
       }}
     >
       {/* Header */}
@@ -86,6 +80,6 @@ export function CollapsiblePanel({
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </GlassPanel>
   )
 }

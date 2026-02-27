@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion'
 import { SRDCard } from '../cards/SRDCard'
 import { subclassToCardProps } from '../data/card-mapper'
-import { getSubclass, getClassForSubclass } from '../data/srd'
-import type { WizardSubclass } from '../types/character'
+import { getSubclassByName, getClassForSubclass } from '../data/srd'
 
 export interface HeroCardProps {
   onTap: () => void
@@ -10,7 +9,7 @@ export interface HeroCardProps {
 }
 
 export function HeroCard({ onTap, subclass }: HeroCardProps) {
-  const subclassData = getSubclass(subclass as WizardSubclass)
+  const subclassData = getSubclassByName(subclass)
   const classData = getClassForSubclass(subclass)!
   const cardProps = subclassToCardProps(subclassData, classData)
 

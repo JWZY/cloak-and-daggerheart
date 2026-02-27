@@ -12,3 +12,9 @@ export type { GameInputProps } from './GameInput'
 
 export { GameBadge } from './GameBadge'
 export type { GameBadgeProps } from './GameBadge'
+
+export { StepInstruction } from './StepInstruction'
+export type { StepInstructionProps } from './StepInstruction'
+
+export { SelectableOption } from './SelectableOption'
+export type { SelectableOptionProps } from './SelectableOption'

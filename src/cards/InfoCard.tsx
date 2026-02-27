@@ -5,6 +5,18 @@
  */
 
 import { motion } from 'framer-motion'
+import {
+  goldGradientStyle,
+  subtitleStyle,
+  CARD_WIDTH,
+  CARD_HEIGHT,
+  CARD_BORDER_RADIUS,
+  CARD_BG,
+  GOLD_DROP_SHADOW,
+  CARD_FRAME_OPACITY,
+  CONTENT_OVERLAY_GRADIENT,
+  ILLUSTRATION_MASK,
+} from './card-tokens'
 
 export interface InfoCardFeat {
   name: string
@@ -19,26 +31,9 @@ export interface InfoCardProps {
   footerLeft?: string    // e.g. tier or empty
   footerRight?: string   // e.g. note
   accentColor?: string   // top accent line color, default gold
+  illustrationSrc?: string // optional card illustration (top zone)
   scale?: number
   onClick?: () => void
-}
-
-const goldGradientStyle = {
-  background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  textShadow: 'none',
-} as const
-
-const subtitleStyle = {
-  fontFamily: "'EB Garamond', serif",
-  fontSize: 13,
-  fontWeight: 600,
-  lineHeight: 'normal' as const,
-  letterSpacing: '0.06em',
-  fontVariant: 'small-caps' as const,
-  ...goldGradientStyle,
 }
 
 export function InfoCard({
@@ -49,6 +44,7 @@ export function InfoCard({
   footerLeft,
   footerRight,
   accentColor,
+  illustrationSrc,
   scale = 1,
   onClick,
 }: InfoCardProps) {
@@ -58,10 +54,10 @@ export function InfoCard({
     <div
       className="relative overflow-hidden flex flex-col"
       style={{
-        width: 360,
-        height: 508,
-        borderRadius: 12,
-        background: '#03070d',
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        borderRadius: CARD_BORDER_RADIUS,
+        background: CARD_BG,
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
@@ -80,7 +76,7 @@ export function InfoCard({
         />
       )}
 
-      {/* Decorative top area — atmosphere texture filling illustration zone */}
+      {/* Top illustration / decorative zone */}
       <div
         className="relative"
         style={{
@@ -88,44 +84,59 @@ export function InfoCard({
           flexShrink: 0,
           zIndex: 2,
           overflow: 'hidden',
+          WebkitMaskImage: ILLUSTRATION_MASK,
+          maskImage: ILLUSTRATION_MASK,
         }}
       >
-        {/* Atmosphere texture (flipped, full bleed) */}
-        <img
-          src={`${basePath}images/cards/atmosphere.png`}
-          alt=""
-          className="absolute w-full h-full pointer-events-none"
-          style={{ objectFit: 'cover', opacity: 0.3, transform: 'scaleY(-1) scaleX(-1)' }}
-          draggable={false}
-        />
-
-        {/* Large decorative title — faint, centered in top zone */}
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 72,
-            fontWeight: 500,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.02em',
-            ...goldGradientStyle,
-            opacity: 0.08,
-            userSelect: 'none',
-            pointerEvents: 'none',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {title}
-        </div>
-
-        {/* Bottom gradient fade into content */}
-        <div
-          className="absolute bottom-0 left-0 right-0"
-          style={{
-            height: 60,
-            background: 'linear-gradient(to bottom, transparent, #03070d)',
-          }}
-        />
+        {illustrationSrc ? (
+          <>
+            {/* Illustration image */}
+            <img
+              src={illustrationSrc}
+              alt=""
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{ objectFit: 'cover', objectPosition: 'top', userSelect: 'none' }}
+              draggable={false}
+            />
+            {/* Atmosphere overlay for texture */}
+            <img
+              src={`${basePath}images/cards/atmosphere.png`}
+              alt=""
+              className="absolute w-full h-full pointer-events-none"
+              style={{ objectFit: 'cover', opacity: 0.15, mixBlendMode: 'overlay' }}
+              draggable={false}
+            />
+          </>
+        ) : (
+          <>
+            {/* Fallback: atmosphere texture */}
+            <img
+              src={`${basePath}images/cards/atmosphere.png`}
+              alt=""
+              className="absolute w-full h-full pointer-events-none"
+              style={{ objectFit: 'cover', opacity: 0.3, transform: 'scaleY(-1) scaleX(-1)' }}
+              draggable={false}
+            />
+            {/* Large decorative title — faint, centered */}
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{
+                fontFamily: "'EB Garamond', serif",
+                fontSize: 72,
+                fontWeight: 500,
+                fontVariant: 'small-caps',
+                letterSpacing: '0.02em',
+                ...goldGradientStyle,
+                opacity: 0.08,
+                userSelect: 'none',
+                pointerEvents: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {title}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Background atmosphere layer behind content */}
@@ -143,8 +154,7 @@ export function InfoCard({
         style={{
           minHeight: 348,
           zIndex: 10,
-          background:
-            'linear-gradient(180deg, rgba(31, 58, 96, 0) 0%, rgba(3, 7, 13, 0.81) 8%, rgba(3, 7, 13, 0.81) 83%, rgba(19, 36, 60, 0.35) 97%, rgba(31, 58, 96, 0) 100%)',
+          background: CONTENT_OVERLAY_GRADIENT,
           gap: 10,
           paddingTop: 20,
           paddingBottom: 18,
@@ -152,7 +162,7 @@ export function InfoCard({
       >
         {/* Title */}
         <div className="flex flex-col items-center text-center">
-          <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))', width: '100%' }}>
+          <div style={{ filter: GOLD_DROP_SHADOW, width: '100%' }}>
             <h2
               style={{
                 fontFamily: "'EB Garamond', serif",
@@ -176,7 +186,7 @@ export function InfoCard({
               <div className="flex-1" style={{ height: 2, background: 'linear-gradient(90deg, transparent, #e7ba90)' }} />
               <div className="mx-0.5" style={{ width: 4, height: 4, background: '#e7ba90', transform: 'rotate(45deg)' }} />
             </div>
-            <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
+            <div style={{ filter: GOLD_DROP_SHADOW }}>
               <span style={subtitleStyle}>{subtitle}</span>
             </div>
             <div className="flex items-center flex-1">
@@ -190,8 +200,8 @@ export function InfoCard({
         <p
           style={{
             fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 12.5,
-            lineHeight: '1.5',
+            fontSize: 13.5,
+            lineHeight: '1.4',
             color: 'rgba(212, 207, 199, 0.75)',
             textShadow: '0px 1px 1px #4d381e',
             fontStyle: 'italic',
@@ -228,7 +238,7 @@ export function InfoCard({
         {/* Footer */}
         <div
           className="flex items-center justify-between"
-          style={{ flexShrink: 0, filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}
+          style={{ flexShrink: 0, filter: GOLD_DROP_SHADOW }}
         >
           {footerLeft && <span style={subtitleStyle}>{footerLeft}</span>}
           {!footerLeft && <span />}
@@ -241,7 +251,7 @@ export function InfoCard({
         src={`${basePath}images/cards/frame.svg`}
         alt=""
         className="absolute inset-0 w-full h-full pointer-events-none z-20"
-        style={{ opacity: 0.6 }}
+        style={{ opacity: CARD_FRAME_OPACITY }}
         draggable={false}
       />
     </div>
@@ -255,8 +265,8 @@ export function InfoCard({
         whileHover={onClick ? { y: -4 } : undefined}
         onClick={onClick}
         style={{
-          width: 360 * scale,
-          height: 508 * scale,
+          width: CARD_WIDTH * scale,
+          height: CARD_HEIGHT * scale,
           cursor: onClick ? 'pointer' : 'default',
         }}
       >
@@ -264,8 +274,8 @@ export function InfoCard({
           style={{
             transform: `scale(${scale})`,
             transformOrigin: 'top left',
-            width: 360,
-            height: 508,
+            width: CARD_WIDTH,
+            height: CARD_HEIGHT,
           }}
         >
           {card}

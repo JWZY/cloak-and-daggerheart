@@ -1,21 +1,18 @@
-import { AnimatePresence } from 'framer-motion'
-import { getAllCommunityCards } from '../../data/card-mapper'
-import { InfoCard } from '../../cards/InfoCard'
+import { CommunityCard } from '../../cards/CommunityCard'
+import { communities } from '../../data/srd'
 import { CardSelector } from '../../cards/CardSelector'
-import { CardZoom } from '../../cards/CardZoom'
-import { useCardZoom } from '../../cards/useCardZoom'
+import { CardHand } from '../../cards/CardHand'
 import { SectionHeader } from '../../ui/SectionHeader'
+import { StepInstruction } from '../../ui/StepInstruction'
 import { useDeckStore } from '../../store/deck-store'
 
 export function PickCommunity() {
   const communityName = useDeckStore((s) => s.communityName)
   const setCommunity = useDeckStore((s) => s.setCommunity)
-  const communityCards = getAllCommunityCards()
-  const { zoomedCard, openZoom, closeZoom } = useCardZoom()
 
   const handleTap = (name: string) => {
     if (communityName === name) {
-      openZoom(`community-${name}`)
+      useDeckStore.setState({ communityName: null })
     } else {
       setCommunity(name)
     }
@@ -26,55 +23,26 @@ export function PickCommunity() {
       <h2 className="w-full max-w-xs mb-2 px-4">
         <SectionHeader>Choose Your Community</SectionHeader>
       </h2>
-      <p
-        style={{
-          fontFamily: "'EB Garamond', serif",
-          fontStyle: 'italic',
-          fontSize: 13,
-          color: 'rgba(231, 186, 144, 0.5)',
-          textAlign: 'center',
-          marginBottom: 24,
-        }}
-      >
-        Tap to select — tap again to zoom
-      </p>
+      <StepInstruction>Tap to select or deselect</StepInstruction>
 
-      {/* Horizontal scrollable card rail */}
-      <div
-        className="flex gap-3 overflow-x-auto w-full px-4 pb-4 snap-x snap-mandatory"
-        style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
-      >
-        {communityCards.map((cardProps) => {
-          const isSelected = communityName === cardProps.title
+      {/* Hand-of-cards layout — 9 communities */}
+      <CardHand scale={0.55} overlap={-65} mobileScale={0.42}>
+        {communities.map((community) => {
+          const isSelected = communityName === community.name
           const isDimmed = communityName !== null && !isSelected
 
           return (
-            <div key={cardProps.title} className="snap-center shrink-0">
-              <CardSelector
-                selected={isSelected}
-                dimmed={isDimmed}
-                onSelect={() => handleTap(cardProps.title)}
-              >
-                <InfoCard {...cardProps} scale={0.52} />
-              </CardSelector>
-            </div>
+            <CardSelector
+              key={community.name}
+              selected={isSelected}
+              dimmed={isDimmed}
+              onSelect={() => handleTap(community.name)}
+            >
+              <CommunityCard community={community} />
+            </CardSelector>
           )
         })}
-      </div>
-
-      {/* Card Zoom */}
-      <AnimatePresence>
-        {zoomedCard?.startsWith('community-') && (() => {
-          const name = zoomedCard.replace('community-', '')
-          const cardProps = communityCards.find((c) => c.title === name)
-          if (!cardProps) return null
-          return (
-            <CardZoom layoutId={zoomedCard} onClose={closeZoom}>
-              <InfoCard {...cardProps} />
-            </CardZoom>
-          )
-        })()}
-      </AnimatePresence>
+      </CardHand>
     </div>
   )
 }

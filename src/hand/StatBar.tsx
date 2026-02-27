@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
 import { GameBadge } from '../ui/GameBadge'
+import { GlassPanel } from '../ui/GlassPanel'
 import { useCharacterStore } from '../store/character-store'
 import { parseThresholds } from '../core/character/armor'
 import type { Character } from '../types/character'
@@ -157,19 +158,12 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
   const updateStress = useCharacterStore((s) => s.updateStress)
 
   return (
-    <div
-      className="rounded-xl px-3 py-3 flex flex-col gap-2"
+    <GlassPanel
+      className="flex flex-col gap-2"
       style={{
-        background: `linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.05) 0%,
-          rgba(255, 255, 255, 0.02) 50%,
-          rgba(0, 0, 0, 0.01) 100%
-        )`,
-        backdropFilter: 'blur(2px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(2px) saturate(150%)',
+        borderRadius: 12,
+        padding: '12px',
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.375), inset 0 -1px 1px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.25)',
       }}
     >
       {/* Row 1: HP and Armor */}
@@ -229,6 +223,6 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
           )
         })()}
       </div>
-    </div>
+    </GlassPanel>
   )
 }

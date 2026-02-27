@@ -10,3 +10,16 @@ export const DOMAIN_COLORS: Record<string, string> = {
   Splendor: '#BEA228',
   Valor: '#EB5B00',
 }
+
+// Muted variants — darker, still saturated (for banner outer layer)
+export const DOMAIN_COLORS_MUTED: Record<string, string> = {
+  Arcana: '#2f1f37',
+  Blade: '#640a0e',
+  Bone: '#626565',
+  Codex: '#11233a',
+  Grace: '#710743',
+  Midnight: '#121212',
+  Sage: '#1b2c25',
+  Splendor: '#726118',
+  Valor: '#8d3700',
+}

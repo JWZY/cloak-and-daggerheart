@@ -74,5 +74,25 @@ export function migrateCharacter(
     }
   }
 
+  // Add level-up tracking fields (v3 migration)
+  if (!migrated.advancements) {
+    migrated = {
+      ...migrated,
+      advancements: [],
+    }
+  }
+  if (!migrated.markedTraits) {
+    migrated = {
+      ...migrated,
+      markedTraits: [],
+    }
+  }
+  if (!migrated.subclassTier) {
+    migrated = {
+      ...migrated,
+      subclassTier: 'foundation',
+    }
+  }
+
   return migrated
 }

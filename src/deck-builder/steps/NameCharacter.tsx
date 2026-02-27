@@ -8,6 +8,7 @@ export function NameCharacter() {
   const characterName = useDeckStore((s) => s.characterName)
   const setCharacterName = useDeckStore((s) => s.setCharacterName)
   const subclass = useDeckStore((s) => s.subclass)
+  const selectedClass = useDeckStore((s) => s.selectedClass)
 
   return (
     <div className="flex flex-col items-center justify-center px-6 min-h-[400px] relative">
@@ -29,7 +30,7 @@ export function NameCharacter() {
       <p
         style={{
           fontFamily: "'EB Garamond', serif",
-          fontSize: 12,
+          fontSize: 13,
           color: 'rgba(212, 207, 199, 0.3)',
           textAlign: 'center',
           marginBottom: 8,
@@ -37,7 +38,7 @@ export function NameCharacter() {
           letterSpacing: '0.06em',
         }}
       >
-        {subclass ?? 'Wizard'}
+        {subclass ?? selectedClass ?? ''}
       </p>
 
       <h2 className="w-full max-w-xs mb-8">
@@ -67,14 +68,14 @@ export function NameCharacter() {
             className="gold-text"
             style={{
               fontFamily: "'EB Garamond', serif",
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 500,
               fontVariant: 'small-caps',
               letterSpacing: '0.02em',
               textAlign: 'center',
             }}
           >
-            {characterName.trim()}, {subclass} Wizard
+            {characterName.trim()}, {subclass} {selectedClass}
           </p>
         </div>
       )}

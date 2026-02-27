@@ -1,34 +1,25 @@
-import { ReactNode, useId, useRef, useEffect, useState, useCallback } from 'react'
+import { ReactNode, useId, useRef, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { DOMAIN_COLORS } from './domain-colors'
+import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from './domain-colors'
 import { type DomainIconName, getDomainIconPath } from './domain-icons'
-
-// Gold gradient style shared across title elements (matches SRDCard)
-const goldGradientStyle = {
-  background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  textShadow: 'none',
-} as const
-
-// Shared subtitle style — used by domain name in separator and footer (matches SRDCard)
-const subtitleStyle = {
-  fontFamily: "'EB Garamond', serif",
-  fontSize: 13,
-  fontWeight: 600,
-  lineHeight: 'normal' as const,
-  letterSpacing: '0.06em',
-  fontVariant: 'small-caps' as const,
-  ...goldGradientStyle,
-}
+import { AutoFitTitle } from '../ui/AutoFitTitle'
+import {
+  goldGradientStyle,
+  subtitleStyle,
+  CARD_WIDTH,
+  CARD_HEIGHT,
+  CARD_BORDER_RADIUS,
+  CARD_BG,
+  GOLD_DROP_SHADOW,
+  CARD_FRAME_OPACITY,
+  CONTENT_OVERLAY_GRADIENT,
+  ILLUSTRATION_MASK,
+} from './card-tokens'
 
 // Single-domain masked banner (adapted from SRDCard's MaskedBanner for one icon)
-function DomainBanner({ color, uid, domain, basePath }: {
-  color: string; uid: string; domain: string; basePath: string
+function DomainBanner({ outerColor, innerColor, uid, domain, basePath, level }: {
+  outerColor: string; innerColor: string; uid: string; domain: string; basePath: string; level?: string | number
 }) {
-  // Darken the domain color for the inner pennant
-  const innerColor = darkenColor(color, 0.35)
   const iconName = domain.toLowerCase() as DomainIconName
 
   const maskStyle = {
@@ -51,7 +42,7 @@ function DomainBanner({ color, uid, domain, basePath }: {
       {/* Layer 1: Outer trapezoid */}
       <div className="absolute top-0 left-0 w-[44px] h-[70px]" style={maskAt(0, 0)}>
         <svg viewBox="0 0 44 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <path d="M43.4678 0.5L39.1299 69.5H4.87012L0.532227 0.5H43.4678Z" fill={color} stroke={`url(#${uid}-m-bg)`}/>
+          <path d="M43.4678 0.5L39.1299 69.5H4.87012L0.532227 0.5H43.4678Z" fill={outerColor} stroke={`url(#${uid}-m-bg)`}/>
           <defs>
             <linearGradient id={`${uid}-m-bg`} x1="22" y1="24.57" x2="22" y2="53.62" gradientUnits="userSpaceOnUse">
               <stop offset="0.61" stopColor="#DBC593"/>
@@ -63,7 +54,7 @@ function DomainBanner({ color, uid, domain, basePath }: {
       {/* Layer 2: Inner pennant */}
       <div className="absolute top-0 left-[7px] w-[30px] h-[80px]" style={maskAt(-7, 0)}>
         <svg viewBox="0 0 30 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill={innerColor} stroke={`url(#${uid}-m-fg)`}/>
+          <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill={innerColor} stroke={`url(#${uid}-m-fg)`} />
           <defs>
             <linearGradient id={`${uid}-m-fg`} x1="15" y1="0" x2="15" y2="80" gradientUnits="userSpaceOnUse">
               <stop stopColor="#F9F8F3"/>
@@ -72,9 +63,23 @@ function DomainBanner({ color, uid, domain, basePath }: {
           </defs>
         </svg>
       </div>
-      {/* Layer 3: Single domain icon — centered in pennant */}
-      <div className="absolute flex flex-col items-center justify-center" style={{ top: 10, left: 10, width: 24, height: 44, ...maskAt(-10, -10) }}>
-        <img src={getDomainIconPath(iconName, basePath)} alt="" width={24} height={24} draggable={false} />
+      {/* Layer 3: Level number + domain icon — stacked vertically in pennant */}
+      <div className="absolute flex flex-col items-center justify-center" style={{ top: 4, left: 10, width: 24, height: 60, gap: 0, ...maskAt(-10, -4) }}>
+        {level != null && (
+          <span style={{
+            fontFamily: "'EB Garamond', serif",
+            fontSize: 27,
+            fontWeight: 400,
+            lineHeight: 0,
+            letterSpacing: '-1.62px',
+            fontVariantNumeric: 'lining-nums proportional-nums',
+            textShadow: '0 1px 1px #4d381e',
+            color: '#e7ba90',
+          }}>
+            {level}
+          </span>
+        )}
+        <img src={getDomainIconPath(iconName, basePath)} alt="" width={level != null ? 18 : 24} height={level != null ? 18 : 24} draggable={false} />
       </div>
       {/* Layer 4: Texture overlay */}
       <img
@@ -83,49 +88,6 @@ function DomainBanner({ color, uid, domain, basePath }: {
         className="absolute top-0 left-0 w-[44px] h-[80px] pointer-events-none"
         style={{ mixBlendMode: 'multiply', ...maskAt(0, 0) }}
       />
-    </div>
-  )
-}
-
-/** Darken a hex color by a factor (0 = no change, 1 = black) */
-function darkenColor(hex: string, factor: number): string {
-  const h = hex.replace('#', '')
-  const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - factor))
-  const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - factor))
-  const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - factor))
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
-}
-
-// Auto-sizing title that scales down to fit on one line (same as SRDCard)
-function AutoFitTitle({ children, maxFontSize = 36, style }: {
-  children: React.ReactNode
-  maxFontSize?: number
-  style?: React.CSSProperties
-}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const textRef = useRef<HTMLHeadingElement>(null)
-  const [fontSize, setFontSize] = useState(maxFontSize)
-
-  const fit = useCallback(() => {
-    const container = containerRef.current
-    const text = textRef.current
-    if (!container || !text) return
-    let size = maxFontSize
-    text.style.fontSize = `${size}px`
-    while (text.scrollWidth > container.clientWidth && size > 12) {
-      size -= 0.5
-      text.style.fontSize = `${size}px`
-    }
-    setFontSize(size)
-  }, [maxFontSize])
-
-  useEffect(() => { fit() }, [fit, children])
-
-  return (
-    <div ref={containerRef} style={{ width: '100%', overflow: 'hidden' }}>
-      <h1 ref={textRef} style={{ ...style, fontSize, whiteSpace: 'nowrap' }}>
-        {children}
-      </h1>
     </div>
   )
 }
@@ -162,6 +124,7 @@ export function DomainCard({
   const basePath = import.meta.env.BASE_URL || '/'
   const uid = useId().replace(/:/g, '')
   const domainColor = DOMAIN_COLORS[domain] || '#4e345b'
+  const domainColorMuted = DOMAIN_COLORS_MUTED[domain] || '#2f1f37'
 
   // Build subtitle line: "Grimoire · Level 1 · Recall 2"
   const subtitleParts: string[] = []
@@ -192,10 +155,10 @@ export function DomainCard({
     <div
       className="relative overflow-hidden flex flex-col"
       style={{
-        width: 360,
-        height: 508,
-        borderRadius: 12,
-        background: '#03070d',
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        borderRadius: CARD_BORDER_RADIUS,
+        background: CARD_BG,
         cursor: onClick ? 'pointer' : 'default',
         // Selection ring
         ...(selected ? {
@@ -210,8 +173,8 @@ export function DomainCard({
         height: 288,
         flexShrink: 0,
         zIndex: 2,
-        WebkitMaskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
-        maskImage: 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)',
+        WebkitMaskImage: ILLUSTRATION_MASK,
+        maskImage: ILLUSTRATION_MASK,
       }}>
         {/* Artwork */}
         {artworkSrc && (
@@ -229,7 +192,7 @@ export function DomainCard({
         )}
 
         {/* Domain banner (top-left) — single icon */}
-        <DomainBanner color={domainColor} uid={uid} domain={domain} basePath={basePath} />
+        <DomainBanner outerColor={domainColorMuted} innerColor={domainColor} uid={uid} domain={domain} basePath={basePath} level={level} />
       </div>
 
       {/* Background atmosphere layer */}
@@ -248,8 +211,7 @@ export function DomainCard({
         style={{
           minHeight: 297,
           zIndex: 10,
-          background:
-            'linear-gradient(180deg, rgba(31, 58, 96, 0) 0%, rgba(3, 7, 13, 0.81) 12%, rgba(3, 7, 13, 0.81) 83%, rgba(19, 36, 60, 0.35) 97%, rgba(31, 58, 96, 0) 100%)',
+          background: CONTENT_OVERLAY_GRADIENT,
           gap: 12,
           paddingTop: 24,
           paddingBottom: 18,
@@ -258,7 +220,7 @@ export function DomainCard({
         {/* Title section */}
         <div className="flex flex-col items-center text-center">
           {/* Card name */}
-          <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))', width: '100%' }}>
+          <div style={{ filter: GOLD_DROP_SHADOW, width: '100%' }}>
             <AutoFitTitle
               maxFontSize={36}
               style={{
@@ -295,7 +257,7 @@ export function DomainCard({
             </div>
 
             {/* Domain name */}
-            <div style={{ filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}>
+            <div style={{ filter: GOLD_DROP_SHADOW }}>
               <span style={subtitleStyle}>
                 {domain}
               </span>
@@ -325,7 +287,7 @@ export function DomainCard({
           <div className="text-center" style={{ marginTop: -4 }}>
             <span style={{
               fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 400,
               letterSpacing: '0.04em',
               color: 'rgba(212, 207, 199, 0.6)',
@@ -355,7 +317,7 @@ export function DomainCard({
         {/* Footer */}
         <div
           className="flex items-center justify-between"
-          style={{ flexShrink: 0, filter: 'drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30, 0.5))' }}
+          style={{ flexShrink: 0, filter: GOLD_DROP_SHADOW }}
         >
           <span style={subtitleStyle}>
             {domain}
@@ -371,7 +333,7 @@ export function DomainCard({
         src={`${basePath}images/cards/frame.svg`}
         alt=""
         className="absolute inset-0 w-full h-full pointer-events-none z-20"
-        style={{ opacity: 0.6 }}
+        style={{ opacity: CARD_FRAME_OPACITY }}
         draggable={false}
       />
     </div>
@@ -385,8 +347,8 @@ export function DomainCard({
         whileHover={onClick ? { y: -4 } : undefined}
         onClick={onClick}
         style={{
-          width: 360 * scale,
-          height: 508 * scale,
+          width: CARD_WIDTH * scale,
+          height: CARD_HEIGHT * scale,
           cursor: onClick ? 'pointer' : 'default',
         }}
       >
@@ -394,8 +356,8 @@ export function DomainCard({
           style={{
             transform: `scale(${scale})`,
             transformOrigin: 'top left',
-            width: 360,
-            height: 508,
+            width: CARD_WIDTH,
+            height: CARD_HEIGHT,
           }}
         >
           {card}

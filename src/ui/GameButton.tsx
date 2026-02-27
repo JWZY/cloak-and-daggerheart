@@ -56,7 +56,7 @@ export interface GameButtonProps {
 const sizeStyles = {
   sm: { padding: '6px 16px', fontSize: 13 },
   md: { padding: '10px 24px', fontSize: 15 },
-  lg: { padding: '14px 32px', fontSize: 17 },
+  lg: { padding: '14px 32px', fontSize: 15 },
 } as const
 
 export function GameButton({
