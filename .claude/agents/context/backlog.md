@@ -8,37 +8,6 @@ Prioritized list of features and improvements. Items at top are highest priority
 
 _Goal: A functional, well-crafted level 1 Wizard character creation and play experience._
 
-### Create Background Step ⚠️ CORE MVP
-**Size:** M | **Status:** Not started
-**Description:** Add background questions step to deck builder (SRD Step 6)
-**Notes:**
-- Each class has background questions in `classes.json` — Wizard has 3 questions
-- Player answers free-form text for each question
-- No mechanical effect, but critical for character identity/roleplay
-- `Character.backgroundAnswers: string[]` already exists in the type — just needs a UI step
-- SRD says this can be "left more ambiguous for the time being" but should still be offered
-
-### Create Experiences Step ⚠️ CORE MVP
-**Size:** M | **Status:** Not started
-**Description:** Add experiences step to deck builder (SRD Step 7)
-**Notes:**
-- Player creates 2 custom Experiences at +2 bonus each
-- Experiences are player-authored words/phrases (e.g. "Arcane Scholar", "Survivor of the War")
-- **Mechanically important** — Experiences add bonuses to relevant action rolls
-- `Character` type needs an `experiences: { text: string; bonus: number }[]` field (currently missing)
-- At creation: always 2 experiences, always +2. At level-up: gain new experiences, increase existing ones.
-- SRD example experiences per class in `classes.json`
-
-### Create Connections Step ⚠️ CORE MVP
-**Size:** S | **Status:** Not started
-**Description:** Add connections step to deck builder (SRD Step 9)
-**Notes:**
-- Establish relationships with other PCs via prompted questions
-- Connection questions come from `classes.json` — Wizard has specific prompts
-- SRD explicitly allows skipping: "it's okay if there isn't an established connection between every pair of PCs"
-- `Character.connectionAnswers: string[]` already exists in the type — just needs a UI step
-- Can be skippable/optional in the UI (Continue enabled even if empty)
-
 ### Item Cards
 **Size:** M | **Status:** Open
 **Description:** Card-based UI for equipped weapons and armor in the hand view
@@ -58,6 +27,38 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 ---
 
 ## Completed on v2-card-centric branch
+
+### Full 12-Step Deck Builder Wizard -- DONE
+**Completed:** 2026-02-27
+**What shipped:** All 12 steps of the character creation wizard are implemented and wired into DeckBuilder end-to-end:
+0. PickClass
+1. PickSubclass
+2. PickDomainCards
+3. PickAncestry
+4. PickCommunity
+5. PickEquipment
+6. AssignTraits
+7. CreateExperiences
+8. CreateBackground
+9. CreateConnections
+10. NameCharacter
+11. ReviewDeck
+
+### PickClass Step -- DONE
+**Completed:** 2026-02-27
+**What shipped:** Class selection as step 0 of the deck builder. All SRD classes available for selection.
+
+### Create Experiences Step -- DONE
+**Completed:** 2026-02-27
+**What shipped:** Step 7 in the deck builder. Player creates 2 custom Experiences at +2 bonus each. Experiences are player-authored words/phrases that add bonuses to relevant action rolls.
+
+### Create Background Step -- DONE
+**Completed:** 2026-02-27
+**What shipped:** Step 8 in the deck builder. Background questions from `classes.json` with free-form text answers for character identity/roleplay.
+
+### Create Connections Step -- DONE
+**Completed:** 2026-02-27
+**What shipped:** Step 9 in the deck builder. Relationship prompts from `classes.json` for establishing connections with other PCs. Skippable as per SRD guidance.
 
 ### Card-Based Selection (Horizontal Rails) -- DONE
 **Completed:** 2026-02-13
@@ -121,7 +122,23 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 
 ### Multi-class Support
 **Size:** XL
-**Description:** Support classes beyond Wizard (currently hardcoded in many places). Requires class selection step, class-specific domain cards, class-specific HP/evasion calcs.
+**Description:** Support classes beyond Wizard. PickClass step now exists (step 0), but class-specific domain cards, HP/evasion calcs, and other logic may still have Wizard-specific assumptions.
+
+---
+
+## UX Debt
+
+### Card Sizing on Desktop for Pickers
+**Size:** S
+**Notes:** Domain, ancestry, and community picker cards are too small on desktop viewports. Mobile-first sizing doesn't scale up well.
+
+### Level-Up Wizard Domain Card Count
+**Size:** S
+**Notes:** The level-up wizard's domain card count doesn't reflect advancements. Should update pool/hand sizes based on character level.
+
+### Post-Creation Character Editing
+**Size:** M
+**Notes:** No ability to edit a character after creation is complete. Players currently have to recreate from scratch to change any choices.
 
 ---
 
