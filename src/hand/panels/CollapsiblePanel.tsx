@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
+import { typeSubtitle } from '../../ui/typography'
 import { GlassPanel } from '../../ui/GlassPanel'
 
 export interface CollapsiblePanelProps {
@@ -26,7 +27,7 @@ export function CollapsiblePanel({
       style={{
         borderRadius: 12,
         padding: 0,
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid var(--surface-light)',
       }}
     >
       {/* Header */}
@@ -36,15 +37,11 @@ export function CollapsiblePanel({
         style={{ cursor: 'pointer' }}
       >
         <div className="flex items-center gap-2">
-          <Icon size={14} color={isOpen && accentColor ? `${accentColor}99` : 'rgba(231, 186, 144, 0.4)'} />
+          <Icon size={14} color={isOpen && accentColor ? `${accentColor}99` : 'var(--gold-secondary)'} />
           <span
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontSize: 13,
-              fontWeight: 600,
-              fontVariant: 'small-caps',
-              letterSpacing: '0.04em',
-              color: isOpen ? '#e7ba90' : 'rgba(231, 186, 144, 0.5)',
+              ...typeSubtitle,
+              color: isOpen ? 'var(--gold)' : 'var(--gold-secondary)',
             }}
           >
             {title}
@@ -54,7 +51,7 @@ export function CollapsiblePanel({
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown size={14} color="#e7ba90" style={{ opacity: 0.4 }} />
+          <ChevronDown size={14} color="var(--gold-secondary)" />
         </motion.div>
       </button>
 
@@ -71,7 +68,7 @@ export function CollapsiblePanel({
           >
             <div
               className="px-3 pb-3"
-              style={{ borderTop: '1px solid rgba(231, 186, 144, 0.06)' }}
+              style={{ borderTop: '1px solid var(--gold-muted)' }}
             >
               <div className="pt-2">
                 {children}

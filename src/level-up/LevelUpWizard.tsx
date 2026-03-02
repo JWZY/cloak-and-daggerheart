@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradient } from '../ui/typography'
 import { X, ChevronRight, ChevronLeft, Check, Sparkles } from 'lucide-react'
 import { useLevelUpStore } from '../store/level-up-store'
 import { useCharacterStore } from '../store/character-store'
@@ -117,10 +118,8 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
 
   // Shared styles
   const goldText = {
-    fontFamily: "'EB Garamond', serif",
-    fontWeight: 500 as const,
-    fontVariant: 'small-caps' as const,
-    background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
+    ...typeTitle,
+    background: goldGradient,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
@@ -133,7 +132,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex flex-col"
       style={{
-        background: 'rgba(3, 7, 13, 0.95)',
+        background: 'var(--bg-overlay)',
         backdropFilter: 'blur(20px)',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
@@ -141,7 +140,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
-        <button onClick={onClose} className="p-2 rounded-lg" style={{ color: '#e7ba90' }}>
+        <button onClick={onClose} className="p-2 rounded-lg" style={{ color: 'var(--gold)' }}>
           <X size={20} />
         </button>
         <span style={{ ...goldText, fontSize: 18 }}>
@@ -161,7 +160,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
               height: 8,
               background: i <= store.currentStep
                 ? 'linear-gradient(90deg, #f9f8f3, #e7ba90)'
-                : 'rgba(231, 186, 144, 0.2)',
+                : 'var(--gold-muted)',
             }}
           />
         ))}
@@ -176,7 +175,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -direction * 50 }}
             transition={{ duration: 0.2 }}
-            className="max-w-xs mx-auto"
+            className="max-w-[360px] mx-auto"
           >
             {store.currentStep === 0 && (
               <StepAutoGains
@@ -224,14 +223,10 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
             onClick={handlePrev}
             className="flex items-center gap-1 px-4 py-2.5 rounded-xl"
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontWeight: 600,
-              fontVariant: 'small-caps',
-              letterSpacing: '0.04em',
-              fontSize: 15,
-              color: '#e7ba90',
-              border: '1px solid rgba(231, 186, 144, 0.2)',
-              background: 'rgba(231, 186, 144, 0.05)',
+              ...typeSubtitle,
+              color: 'var(--gold)',
+              border: '1px solid var(--gold-muted)',
+              background: 'var(--gold-muted)',
             }}
           >
             <ChevronLeft size={16} />
@@ -247,15 +242,11 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
             disabled={!canProceedFromStep()}
             className="flex items-center gap-1 px-5 py-2.5 rounded-xl transition-opacity"
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontWeight: 600,
-              fontVariant: 'small-caps',
-              letterSpacing: '0.04em',
-              fontSize: 15,
+              ...typeSubtitle,
               color: '#1a1207',
               background: canProceedFromStep()
                 ? 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)'
-                : 'rgba(231, 186, 144, 0.2)',
+                : 'var(--gold-muted)',
               opacity: canProceedFromStep() ? 1 : 0.5,
             }}
           >
@@ -267,11 +258,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
             onClick={handleConfirm}
             className="flex items-center gap-1 px-5 py-2.5 rounded-xl"
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontWeight: 600,
-              fontVariant: 'small-caps',
-              letterSpacing: '0.04em',
-              fontSize: 15,
+              ...typeSubtitle,
               color: '#1a1207',
               background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
             }}
@@ -303,7 +290,7 @@ function StepAutoGains({
   return (
     <div className="flex flex-col gap-5">
       <div className="text-center pb-2">
-        <p style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, color: 'rgba(212, 207, 199, 0.7)' }}>
+        <p style={{ fontFamily: typeBody.fontFamily, fontSize: 14, color: 'var(--text-secondary)' }}>
           These upgrades happen automatically at Level {character.level + 1}
         </p>
       </div>
@@ -328,17 +315,13 @@ function StepAutoGains({
       <div className="flex flex-col gap-2 pt-2">
         <span
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 15,
-            fontWeight: 600,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.04em',
-            color: '#e7ba90',
+            ...typeSubtitle,
+            color: 'var(--gold)',
           }}
         >
           New Experience (+2 bonus)
         </span>
-        <p style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 13, color: 'rgba(212, 207, 199, 0.5)', lineHeight: 1.4 }}>
+        <p style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.4 }}>
           Describe something your character learned or went through
         </p>
         <input
@@ -348,10 +331,10 @@ function StepAutoGains({
           placeholder="e.g. Survived the Siege of Thornwall"
           className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
           style={{
-            fontFamily: "'Source Sans 3', sans-serif",
+            fontFamily: typeBody.fontFamily,
             fontSize: 14,
-            background: 'rgba(231, 186, 144, 0.06)',
-            border: '1px solid rgba(231, 186, 144, 0.15)',
+            background: 'var(--gold-muted)',
+            border: '1px solid var(--gold-muted)',
             color: '#D4CFC7',
           }}
         />
@@ -365,19 +348,19 @@ function GainRow({ label, from, to, changed }: { label: string; from: string; to
     <div
       className="flex items-center justify-between px-3 py-2.5 rounded-xl"
       style={{
-        background: 'rgba(231, 186, 144, 0.06)',
-        border: '1px solid rgba(231, 186, 144, 0.1)',
+        background: 'var(--gold-muted)',
+        border: '1px solid var(--gold-muted)',
       }}
     >
-      <span style={{ fontFamily: "'EB Garamond', serif", fontSize: 14, fontWeight: 600, fontVariant: 'small-caps', color: 'rgba(212, 207, 199, 0.7)' }}>
+      <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--text-secondary)' }}>
         {label}
       </span>
       <div className="flex items-center gap-2">
-        <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, color: 'rgba(212, 207, 199, 0.4)' }}>{from}</span>
+        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 14, color: 'var(--text-muted)' }}>{from}</span>
         {changed && (
           <>
-            <ChevronRight size={12} style={{ color: '#e7ba90' }} />
-            <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, fontWeight: 700, color: '#e7ba90' }}>{to}</span>
+            <ChevronRight size={12} style={{ color: 'var(--gold)' }} />
+            <span style={{ fontFamily: typeBody.fontFamily, fontSize: 14, fontWeight: 700, color: 'var(--gold)' }}>{to}</span>
           </>
         )}
       </div>
@@ -499,7 +482,7 @@ function StepAdvancements({
     <div className="flex flex-col gap-4">
       {/* Slots indicator */}
       <div className="flex items-center justify-center gap-3">
-        <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 13, color: 'rgba(212, 207, 199, 0.5)' }}>
+        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--text-muted)' }}>
           Slots used:
         </span>
         <div className="flex gap-1.5">
@@ -511,7 +494,7 @@ function StepAdvancements({
                 background: i < slotsUsed
                   ? 'linear-gradient(180deg, #f9f8f3, #e7ba90)'
                   : 'transparent',
-                borderColor: i < slotsUsed ? '#e7ba90' : 'rgba(231, 186, 144, 0.2)',
+                borderColor: i < slotsUsed ? 'var(--gold)' : 'var(--gold-muted)',
               }}
             />
           ))}
@@ -526,11 +509,11 @@ function StepAdvancements({
               key={i}
               className="flex items-center justify-between px-3 py-2 rounded-xl"
               style={{
-                background: 'rgba(231, 186, 144, 0.1)',
-                border: '1px solid rgba(231, 186, 144, 0.25)',
+                background: 'var(--gold-muted)',
+                border: '1px solid var(--gold-muted)',
               }}
             >
-              <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 13, color: '#e7ba90' }}>
+              <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--gold)' }}>
                 {ADVANCEMENT_LABELS[a.type]}
                 {a.traits && ` (${a.traits.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ')})`}
                 {a.experienceIndices && ` (Exp ${a.experienceIndices.map(idx => idx + 1).join(', ')})`}
@@ -538,7 +521,7 @@ function StepAdvancements({
               <button
                 onClick={() => onRemove(i)}
                 className="p-1 rounded"
-                style={{ color: 'rgba(231, 186, 144, 0.5)' }}
+                style={{ color: 'var(--gold-secondary)' }}
               >
                 <X size={14} />
               </button>
@@ -549,12 +532,12 @@ function StepAdvancements({
 
       {/* Trait picker — full-width rows matching AssignTraits pattern */}
       {pickingTraits && (
-        <div className="flex flex-col gap-3 p-3 rounded-xl" style={{ background: 'rgba(231, 186, 144, 0.06)', border: '1px solid rgba(231, 186, 144, 0.15)' }}>
+        <div className="flex flex-col gap-3 p-3 rounded-xl" style={{ background: 'var(--gold-muted)', border: '1px solid var(--gold-muted)' }}>
           <div className="flex items-center justify-between">
-            <span style={{ fontFamily: "'EB Garamond', serif", fontSize: 14, fontWeight: 600, fontVariant: 'small-caps', color: '#e7ba90' }}>
+            <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--gold)' }}>
               Pick 2 unmarked traits to increase
             </span>
-            <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, color: 'rgba(231, 186, 144, 0.5)' }}>
+            <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
               {selectedTraits.length} / 2
             </span>
           </div>
@@ -570,11 +553,11 @@ function StepAdvancements({
                   className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all"
                   style={{
                     background: isSelected
-                      ? 'rgba(231, 186, 144, 0.08)'
-                      : 'rgba(255, 255, 255, 0.03)',
+                      ? 'var(--gold-muted)'
+                      : 'var(--surface-faint)',
                     border: isSelected
-                      ? '1px solid rgba(231, 186, 144, 0.3)'
-                      : '1px solid rgba(255, 255, 255, 0.08)',
+                      ? '1px solid var(--gold-muted)'
+                      : '1px solid var(--surface-light)',
                     boxShadow: isSelected
                       ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
                       : 'none',
@@ -584,33 +567,29 @@ function StepAdvancements({
                 >
                   <span
                     style={{
-                      fontFamily: "'EB Garamond', serif",
-                      fontSize: 15,
-                      fontWeight: 600,
-                      fontVariant: 'small-caps',
-                      letterSpacing: '0.04em',
+                      ...typeSubtitle,
                       color: isMarked
-                        ? 'rgba(212, 207, 199, 0.4)'
+                        ? 'var(--text-muted)'
                         : isSelected
-                          ? '#e7ba90'
-                          : 'rgba(212, 207, 199, 0.7)',
+                          ? 'var(--gold)'
+                          : 'var(--text-secondary)',
                     }}
                   >
                     {trait}
                     {isMarked && (
-                      <span style={{ fontSize: 11, marginLeft: 6, color: 'rgba(212, 207, 199, 0.3)' }}>marked</span>
+                      <span style={{ fontSize: 11, marginLeft: 6, color: 'var(--text-muted)' }}>marked</span>
                     )}
                   </span>
                   <span
                     style={{
-                      fontFamily: "'Source Sans 3', sans-serif",
+                      fontFamily: typeBody.fontFamily,
                       fontSize: 15,
                       fontWeight: 700,
                       color: isMarked
-                        ? 'rgba(212, 207, 199, 0.2)'
+                        ? 'var(--text-muted)'
                         : isSelected
-                          ? '#e7ba90'
-                          : 'rgba(212, 207, 199, 0.5)',
+                          ? 'var(--gold)'
+                          : 'var(--text-muted)',
                       minWidth: 32,
                       textAlign: 'right',
                     }}
@@ -624,7 +603,7 @@ function StepAdvancements({
           <button
             onClick={() => { setPickingTraits(false); setSelectedTraits([]) }}
             className="self-start px-3 py-1.5 text-sm rounded-lg"
-            style={{ color: 'rgba(212, 207, 199, 0.5)' }}
+            style={{ color: 'var(--text-muted)' }}
           >
             Cancel
           </button>
@@ -633,12 +612,13 @@ function StepAdvancements({
 
       {/* Experience picker sub-modal */}
       {pickingExperiences && (
-        <div className="flex flex-col gap-3 p-3 rounded-xl" style={{ background: 'rgba(231, 186, 144, 0.06)', border: '1px solid rgba(231, 186, 144, 0.15)' }}>
-          <span style={{ fontFamily: "'EB Garamond', serif", fontSize: 14, fontWeight: 600, fontVariant: 'small-caps', color: '#e7ba90' }}>
+        <div className="flex flex-col gap-3 p-3 rounded-xl" style={{ background: 'var(--gold-muted)', border: '1px solid var(--gold-muted)' }}>
+          <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--gold)' }}>
             Pick 2 experiences to boost
           </span>
           <div className="flex flex-col gap-2">
-            {character.experiences.map((exp, idx) => {
+            {(character.experiences || []).map((exp, idx) => {
+              if (!exp?.text) return null
               const isSelected = selectedExpIndices.includes(idx)
               return (
                 <button
@@ -646,11 +626,11 @@ function StepAdvancements({
                   onClick={() => toggleExpIndex(idx)}
                   className="px-3 py-2 rounded-lg text-left transition-all"
                   style={{
-                    fontFamily: "'Source Sans 3', sans-serif",
+                    fontFamily: typeBody.fontFamily,
                     fontSize: 13,
-                    background: isSelected ? 'rgba(231, 186, 144, 0.15)' : 'rgba(255,255,255,0.03)',
-                    border: isSelected ? '1px solid rgba(231, 186, 144, 0.4)' : '1px solid rgba(255,255,255,0.06)',
-                    color: isSelected ? '#e7ba90' : 'rgba(212, 207, 199, 0.6)',
+                    background: isSelected ? 'var(--gold-muted)' : 'var(--surface-faint)',
+                    border: isSelected ? '1px solid var(--gold-secondary)' : '1px solid var(--surface-light)',
+                    color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
                   }}
                 >
                   {exp.text} (+{exp.bonus})
@@ -659,7 +639,7 @@ function StepAdvancements({
             })}
           </div>
           <div className="flex justify-end gap-2">
-            <button onClick={() => setPickingExperiences(false)} className="px-3 py-1.5 text-sm rounded-lg" style={{ color: 'rgba(212, 207, 199, 0.5)' }}>
+            <button onClick={() => setPickingExperiences(false)} className="px-3 py-1.5 text-sm rounded-lg" style={{ color: 'var(--text-muted)' }}>
               Cancel
             </button>
             <button
@@ -667,9 +647,9 @@ function StepAdvancements({
               disabled={selectedExpIndices.length !== 2}
               className="px-3 py-1.5 text-sm rounded-lg"
               style={{
-                background: selectedExpIndices.length === 2 ? 'rgba(231, 186, 144, 0.2)' : 'transparent',
-                color: selectedExpIndices.length === 2 ? '#e7ba90' : 'rgba(212, 207, 199, 0.3)',
-                border: '1px solid rgba(231, 186, 144, 0.2)',
+                background: selectedExpIndices.length === 2 ? 'var(--gold-muted)' : 'transparent',
+                color: selectedExpIndices.length === 2 ? 'var(--gold)' : 'var(--text-muted)',
+                border: '1px solid var(--gold-muted)',
               }}
             >
               Confirm
@@ -681,7 +661,7 @@ function StepAdvancements({
       {/* Available advancements */}
       {slotsUsed < 2 && !pickingTraits && !pickingExperiences && (
         <div className="flex flex-col gap-2">
-          <span style={{ fontFamily: "'EB Garamond', serif", fontSize: 14, fontWeight: 600, fontVariant: 'small-caps', color: 'rgba(212, 207, 199, 0.5)' }}>
+          <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--text-muted)' }}>
             Available Advancements
           </span>
           {availableTypes.map(type => {
@@ -698,14 +678,14 @@ function StepAdvancements({
                 disabled={isDisabled}
                 className="flex flex-col px-3 py-2.5 rounded-xl text-left transition-all"
                 style={{
-                  background: !isDisabled ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
-                  border: '1px solid rgba(231, 186, 144, 0.1)',
+                  background: !isDisabled ? 'var(--surface-faint)' : 'transparent',
+                  border: '1px solid var(--gold-muted)',
                   opacity: isDisabled ? 0.35 : 1,
                 }}
               >
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-2">
-                    <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, fontWeight: 600, color: '#D4CFC7' }}>
+                    <span style={{ fontFamily: typeBody.fontFamily, fontSize: 14, fontWeight: 600, color: '#D4CFC7' }}>
                       {ADVANCEMENT_LABELS[type]}
                     </span>
                     {/* Per-tier pick limit checkboxes */}
@@ -721,21 +701,21 @@ function StepAdvancements({
                               ? 'linear-gradient(180deg, #f9f8f3, #e7ba90)'
                               : 'transparent',
                             border: i < picksUsed
-                              ? '1px solid #e7ba90'
-                              : '1px solid rgba(231, 186, 144, 0.3)',
+                              ? '1px solid var(--gold)'
+                              : '1px solid var(--gold-muted)',
                             boxShadow: i < picksUsed
-                              ? '0 0 4px rgba(231, 186, 144, 0.3)'
+                              ? '0 0 4px var(--gold-muted)'
                               : 'none',
                           }}
                         />
                       ))}
                     </div>
                   </div>
-                  <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, color: 'rgba(231, 186, 144, 0.5)' }}>
+                  <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
                     {cost} {cost === 1 ? 'slot' : 'slots'}
                   </span>
                 </div>
-                <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, color: 'rgba(212, 207, 199, 0.4)', marginTop: 2 }}>
+                <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                   {ADVANCEMENT_DESCRIPTIONS[type]}
                 </span>
               </button>
@@ -772,13 +752,13 @@ function StepDomainCard({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <p style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, color: 'rgba(212, 207, 199, 0.7)', textAlign: 'center' }}>
+      <p style={{ fontFamily: typeBody.fontFamily, fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center' }}>
         {maxCards === 1
           ? 'Choose a new domain card from your class domains'
           : `Choose ${maxCards} domain cards from your class domains`}
       </p>
       <div className="flex justify-center">
-        <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 13, color: 'rgba(231, 186, 144, 0.6)' }}>
+        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--gold-secondary)' }}>
           {selectedCards.length} of {maxCards} selected
         </span>
       </div>
@@ -794,21 +774,21 @@ function StepDomainCard({
               disabled={dimmed}
               className="flex flex-col px-3 py-3 rounded-xl text-left transition-all"
               style={{
-                background: isSelected ? 'rgba(231, 186, 144, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-                border: isSelected ? '1px solid rgba(231, 186, 144, 0.35)' : '1px solid rgba(231, 186, 144, 0.08)',
+                background: isSelected ? 'var(--gold-muted)' : 'var(--surface-faint)',
+                border: isSelected ? '1px solid var(--gold-secondary)' : '1px solid var(--gold-muted)',
                 opacity: dimmed ? 0.4 : 1,
                 cursor: dimmed ? 'default' : 'pointer',
               }}
             >
               <div className="flex items-center justify-between w-full">
-                <span style={{ fontFamily: "'EB Garamond', serif", fontSize: 15, fontWeight: 600, color: isSelected ? '#e7ba90' : '#D4CFC7' }}>
+                <span style={{ fontFamily: typeSubtitle.fontFamily, fontSize: typeSubtitle.fontSize, fontWeight: typeSubtitle.fontWeight, color: isSelected ? 'var(--gold)' : '#D4CFC7' }}>
                   {card.name}
                 </span>
-                <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 11, color: 'rgba(212, 207, 199, 0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <span style={{ ...typeMicro, color: 'var(--text-muted)' }}>
                   {card.domain} &middot; L{card.level}
                 </span>
               </div>
-              <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, color: 'rgba(212, 207, 199, 0.5)', marginTop: 4, lineHeight: 1.4 }}>
+              <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>
                 {card.text.length > 120 ? card.text.slice(0, 120) + '\u2026' : card.text}
               </span>
             </button>
@@ -839,20 +819,18 @@ function StepReview({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-center gap-2 pb-2">
-        <Sparkles size={16} style={{ color: '#e7ba90' }} />
+        <Sparkles size={16} style={{ color: 'var(--gold)' }} />
         <span style={{
-          fontFamily: "'EB Garamond', serif",
+          ...typeTitle,
           fontSize: 20,
-          fontWeight: 500,
-          fontVariant: 'small-caps',
-          background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
+          background: goldGradient,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
         }}>
           Level {character.level + 1}
         </span>
-        <Sparkles size={16} style={{ color: '#e7ba90' }} />
+        <Sparkles size={16} style={{ color: 'var(--gold)' }} />
       </div>
 
       <ReviewSection title="Automatic Gains">
@@ -887,10 +865,10 @@ function StepReview({
 function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <span style={{ fontFamily: "'EB Garamond', serif", fontSize: 14, fontWeight: 600, fontVariant: 'small-caps', letterSpacing: '0.04em', color: '#e7ba90' }}>
+      <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--gold)' }}>
         {title}
       </span>
-      <div className="flex flex-col gap-1.5 pl-2" style={{ borderLeft: '2px solid rgba(231, 186, 144, 0.15)' }}>
+      <div className="flex flex-col gap-1.5 pl-2" style={{ borderLeft: '2px solid var(--gold-muted)' }}>
         {children}
       </div>
     </div>
@@ -900,8 +878,8 @@ function ReviewSection({ title, children }: { title: string; children: React.Rea
 function ReviewItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 13, color: 'rgba(212, 207, 199, 0.7)' }}>{label}</span>
-      {value && <span style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 13, fontWeight: 600, color: '#e7ba90' }}>{value}</span>}
+      <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--text-secondary)' }}>{label}</span>
+      {value && <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, fontWeight: 600, color: 'var(--gold)' }}>{value}</span>}
     </div>
   )
 }

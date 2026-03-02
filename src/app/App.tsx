@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { typeTitle } from '../ui/typography'
 import { DeckBuilder } from '../deck-builder/DeckBuilder'
 import { HandView } from '../hand/HandView'
 import { useCharacterStore } from '../store/character-store'
@@ -64,7 +65,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ height: '100dvh', background: '#03070d', overflow: 'hidden' }}>
+    <div style={{ height: '100dvh', background: 'var(--bg-page)', overflow: 'hidden' }}>
       <AnimatePresence mode="popLayout">
         {characters.length === 0 ? (
           <motion.div
@@ -129,7 +130,7 @@ function Splash({ onFinish }: { onFinish: () => void }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#03070d',
+        background: 'var(--bg-page)',
         zIndex: 9999,
       }}
     >
@@ -161,9 +162,8 @@ function Splash({ onFinish }: { onFinish: () => void }) {
         <span
           className="gold-text"
           style={{
-            fontFamily: "'EB Garamond', serif",
+            ...typeTitle,
             fontSize: 32,
-            fontWeight: 500,
             letterSpacing: '0.08em',
           }}
         >

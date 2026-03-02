@@ -5,6 +5,7 @@
  */
 
 import { motion } from 'framer-motion'
+import { typeTitle, typeBody } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
@@ -121,10 +122,8 @@ export function InfoCard({
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{
-                fontFamily: "'EB Garamond', serif",
+                ...typeTitle,
                 fontSize: 72,
-                fontWeight: 500,
-                fontVariant: 'small-caps',
                 letterSpacing: '0.02em',
                 ...goldGradientStyle,
                 opacity: 0.08,
@@ -165,12 +164,9 @@ export function InfoCard({
           <div style={{ filter: GOLD_DROP_SHADOW, width: '100%' }}>
             <h2
               style={{
-                fontFamily: "'EB Garamond', serif",
-                fontWeight: 500,
+                ...typeTitle,
                 fontSize: 32,
                 lineHeight: '32px',
-                letterSpacing: '0.01em',
-                fontVariant: 'small-caps' as const,
                 ...goldGradientStyle,
                 textAlign: 'center',
                 whiteSpace: 'nowrap',
@@ -183,15 +179,15 @@ export function InfoCard({
           {/* Separator with subtitle */}
           <div className="flex items-center w-full gap-2">
             <div className="flex items-center flex-1">
-              <div className="flex-1" style={{ height: 2, background: 'linear-gradient(90deg, transparent, #e7ba90)' }} />
-              <div className="mx-0.5" style={{ width: 4, height: 4, background: '#e7ba90', transform: 'rotate(45deg)' }} />
+              <div className="flex-1" style={{ height: 2, background: 'linear-gradient(90deg, transparent, var(--gold))' }} />
+              <div className="mx-0.5" style={{ width: 4, height: 4, background: 'var(--gold)', transform: 'rotate(45deg)' }} />
             </div>
             <div style={{ filter: GOLD_DROP_SHADOW }}>
               <span style={subtitleStyle}>{subtitle}</span>
             </div>
             <div className="flex items-center flex-1">
-              <div className="mx-0.5" style={{ width: 4, height: 4, background: '#e7ba90', transform: 'rotate(45deg)' }} />
-              <div className="flex-1" style={{ height: 2, background: 'linear-gradient(90deg, #e7ba90, transparent)' }} />
+              <div className="mx-0.5" style={{ width: 4, height: 4, background: 'var(--gold)', transform: 'rotate(45deg)' }} />
+              <div className="flex-1" style={{ height: 2, background: 'linear-gradient(90deg, var(--gold), transparent)' }} />
             </div>
           </div>
         </div>
@@ -199,10 +195,8 @@ export function InfoCard({
         {/* Description */}
         <p
           style={{
-            fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 13.5,
-            lineHeight: '1.4',
-            color: 'rgba(212, 207, 199, 0.75)',
+            ...typeBody,
+            color: 'var(--text-secondary)',
             textShadow: '0px 1px 1px #4d381e',
             fontStyle: 'italic',
           }}
@@ -212,9 +206,9 @@ export function InfoCard({
 
         {/* Thin separator before feats */}
         <div className="flex items-center gap-2">
-          <div className="flex-1" style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(231, 186, 144, 0.3))' }} />
-          <div style={{ width: 3, height: 3, background: '#e7ba90', transform: 'rotate(45deg)', opacity: 0.5 }} />
-          <div className="flex-1" style={{ height: 1, background: 'linear-gradient(90deg, rgba(231, 186, 144, 0.3), transparent)' }} />
+          <div className="flex-1" style={{ height: 1, background: 'linear-gradient(90deg, transparent, var(--gold-muted))' }} />
+          <div style={{ width: 3, height: 3, background: 'var(--gold-secondary)', transform: 'rotate(45deg)' }} />
+          <div className="flex-1" style={{ height: 1, background: 'linear-gradient(90deg, var(--gold-muted), transparent)' }} />
         </div>
 
         {/* Feats */}
@@ -223,10 +217,8 @@ export function InfoCard({
             <p
               key={i}
               style={{
-                fontFamily: "'Source Sans 3', sans-serif",
-                fontSize: 13.5,
-                lineHeight: '1.4',
-                color: 'rgba(212, 207, 199, 0.9)',
+                ...typeBody,
+                color: 'var(--text-primary)',
                 textShadow: '0px 1px 1px #4d381e',
               }}
             >

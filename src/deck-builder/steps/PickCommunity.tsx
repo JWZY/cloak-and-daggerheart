@@ -20,7 +20,7 @@ export function PickCommunity() {
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="w-full max-w-xs mb-2 px-4">
+      <h2 className="w-full max-w-[360px] mb-2 px-4">
         <SectionHeader>Choose Your Community</SectionHeader>
       </h2>
       <StepInstruction>Tap to select or deselect</StepInstruction>

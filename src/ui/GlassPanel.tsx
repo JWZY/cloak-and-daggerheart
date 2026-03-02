@@ -32,21 +32,21 @@ export function GlassPanel({
   let boxShadow: string
 
   if (variant === 'gold') {
-    border = '1px solid rgba(231, 186, 144, 0.2)'
+    border = '1px solid var(--gold-muted)'
     boxShadow = `
       inset 0 1px 1px rgba(249, 248, 243, 0.15),
       inset 0 -1px 1px rgba(0, 0, 0, 0.1),
       0 4px 16px rgba(0, 0, 0, 0.25)
     `
   } else if (variant === 'domain' && domainColor) {
-    border = '1px solid rgba(255, 255, 255, 0.1)'
+    border = '1px solid var(--surface-border)'
     boxShadow = `
       inset 0 1px 1px rgba(255, 255, 255, 0.375),
       inset 0 -1px 1px rgba(0, 0, 0, 0.1),
       0 4px 16px rgba(0, 0, 0, 0.25)
     `
   } else {
-    border = '1px solid rgba(255, 255, 255, 0.1)'
+    border = '1px solid var(--surface-border)'
     boxShadow = `
       inset 0 1px 1px rgba(255, 255, 255, 0.375),
       inset 0 -1px 1px rgba(0, 0, 0, 0.1),

@@ -1,6 +1,7 @@
 import { useDeckStore } from '../../store/deck-store'
 import { GameInput } from '../../ui/GameInput'
 import { SectionHeader } from '../../ui/SectionHeader'
+import { typeSubtitle, typeTitle } from '../../ui/typography'
 
 const BASE_PATH = import.meta.env.BASE_URL ?? '/'
 
@@ -29,23 +30,20 @@ export function NameCharacter() {
       {/* Subtle background label */}
       <p
         style={{
-          fontFamily: "'EB Garamond', serif",
-          fontSize: 13,
-          color: 'rgba(212, 207, 199, 0.3)',
+          ...typeSubtitle,
+          color: 'var(--text-muted)',
           textAlign: 'center',
           marginBottom: 8,
-          fontVariant: 'small-caps',
-          letterSpacing: '0.06em',
         }}
       >
         {subclass ?? selectedClass ?? ''}
       </p>
 
-      <h2 className="w-full max-w-xs mb-8">
+      <h2 className="w-full max-w-[360px] mb-8">
         <SectionHeader>Name Your Character</SectionHeader>
       </h2>
 
-      <div className="w-full max-w-xs relative z-10">
+      <div className="w-full max-w-[360px] relative z-10">
         <GameInput
           type="text"
           value={characterName}
@@ -55,8 +53,8 @@ export function NameCharacter() {
           style={{
             textAlign: 'center',
             fontSize: 22,
-            fontFamily: "'EB Garamond', serif",
-            fontWeight: 500,
+            fontFamily: typeTitle.fontFamily,
+            fontWeight: typeTitle.fontWeight,
             padding: '14px 16px',
           }}
         />
@@ -67,10 +65,8 @@ export function NameCharacter() {
           <p
             className="gold-text"
             style={{
-              fontFamily: "'EB Garamond', serif",
+              ...typeTitle,
               fontSize: 24,
-              fontWeight: 500,
-              fontVariant: 'small-caps',
               letterSpacing: '0.02em',
               textAlign: 'center',
             }}

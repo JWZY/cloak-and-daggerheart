@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react'
+import { typeSubtitle } from './typography'
 
 export interface SectionHeaderProps {
   children: ReactNode
@@ -20,14 +21,14 @@ export function SectionHeader({ children }: SectionHeaderProps) {
           style={{
             height: 2,
             flex: 1,
-            background: 'linear-gradient(90deg, transparent, #e7ba90)',
+            background: 'linear-gradient(90deg, transparent, var(--gold))',
           }}
         />
         <div
           style={{
             width: 4,
             height: 4,
-            background: '#e7ba90',
+            background: 'var(--gold)',
             transform: 'rotate(45deg)',
             margin: '0 2px',
             flexShrink: 0,
@@ -43,11 +44,7 @@ export function SectionHeader({ children }: SectionHeaderProps) {
         <span
           className="gold-text"
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 13,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            fontVariant: 'small-caps',
+            ...typeSubtitle,
             whiteSpace: 'nowrap',
           }}
         >
@@ -61,7 +58,7 @@ export function SectionHeader({ children }: SectionHeaderProps) {
           style={{
             width: 4,
             height: 4,
-            background: '#e7ba90',
+            background: 'var(--gold)',
             transform: 'rotate(45deg)',
             margin: '0 2px',
             flexShrink: 0,
@@ -71,7 +68,7 @@ export function SectionHeader({ children }: SectionHeaderProps) {
           style={{
             height: 2,
             flex: 1,
-            background: 'linear-gradient(90deg, #e7ba90, transparent)',
+            background: 'linear-gradient(90deg, var(--gold), transparent)',
           }}
         />
       </div>

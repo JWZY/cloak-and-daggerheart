@@ -32,11 +32,11 @@ export function SelectableOption({
       style={{
         position: 'relative',
         background: selected
-          ? 'rgba(231, 186, 144, 0.08)'
-          : 'rgba(255, 255, 255, 0.03)',
+          ? 'var(--gold-muted)'
+          : 'var(--surface-faint)',
         border: selected
-          ? '1px solid rgba(231, 186, 144, 0.3)'
-          : '1px solid rgba(255, 255, 255, 0.08)',
+          ? '1px solid var(--gold-muted)'
+          : '1px solid var(--surface-light)',
         boxShadow: selected
           ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
           : 'none',

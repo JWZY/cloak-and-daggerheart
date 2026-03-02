@@ -25,7 +25,7 @@ export function PickSubclass() {
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="w-full max-w-xs mb-4 px-4">
+      <h2 className="w-full max-w-[360px] mb-4 px-4">
         <SectionHeader>Choose Your Subclass</SectionHeader>
       </h2>
       <StepInstruction>Tap to select — tap again to zoom</StepInstruction>

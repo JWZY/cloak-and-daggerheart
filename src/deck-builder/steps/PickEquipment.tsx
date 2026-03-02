@@ -4,6 +4,7 @@ import { SectionHeader } from '../../ui/SectionHeader'
 import { StepInstruction } from '../../ui/StepInstruction'
 import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
+import { typeSubtitle, typeBody } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { tier1Armors, tier1PrimaryWeapons, tier1SecondaryWeapons, getSuggestedEquipment } from '../../data/srd'
 import { parseThresholds } from '../../core/character/armor'
@@ -117,12 +118,8 @@ function ArmorOption({
       <div className="flex items-center justify-between mb-1">
         <span
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 15,
-            fontWeight: 600,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.04em',
-            color: isSelected ? '#e7ba90' : 'rgba(212, 207, 199, 0.7)',
+            ...typeSubtitle,
+            color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
           }}
         >
           {armor.name}
@@ -133,9 +130,9 @@ function ArmorOption({
       <div
         className="flex gap-3 flex-wrap"
         style={{
-          fontFamily: "'Source Sans 3', sans-serif",
+          fontFamily: typeBody.fontFamily,
           fontSize: 11,
-          color: 'rgba(212, 207, 199, 0.5)',
+          color: 'var(--text-muted)',
         }}
       >
         <span>Major {thresholds.major}</span>
@@ -147,9 +144,9 @@ function ArmorOption({
       {armor.feat_text && (
         <p
           style={{
-            fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 13.5,
-            color: isSelected ? '#e7ba90' : 'rgba(231, 186, 144, 0.5)',
+            fontFamily: typeBody.fontFamily,
+            fontSize: typeBody.fontSize,
+            color: isSelected ? 'var(--gold)' : 'var(--gold-secondary)',
             marginTop: 4,
             lineHeight: 1.35,
           }}
@@ -189,18 +186,14 @@ function WeaponOption({
       <div className="flex items-center justify-between mb-1">
         <span
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 15,
-            fontWeight: 600,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.04em',
-            color: isSelected ? '#e7ba90' : 'rgba(212, 207, 199, 0.7)',
+            ...typeSubtitle,
+            color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
           }}
         >
           {weapon.name}
         </span>
         <div className="flex items-center gap-2">
-          {isSuggested && !isSelected && <GameBadge color="rgba(212, 207, 199, 0.5)">Suggested</GameBadge>}
+          {isSuggested && !isSelected && <GameBadge color="var(--text-muted)">Suggested</GameBadge>}
         </div>
       </div>
 
@@ -208,9 +201,9 @@ function WeaponOption({
       <div
         className="flex gap-3 flex-wrap"
         style={{
-          fontFamily: "'Source Sans 3', sans-serif",
+          fontFamily: typeBody.fontFamily,
           fontSize: 11,
-          color: 'rgba(212, 207, 199, 0.5)',
+          color: 'var(--text-muted)',
         }}
       >
         <span>{weapon.trait}</span>
@@ -223,9 +216,9 @@ function WeaponOption({
       {weapon.feat_text && (
         <p
           style={{
-            fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 13.5,
-            color: isSelected ? '#e7ba90' : 'rgba(231, 186, 144, 0.5)',
+            fontFamily: typeBody.fontFamily,
+            fontSize: typeBody.fontSize,
+            color: isSelected ? 'var(--gold)' : 'var(--gold-secondary)',
             marginTop: 4,
             lineHeight: 1.35,
           }}
@@ -333,9 +326,8 @@ export function PickEquipment() {
         </div>
         <p
           style={{
-            fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 13.5,
-            color: 'rgba(212, 207, 199, 0.4)',
+            ...typeBody,
+            color: 'var(--text-muted)',
             textAlign: 'center',
             marginBottom: 12,
           }}
@@ -413,7 +405,7 @@ export function PickEquipment() {
                     fontWeight: 600,
                     fontVariant: 'small-caps',
                     letterSpacing: '0.06em',
-                    color: 'rgba(212, 207, 199, 0.35)',
+                    color: 'var(--text-muted)',
                     marginBottom: 8,
                     paddingLeft: 4,
                   }}
@@ -470,7 +462,7 @@ export function PickEquipment() {
             style={{
               fontFamily: "'Source Sans 3', sans-serif",
               fontSize: 13.5,
-              color: 'rgba(212, 207, 199, 0.3)',
+              color: 'var(--text-muted)',
               textAlign: 'center',
               fontStyle: 'italic',
               marginBottom: 12,
@@ -486,7 +478,7 @@ export function PickEquipment() {
             style={{
               fontFamily: "'Source Sans 3', sans-serif",
               fontSize: 13.5,
-              color: 'rgba(212, 207, 199, 0.4)',
+              color: 'var(--text-muted)',
               textAlign: 'center',
               marginBottom: 12,
             }}
@@ -515,7 +507,7 @@ export function PickEquipment() {
                     fontWeight: 600,
                     fontVariant: 'small-caps',
                     letterSpacing: '0.06em',
-                    color: 'rgba(212, 207, 199, 0.35)',
+                    color: 'var(--text-muted)',
                     marginBottom: 8,
                     paddingLeft: 4,
                   }}

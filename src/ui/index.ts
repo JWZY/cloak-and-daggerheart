@@ -18,3 +18,6 @@ export type { StepInstructionProps } from './StepInstruction'
 
 export { SelectableOption } from './SelectableOption'
 export type { SelectableOptionProps } from './SelectableOption'
+
+// Typography tokens
+export { typeTitle, typeSubtitle, typeBody, typeMicro, goldLight, goldDark, goldGradient } from './typography'

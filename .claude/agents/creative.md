@@ -62,13 +62,13 @@ The canonical mapping lives in `src/cards/domain-colors.ts`:
 ```ts
 // Domain colors — single source of truth (Figma banner = canonical)
 export const DOMAIN_COLORS: Record<string, string> = {
-  Arcana:   '#4e345b',
+  Arcana:   '#77457E',
   Blade:    '#A61118',
   Bone:     '#A3A9A8',
   Codex:    '#1D3B61',
   Grace:    '#BD0C70',
   Midnight: '#1E1E1E',
-  Sage:     '#2d4a3e',
+  Sage:     '#006E3A',
   Splendor: '#BEA228',
   Valor:    '#EB5B00',
 }

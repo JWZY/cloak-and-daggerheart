@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { typeBody } from '../../ui/typography'
 import { useCharacterStore } from '../../store/character-store'
 import type { Character } from '../../types/character'
 
@@ -43,21 +44,21 @@ export function NotesPanel({ character }: NotesPanelProps) {
         rows={5}
         className="w-full resize-none rounded-lg px-3 py-2.5 outline-none"
         style={{
-          background: 'rgba(3, 7, 13, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          color: 'rgba(212, 207, 199, 0.85)',
-          fontFamily: "'Source Sans 3', sans-serif",
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--surface-light)',
+          color: 'var(--text-primary)',
+          fontFamily: typeBody.fontFamily,
           fontSize: 13,
           lineHeight: '1.5',
-          caretColor: '#e7ba90',
+          caretColor: 'var(--gold)',
           transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = '#e7ba90'
-          e.currentTarget.style.boxShadow = '0 0 0 2px rgba(231, 186, 144, 0.15)'
+          e.currentTarget.style.borderColor = 'var(--gold)'
+          e.currentTarget.style.boxShadow = '0 0 0 2px var(--gold-muted)'
         }}
         onBlur={(e) => {
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)'
+          e.currentTarget.style.borderColor = 'var(--surface-light)'
           e.currentTarget.style.boxShadow = 'none'
         }}
       />

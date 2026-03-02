@@ -3,6 +3,7 @@ import { GameInput } from '../../ui/GameInput'
 import { GameBadge } from '../../ui/GameBadge'
 import { SectionHeader } from '../../ui/SectionHeader'
 import { StepInstruction } from '../../ui/StepInstruction'
+import { typeSubtitle } from '../../ui/typography'
 
 const EXPERIENCE_LABELS = ['Experience 1', 'Experience 2'] as const
 
@@ -27,11 +28,7 @@ export function CreateExperiences() {
             <div className="flex items-center justify-between">
               <span
                 style={{
-                  fontFamily: "'EB Garamond', serif",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  letterSpacing: '0.06em',
-                  fontVariant: 'small-caps',
+                  ...typeSubtitle,
                   color: '#e7ba90',
                 }}
               >

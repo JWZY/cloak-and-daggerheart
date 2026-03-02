@@ -24,7 +24,7 @@ export function PickDomainCards() {
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="w-full max-w-xs mb-2 px-4">
+      <h2 className="w-full max-w-[360px] mb-2 px-4">
         <SectionHeader>Choose Your Domain Cards</SectionHeader>
       </h2>
       <StepInstruction style={{ marginBottom: 8 }}>Tap to select or deselect</StepInstruction>

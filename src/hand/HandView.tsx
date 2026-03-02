@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
+import { typeTitle, typeSubtitle, goldGradient } from '../ui/typography'
 import { BarChart3, Sword, StickyNote, X } from 'lucide-react'
 import { LevelUpWizard } from '../level-up/LevelUpWizard'
 import { HeroCard } from './HeroCard'
@@ -230,7 +231,7 @@ export function HandView({ character }: HandViewProps) {
         overflowY: 'auto',
         overflowX: 'hidden',
         WebkitOverflowScrolling: 'touch',
-        background: '#03070d',
+        background: 'var(--bg-page)',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
         ['--accent-color' as string]: accentColor,
@@ -246,8 +247,8 @@ export function HandView({ character }: HandViewProps) {
           className="flex items-center justify-center rounded-lg transition-colors"
           style={{
             background: 'transparent',
-            border: '1px solid rgba(231, 186, 144, 0.15)',
-            color: '#e7ba90',
+            border: '1px solid var(--gold-muted)',
+            color: 'var(--gold)',
             minWidth: 44,
             minHeight: 44,
             opacity: 0.6,
@@ -270,11 +271,9 @@ export function HandView({ character }: HandViewProps) {
               <div className="flex flex-col items-center pb-4">
                 <span
                   style={{
-                    fontFamily: "'EB Garamond', serif",
+                    ...typeTitle,
                     fontSize: 24,
-                    fontWeight: 500,
-                    fontVariant: 'small-caps',
-                    background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
+                    background: goldGradient,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -285,12 +284,8 @@ export function HandView({ character }: HandViewProps) {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'EB Garamond', serif",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    fontVariant: 'small-caps',
-                    color: '#e7ba90',
-                    letterSpacing: '0.06em',
+                    ...typeSubtitle,
+                    color: 'var(--gold)',
                     textAlign: 'center',
                   }}
                 >
@@ -308,10 +303,10 @@ export function HandView({ character }: HandViewProps) {
                       fontFamily: "'EB Garamond', serif",
                       fontWeight: 600,
                       fontVariant: 'small-caps',
-                      letterSpacing: '0.04em',
+                      letterSpacing: '0.06em',
                       background: 'linear-gradient(180deg, rgba(249,248,243,0.12) 0%, rgba(231,186,144,0.12) 100%)',
-                      border: '1px solid rgba(231, 186, 144, 0.3)',
-                      color: '#e7ba90',
+                      border: '1px solid var(--gold-muted)',
+                      color: 'var(--gold)',
                     }}
                   >
                     Level Up
@@ -368,7 +363,7 @@ export function HandView({ character }: HandViewProps) {
                 fontSize: 13,
                 fontWeight: 600,
                 fontVariant: 'small-caps',
-                color: '#e7ba90',
+                color: 'var(--gold)',
                 letterSpacing: '0.06em',
                 textAlign: 'center',
               }}
@@ -384,10 +379,7 @@ export function HandView({ character }: HandViewProps) {
                 onClick={() => setShowLevelUp(true)}
                 className="px-4 py-1.5 rounded-full text-sm transition-all"
                 style={{
-                  fontFamily: "'EB Garamond', serif",
-                  fontWeight: 600,
-                  fontVariant: 'small-caps',
-                  letterSpacing: '0.04em',
+                  ...typeSubtitle,
                   background: 'linear-gradient(180deg, rgba(249,248,243,0.12) 0%, rgba(231,186,144,0.12) 100%)',
                   border: '1px solid rgba(231, 186, 144, 0.3)',
                   color: '#e7ba90',

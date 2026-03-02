@@ -1,4 +1,5 @@
 import { Sword, Shield, Scroll } from 'lucide-react'
+import { typeMicro, typeSubtitle, typeBody } from '../../ui/typography'
 import type { Character } from '../../types/character'
 
 export interface EquipmentPanelProps {
@@ -25,22 +26,18 @@ function EquipmentRow({
         style={{
           width: 28,
           height: 28,
-          background: 'rgba(3, 7, 13, 0.6)',
-          border: '1px solid rgba(231, 186, 144, 0.1)',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--gold-muted)',
         }}
       >
-        <Icon size={14} color="rgba(231, 186, 144, 0.4)" />
+        <Icon size={14} color="var(--gold-secondary)" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
           <span
             style={{
-              fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 11,
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              color: 'rgba(231, 186, 144, 0.4)',
+              ...typeMicro,
+              color: 'var(--gold-secondary)',
               flexShrink: 0,
             }}
           >
@@ -48,10 +45,10 @@ function EquipmentRow({
           </span>
           <span
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'rgba(212, 207, 199, 0.85)',
+              fontFamily: typeSubtitle.fontFamily,
+              fontSize: typeSubtitle.fontSize,
+              fontWeight: typeSubtitle.fontWeight,
+              color: 'var(--text-primary)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -63,11 +60,11 @@ function EquipmentRow({
         {details && (
           <span
             style={{
-              fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 11,
+              fontFamily: typeBody.fontFamily,
+              fontSize: typeMicro.fontSize,
               display: 'block',
               marginTop: 2,
-              color: 'rgba(212, 207, 199, 0.45)',
+              color: 'var(--text-muted)',
             }}
           >
             {details}
@@ -107,7 +104,7 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
         style={{
           height: 1,
           margin: '4px 0',
-          background: 'linear-gradient(90deg, transparent, rgba(231, 186, 144, 0.1), transparent)',
+          background: 'linear-gradient(90deg, transparent, var(--gold-muted), transparent)',
         }}
       />
 
@@ -123,7 +120,7 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
         style={{
           height: 1,
           margin: '4px 0',
-          background: 'linear-gradient(90deg, transparent, rgba(231, 186, 144, 0.1), transparent)',
+          background: 'linear-gradient(90deg, transparent, var(--gold-muted), transparent)',
         }}
       />
 
@@ -137,16 +134,12 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
       {/* Gold */}
       <div
         className="flex items-center gap-2 pt-2 mt-1"
-        style={{ borderTop: '1px solid rgba(231, 186, 144, 0.08)' }}
+        style={{ borderTop: '1px solid var(--gold-muted)' }}
       >
-        <Scroll size={12} color="rgba(231, 186, 144, 0.5)" />
+        <Scroll size={12} color="var(--gold-secondary)" />
         <span
           style={{
-            fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 11,
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
+            ...typeMicro,
             color: 'rgba(231, 186, 144, 0.4)',
           }}
         >
@@ -154,10 +147,10 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
         </span>
         <span
           style={{
-            fontFamily: "'Source Sans 3', sans-serif",
+            fontFamily: typeBody.fontFamily,
             fontSize: 13,
             fontWeight: 700,
-            color: '#e7ba90',
+            color: 'var(--gold)',
           }}
         >
           {character.gold}

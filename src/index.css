@@ -25,13 +25,23 @@
 
   /* Daggerheart Design Tokens */
   --gold-light: #f9f8f3;
-  --gold-mid: #e7ba90;
+  --gold: #e7ba90;
+  --gold-secondary: rgba(231, 186, 144, 0.5);
+  --gold-muted: rgba(231, 186, 144, 0.25);
   --gold-solid: #d4af37;
   --gold-border: #DBC593;
   --gold-border-dark: #C29734;
   --card-bg-dark: #03070d;
   --card-bg-darkalt: #1e201f;
-  --text-body: rgba(212, 207, 199, 0.9);
+  --text-primary: rgba(212, 207, 199, 0.9);
+  --text-secondary: rgba(212, 207, 199, 0.6);
+  --text-muted: rgba(212, 207, 199, 0.35);
+  --bg-page: #03070d;
+  --bg-surface: rgba(3, 7, 13, 0.6);
+  --bg-overlay: rgba(3, 7, 13, 0.92);
+  --surface-faint: rgba(255, 255, 255, 0.03);
+  --surface-light: rgba(255, 255, 255, 0.06);
+  --surface-border: rgba(255, 255, 255, 0.1);
   --shadow-warm: #4d381e;
 
   /* Mouse tracking for glow effect */
@@ -97,7 +107,7 @@ html, body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: #03070d;
+  background-color: var(--bg-page);
   color: #1c1c1e;
   overflow: hidden;
   /* Each view manages its own scroll — body never scrolls */
@@ -552,8 +562,13 @@ button, a {
   text-shadow: 0 1px 0 rgba(249, 248, 243, 0.4), 0 -1px 1px rgba(77, 56, 30, 0.3);
 }
 
-/* Typography classes */
+/* Typography classes
+ * Canonical source: src/ui/typography.ts (typeTitle, typeSubtitle, typeBody, typeMicro)
+ * These CSS classes mirror the JS tokens for use in non-React contexts.
+ * Keep in sync with the token file.
+ */
 .type-display {
+  /* maps to typeTitle */
   font-family: 'EB Garamond', serif;
   font-weight: 500;
   line-height: 1;
@@ -562,6 +577,7 @@ button, a {
 }
 
 .type-subtitle {
+  /* maps to typeSubtitle */
   font-family: 'EB Garamond', serif;
   font-size: 13px;
   font-weight: 600;
@@ -571,28 +587,31 @@ button, a {
 }
 
 .type-body {
+  /* maps to typeBody (with card-specific color/shadow) */
   font-family: 'Source Sans 3', sans-serif;
   font-size: 13.5px;
   line-height: 1.4;
-  color: rgba(212, 207, 199, 0.9);
+  color: var(--text-primary);
   text-shadow: 0px 1px 1px #4d381e;
 }
 
 .type-ui-label {
+  /* alias for typeSubtitle */
   font-family: 'EB Garamond', serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   font-variant: small-caps;
 }
 
 .type-stat-label {
-  font-family: 'Source Sans 3', sans-serif;
+  /* maps to typeMicro */
+  font-family: 'EB Garamond', serif;
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(212, 207, 199, 0.7);
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
 }
 
 /* Deck Builder preview panel — desktop only */

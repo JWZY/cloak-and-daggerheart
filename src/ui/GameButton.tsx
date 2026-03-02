@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
+import { typeSubtitle } from './typography'
 
 /**
  * Small diamond rivet ornament for button corners.
@@ -55,8 +56,8 @@ export interface GameButtonProps {
 
 const sizeStyles = {
   sm: { padding: '6px 16px', fontSize: 13 },
-  md: { padding: '10px 24px', fontSize: 15 },
-  lg: { padding: '14px 32px', fontSize: 15 },
+  md: { padding: '10px 24px', fontSize: 13 },
+  lg: { padding: '14px 32px', fontSize: 13 },
 } as const
 
 export function GameButton({
@@ -70,10 +71,7 @@ export function GameButton({
   const sizeStyle = sizeStyles[size]
 
   const baseStyle: React.CSSProperties = {
-    fontFamily: "'EB Garamond', serif",
-    fontWeight: 600,
-    letterSpacing: '0.04em',
-    fontVariant: 'small-caps',
+    ...typeSubtitle,
     borderRadius: 8,
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.5 : 1,
@@ -159,10 +157,7 @@ export function GameButton({
           {/* Engraved text */}
           <span
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontWeight: 600,
-              letterSpacing: '0.04em',
-              fontVariant: 'small-caps',
+              ...typeSubtitle,
               fontSize: sizeStyle.fontSize,
               background:
                 'linear-gradient(180deg, #c8c0b4 0%, #9e978b 100%)',
@@ -216,10 +211,7 @@ export function GameButton({
         >
           <span
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontWeight: 600,
-              letterSpacing: '0.04em',
-              fontVariant: 'small-caps',
+              ...typeSubtitle,
               fontSize: sizeStyle.fontSize,
               background:
                 'linear-gradient(180deg, #9e978b 0%, #7a746a 100%)',
@@ -248,7 +240,7 @@ export function GameButton({
         ...baseStyle,
         background: 'transparent',
         border: 'none',
-        color: '#e7ba90',
+        color: 'var(--gold)',
         padding: '8px 16px',
         fontSize: sizeStyle.fontSize,
       }}

@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react'
+import { typeSubtitle } from './typography'
 
 export interface StepInstructionProps {
   children: ReactNode
@@ -9,10 +10,10 @@ export function StepInstruction({ children, style }: StepInstructionProps) {
   return (
     <p
       style={{
-        fontFamily: "'EB Garamond', serif",
+        fontFamily: typeSubtitle.fontFamily,
         fontStyle: 'italic',
-        fontSize: 13,
-        color: 'rgba(231, 186, 144, 0.5)',
+        fontSize: typeSubtitle.fontSize,
+        color: 'var(--gold-secondary)',
         textAlign: 'center',
         marginBottom: 24,
         ...style,

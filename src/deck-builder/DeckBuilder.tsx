@@ -118,7 +118,7 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
       style={{
         height: '100dvh',
         paddingTop: 'env(safe-area-inset-top)',
-        background: '#03070d',
+        background: 'var(--bg-page)',
       }}
     >
       {/* Atmosphere texture overlay */}
@@ -142,8 +142,8 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
         style={{
           position: 'relative',
           zIndex: 10,
-          borderRight: '1px solid rgba(231, 186, 144, 0.08)',
-          background: 'rgba(3, 7, 13, 0.5)',
+          borderRight: '1px solid var(--gold-muted)',
+          background: 'var(--bg-surface)',
           flexShrink: 0,
         }}
       >
@@ -308,9 +308,9 @@ function assembleCharacter(
     advancements: [],
     markedTraits: [],
     subclassTier: 'foundation',
-    backgroundAnswers: store.backgroundAnswers,
-    experiences: store.experiences,
-    connectionAnswers: store.connectionAnswers,
+    backgroundAnswers: store.backgroundAnswers || [],
+    experiences: (store.experiences || []).filter((e) => e?.text),
+    connectionAnswers: store.connectionAnswers || [],
     createdAt: Date.now(),
   }
 }

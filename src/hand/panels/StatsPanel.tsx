@@ -1,5 +1,6 @@
 import { TRAIT_NAMES, formatTraitValue } from '../../core/rules/traits'
 import { getSubclassByName } from '../../data/srd'
+import { typeSubtitle, typeMicro, typeBody } from '../../ui/typography'
 import { GameBadge } from '../../ui/GameBadge'
 import type { Character } from '../../types/character'
 
@@ -35,21 +36,17 @@ export function StatsPanel({ character }: StatsPanelProps) {
               className="flex items-center justify-between py-1 px-2 rounded-lg"
               style={{
                 background: isSpellcast
-                  ? 'rgba(231, 186, 144, 0.06)'
+                  ? 'var(--gold-muted)'
                   : 'transparent',
                 border: isSpellcast
-                  ? '1px solid rgba(231, 186, 144, 0.15)'
+                  ? '1px solid var(--gold-muted)'
                   : '1px solid transparent',
               }}
             >
               <span
                 style={{
-                  fontFamily: "'EB Garamond', serif",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  fontVariant: 'small-caps',
-                  letterSpacing: '0.04em',
-                  color: isSpellcast ? '#e7ba90' : 'rgba(212, 207, 199, 0.7)',
+                  ...typeSubtitle,
+                  color: isSpellcast ? 'var(--gold)' : 'var(--text-secondary)',
                 }}
               >
                 {traitLabels[trait]}
@@ -57,12 +54,8 @@ export function StatsPanel({ character }: StatsPanelProps) {
                   <span
                     className="ml-1"
                     style={{
-                      fontFamily: "'Source Sans 3', sans-serif",
-                      fontSize: 11,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      color: 'rgba(231, 186, 144, 0.5)',
-                      fontVariant: 'normal',
+                      ...typeMicro,
+                      color: 'var(--gold-secondary)',
                     }}
                   >
                     SC
@@ -71,15 +64,15 @@ export function StatsPanel({ character }: StatsPanelProps) {
               </span>
               <span
                 style={{
-                  fontFamily: "'Source Sans 3', sans-serif",
+                  fontFamily: typeBody.fontFamily,
                   fontSize: 15,
                   fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums',
                   color: value > 0
-                    ? '#e7ba90'
+                    ? 'var(--gold)'
                     : value < 0
                       ? '#A61118'
-                      : 'rgba(212, 207, 199, 0.5)',
+                      : 'var(--text-muted)',
                 }}
               >
                 {formatTraitValue(value)}

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
+import { typeMicro, typeBody } from '../ui/typography'
 import { GameBadge } from '../ui/GameBadge'
 import { GlassPanel } from '../ui/GlassPanel'
 import { useCharacterStore } from '../store/character-store'
@@ -40,10 +41,10 @@ function StatButton({
         width: 28,
         height: 28,
         background: disabled
-          ? 'rgba(3, 7, 13, 0.6)'
-          : 'rgba(3, 7, 13, 0.8)',
-        border: `1px solid ${disabled ? 'rgba(231, 186, 144, 0.08)' : 'rgba(231, 186, 144, 0.25)'}`,
-        color: disabled ? 'rgba(212, 207, 199, 0.2)' : '#e7ba90',
+          ? 'var(--bg-surface)'
+          : 'var(--bg-overlay)',
+        border: `1px solid ${disabled ? 'var(--gold-muted)' : 'var(--gold-muted)'}`,
+        color: disabled ? 'var(--text-muted)' : 'var(--gold)',
         cursor: disabled ? 'default' : 'pointer',
       }}
     >
@@ -84,12 +85,8 @@ function StatRow({
       {/* Label */}
       <span
         style={{
-          fontFamily: "'EB Garamond', serif",
-          fontSize: 11,
-          fontWeight: 600,
-          fontVariant: 'small-caps',
-          letterSpacing: '0.04em',
-          color: 'rgba(231, 186, 144, 0.5)',
+          ...typeMicro,
+          color: 'var(--gold-secondary)',
           width: 46,
           flexShrink: 0,
         }}
@@ -116,7 +113,7 @@ function StatRow({
                 <Icon
                   size={14}
                   fill={filled ? color : 'transparent'}
-                  color={filled ? color : 'rgba(212, 207, 199, 0.2)'}
+                  color={filled ? color : 'var(--text-muted)'}
                   strokeWidth={filled ? 0 : 1.5}
                 />
               </motion.div>
@@ -128,10 +125,10 @@ function StatRow({
       {/* Count label */}
       <span
         style={{
-          fontFamily: "'Source Sans 3', sans-serif",
-          fontSize: 11,
+          fontFamily: typeBody.fontFamily,
+          fontSize: typeMicro.fontSize,
           fontWeight: 600,
-          color: 'rgba(212, 207, 199, 0.6)',
+          color: 'var(--text-secondary)',
           minWidth: 28,
           textAlign: 'right',
           fontVariantNumeric: 'tabular-nums',
@@ -163,7 +160,7 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
       style={{
         borderRadius: 12,
         padding: '12px',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid var(--surface-light)',
       }}
     >
       {/* Row 1: HP and Armor */}

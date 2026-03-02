@@ -1,7 +1,15 @@
 /**
  * Shared card design tokens — single source of truth for SRDCard, DomainCard, and InfoCard.
  * SRDCard is the canonical reference. All values here match SRDCard exactly.
+ *
+ * Typography tokens are centralized in src/ui/typography.ts.
+ * This file re-exports what card components need.
  */
+
+import { typeSubtitle, goldLight, goldDark } from '../ui/typography'
+
+// Re-export typography tokens for card consumers
+export { typeTitle, typeSubtitle, typeBody, typeMicro, goldLight, goldDark, goldGradient } from '../ui/typography'
 
 // Card dimensions
 export const CARD_WIDTH = 360
@@ -11,7 +19,7 @@ export const CARD_BG = '#03070d'
 
 // Gold gradient style for title elements (background-clip text)
 export const goldGradientStyle = {
-  background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
+  background: `linear-gradient(180deg, ${goldLight} 0%, ${goldDark} 100%)`,
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
   backgroundClip: 'text',
@@ -20,12 +28,8 @@ export const goldGradientStyle = {
 
 // Shared subtitle style — used by class/domain name and footer
 export const subtitleStyle = {
-  fontFamily: "'EB Garamond', serif",
-  fontSize: 13,
-  fontWeight: 600,
+  ...typeSubtitle,
   lineHeight: 'normal' as const,
-  letterSpacing: '0.06em',
-  fontVariant: 'small-caps' as const,
   ...goldGradientStyle,
 }
 

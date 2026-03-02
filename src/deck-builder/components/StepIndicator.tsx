@@ -28,12 +28,12 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
               height: 8,
               borderRadius: '50%',
               background: isCurrent
-                ? '#e7ba90'
+                ? 'var(--gold)'
                 : isCompleted
-                  ? '#e7ba90'
-                  : 'rgba(231, 186, 144, 0.25)',
+                  ? 'var(--gold)'
+                  : 'var(--gold-muted)',
               boxShadow: isCurrent
-                ? '0 0 6px rgba(231, 186, 144, 0.4)'
+                ? '0 0 6px var(--gold-secondary)'
                 : 'none',
               transition: 'background 0.2s ease, box-shadow 0.2s ease',
             }}

@@ -39,41 +39,67 @@ on every card title, subtitle, footer, separator line, diamond, and border strok
 | Token | Value | Usage |
 |-------|-------|-------|
 | `gold-light` | `#f9f8f3` | Top of gold gradient (near-white warm) |
-| `gold-mid` | `#e7ba90` | Bottom of gold gradient / solid gold accent |
+| `gold` | `#e7ba90` | Bottom of gold gradient / solid gold accent (CSS: `var(--gold)`) |
 | `gold-border` | `#DBC593` | Banner outer stroke start |
 | `gold-border-dark` | `#C29734` | Banner outer stroke end |
 | `gold-solid` | `#d4af37` | DomainCard border (`2px solid #d4af37`) |
 
-### 1.3 Text Colors
+### 1.3 Text Colors (Warm Cream Scale)
 
-| Token | Value | Source | Usage |
-|-------|-------|--------|-------|
-| `text-body` | `rgba(212, 207, 199, 0.9)` | SRDCard body | Primary body text on dark surfaces |
-| `text-body-rgb` | `212, 207, 199` | -- | RGB components for opacity variants |
-| `text-white` | `white` | Glass system | High-contrast headings on dark bg |
-| `text-secondary` | `rgba(255, 255, 255, 0.7)` | Glass system | Secondary/supporting text |
-| `text-muted` | `rgba(255, 255, 255, 0.5)` | Glass system | Captions, metadata |
-| `text-domain-meta` | `text-gray-500` | DomainCard metadata | Light-theme metadata text |
-| `text-domain-body` | `text-gray-800` | DomainCard content | Light-theme body text |
+Three tiers for text on dark surfaces. Defined as CSS custom properties in `index.css`.
 
-### 1.4 Domain Colors
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--text-primary` | `rgba(212, 207, 199, 0.9)` | Body text, readable content, titles |
+| `--text-secondary` | `rgba(212, 207, 199, 0.6)` | Labels, metadata, annotations |
+| `--text-muted` | `rgba(212, 207, 199, 0.35)` | Disabled, placeholders, hints, empty states |
+
+Usage in inline styles: `color: 'var(--text-primary)'`
+
+### 1.4 Gold Accent Scale
+
+Three tiers for gold accent elements. Base color: `#e7ba90`.
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--gold` | `#e7ba90` | Primary gold -- text, icons, active accents |
+| `--gold-secondary` | `rgba(231, 186, 144, 0.5)` | Muted labels, dimmed icons, instruction text |
+| `--gold-muted` | `rgba(231, 186, 144, 0.25)` | Borders, glows, tinted backgrounds, separators |
+
+### 1.5 Domain Colors
 
 The nine Daggerheart domains each have a canonical color. These are used for
 banner fills, domain tags, card accents, and can tint entire UI sections.
 
 | Domain | Hex | Character |
 |--------|-----|-----------|
-| Arcana | `#4e345b` | Deep purple -- mystic, arcane |
+| Arcana | `#77457E` | Medium purple -- mystic, arcane |
 | Blade | `#A61118` | Dark crimson -- martial, aggressive |
 | Bone | `#A3A9A8` | Steel gray -- death, resilience |
 | Codex | `#1D3B61` | Navy blue -- knowledge, wisdom |
 | Grace | `#BD0C70` | Magenta-pink -- healing, divine |
 | Midnight | `#1E1E1E` | Near-black -- shadow, stealth |
-| Sage | `#2d4a3e` | Forest green -- nature, balance |
+| Sage | `#006E3A` | Rich green -- nature, balance |
 | Splendor | `#BEA228` | Rich gold -- beauty, radiance |
 | Valor | `#EB5B00` | Bright orange -- courage, fire |
 
-### 1.5 Surface Colors (Glass System)
+### 1.6 Surface Colors
+
+#### Dark Backgrounds
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--bg-page` | `#03070d` | Page and card solid background |
+| `--bg-surface` | `rgba(3, 7, 13, 0.6)` | Input backgrounds, surfaces |
+| `--bg-overlay` | `rgba(3, 7, 13, 0.92)` | Sticky headers, heavy overlays |
+
+#### White Surfaces
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--surface-faint` | `rgba(255, 255, 255, 0.03)` | Unselected items, subtle fills |
+| `--surface-light` | `rgba(255, 255, 255, 0.06)` | Panels, interactive surfaces |
+| `--surface-border` | `rgba(255, 255, 255, 0.1)` | Borders, dividers |
+
+### 1.7 Surface Colors (Glass System)
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -82,7 +108,7 @@ banner fills, domain tags, card accents, and can tint entire UI sections.
 | `glass-border` | `rgba(255,255,255,0.1)` | Panel border |
 | `glass-border-focus` | `rgba(255,255,255,0.2)` | Focus-state border |
 
-### 1.6 Semantic Colors
+### 1.8 Semantic Colors
 
 | Token | Suggested Value | Usage |
 |-------|-----------------|-------|
@@ -92,7 +118,7 @@ banner fills, domain tags, card accents, and can tint entire UI sections.
 | `stress-shadow` | `#1E1E1E` (Midnight) | Stress resource |
 | `success-green` | `#22c55e` | DomainCard selected state |
 
-### 1.7 Content Area Gradient
+### 1.9 Content Area Gradient
 
 The SRDCard content area uses a multi-stop gradient that transitions from
 transparent at top to near-opaque dark, then back to transparent at bottom:
@@ -170,7 +196,7 @@ filter: drop-shadow(0px 1px 2px #4d381e) drop-shadow(0px 0px 4px rgba(77, 56, 30
   font-family: 'Source Sans 3', sans-serif;
   font-size: 13.5px;
   line-height: 1.4;
-  color: rgba(212, 207, 199, 0.9);
+  color: var(--text-primary);
   text-shadow: 0px 1px 1px #4d381e;
 }
 ```
@@ -235,23 +261,23 @@ For interactive elements, blend the serif identity with readability:
 ```css
 .type-ui-label {
   font-family: 'EB Garamond', serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   font-variant: small-caps;
 }
 ```
 
-For stat labels (HP, Armor, etc.):
+For stat labels (HP, Armor, badges, equipment labels):
 
 ```css
 .type-stat-label {
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: 'EB Garamond', serif;
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(212, 207, 199, 0.7);
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
 }
 ```
 
@@ -453,7 +479,7 @@ DomainCard: `border-radius: 20px`, `border: 2px solid #d4af37`
 ### 4.4 Panel Border (Glass)
 
 ```css
-border: 1px solid rgba(255, 255, 255, 0.1);
+border: 1px solid var(--surface-border);
 border-radius: 16px;   /* --lg-card-radius */
 ```
 
@@ -476,9 +502,9 @@ All CSS values are exact or directly derived from existing code.
 
   /* Typography */
   font-family: 'EB Garamond', serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   font-variant: small-caps;
 
   /* Engraved text on gold surface */
@@ -519,9 +545,9 @@ All CSS values are exact or directly derived from existing code.
 
   /* Typography */
   font-family: 'EB Garamond', serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   font-variant: small-caps;
 
   /* Gold gradient text */
@@ -556,7 +582,7 @@ All CSS values are exact or directly derived from existing code.
   font-family: 'EB Garamond', serif;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   font-variant: small-caps;
   color: #e7ba90;
 
@@ -610,7 +636,7 @@ All CSS values are exact or directly derived from existing code.
 
 /* Gold-accented variant */
 .panel-glass-gold {
-  border: 1px solid rgba(231, 186, 144, 0.2);  /* #e7ba90 at 20% */
+  border: 1px solid var(--gold-muted);
   box-shadow:
     inset 0 1px 1px rgba(249, 248, 243, 0.15),
     inset 0 -1px 1px rgba(0, 0, 0, 0.1),
@@ -624,10 +650,10 @@ All CSS values are exact or directly derived from existing code.
 .input-dark {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(3, 7, 13, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-surface);
+  border: 1px solid var(--surface-border);
   border-radius: 8px;
-  color: rgba(212, 207, 199, 0.9);
+  color: var(--text-primary);
   font-family: 'Source Sans 3', sans-serif;
   font-size: 14px;
   outline: none;
@@ -642,8 +668,8 @@ All CSS values are exact or directly derived from existing code.
 }
 
 .input-dark:focus {
-  border-color: #e7ba90;
-  box-shadow: 0 0 0 2px rgba(231, 186, 144, 0.15);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-muted);
 }
 ```
 
@@ -699,14 +725,14 @@ Reuse of the SRDCard diamond + line separator pattern:
   align-items: center;
   padding: 2px 10px;
   border-radius: 9999px;
-  background: rgba(231, 186, 144, 0.1);    /* gold at 10% */
-  border: 1px solid rgba(231, 186, 144, 0.3);
+  background: var(--gold-muted);
+  border: 1px solid var(--gold-muted);
 
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: 'EB Garamond', serif;
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
   color: #e7ba90;
 }
 
@@ -755,18 +781,18 @@ Reuse of the SRDCard diamond + line separator pattern:
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(231, 186, 144, 0.25);
+  background: var(--gold-muted);
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .step-dot--active {
-  background: #e7ba90;
+  background: var(--gold);
   transform: scale(1.25);
-  box-shadow: 0 0 6px rgba(231, 186, 144, 0.4);
+  box-shadow: 0 0 6px var(--gold-secondary);
 }
 
 .step-dot--completed {
-  background: #e7ba90;
+  background: var(--gold);
 }
 ```
 
@@ -929,11 +955,13 @@ The DomainCard component contains two inline SVG emblems that can be extracted:
 ### Color Hierarchy on Dark Surfaces
 
 ```
-Gold gradient text  -->  highest emphasis (titles, CTAs)
-Warm white text     -->  high emphasis (active states, primary content)
-#D4CFC7 at 90%     -->  standard body text
-White at 70%        -->  secondary content
-White at 50%        -->  muted / disabled
+Gold gradient text       -->  highest emphasis (titles, CTAs)
+var(--gold)              -->  active accents, labels, icons
+var(--text-primary)      -->  standard body text
+var(--text-secondary)    -->  secondary content, metadata
+var(--text-muted)        -->  disabled, placeholders, hints
+var(--gold-secondary)    -->  dimmed gold labels, instruction text
+var(--gold-muted)        -->  borders, glows, tinted backgrounds
 ```
 
 ### When to Use Each Font

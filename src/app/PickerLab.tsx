@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { typeTitle, typeSubtitle, typeBody } from '../ui/typography'
 import { FlatDomainCard } from '../cards/FlatDomainCard'
 import { DomainCard } from '../cards/DomainCard'
+import { CardZoom } from '../cards/CardZoom'
+import { useCardZoom } from '../cards/useCardZoom'
 import { getDomainCards, parseAbilityText } from '../data/card-mapper'
 import { SectionHeader } from '../ui/SectionHeader'
 import { GameBadge } from '../ui/GameBadge'
@@ -13,8 +16,8 @@ import { DOMAIN_COLORS } from '../cards/domain-colors'
 // Accessible at ?pickers
 // ---------------------------------------------------------------------------
 
-const PAGE_BG = '#03070d'
-const WARM = 'rgba(212, 207, 199, 0.8)'
+const PAGE_BG = 'var(--bg-page)'
+const WARM = 'var(--text-primary)'
 const MAX_CARDS = 2
 const DEMO_CLASS = 'Wizard' // Codex + Splendor domains
 
@@ -23,18 +26,19 @@ type ViewMode = 'flat' | 'full' | 'split'
 export default function PickerLab() {
   const [selected, setSelected] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<ViewMode>('flat')
+  const { zoomedCard, openZoom, closeZoom } = useCardZoom()
 
   const domainCards = getDomainCards(DEMO_CLASS)
   const maxSelected = selected.length >= MAX_CARDS
 
-  const toggleCard = (name: string) => {
-    setSelected((prev) =>
-      prev.includes(name)
-        ? prev.filter((n) => n !== name)
-        : prev.length < MAX_CARDS
-          ? [...prev, name]
-          : prev,
-    )
+  const handleTap = (name: string) => {
+    if (selected.includes(name)) {
+      // Already selected — expand into full card
+      openZoom(`domain-${name}`)
+    } else if (selected.length < MAX_CARDS) {
+      // Not selected yet — select it
+      setSelected((prev) => [...prev, name])
+    }
   }
 
   return (
@@ -43,7 +47,7 @@ export default function PickerLab() {
         minHeight: '100vh',
         background: PAGE_BG,
         color: WARM,
-        fontFamily: "'Source Sans 3', sans-serif",
+        fontFamily: typeBody.fontFamily,
       }}
     >
       {/* Sticky header */}
@@ -52,10 +56,10 @@ export default function PickerLab() {
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          background: 'rgba(3, 7, 13, 0.92)',
+          background: 'var(--bg-overlay)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(231, 186, 144, 0.12)',
+          borderBottom: '1px solid var(--gold-muted)',
           padding: '10px 24px',
           display: 'flex',
           gap: 16,
@@ -66,12 +70,8 @@ export default function PickerLab() {
       >
         <span
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 13,
-            fontWeight: 600,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.06em',
-            color: '#e7ba90',
+            ...typeSubtitle,
+            color: 'var(--gold)',
           }}
         >
           Picker Lab
@@ -83,23 +83,20 @@ export default function PickerLab() {
               key={mode}
               onClick={() => setViewMode(mode)}
               style={{
-                fontFamily: "'EB Garamond', serif",
+                ...typeSubtitle,
                 fontSize: 12,
-                fontWeight: 600,
-                fontVariant: 'small-caps',
-                letterSpacing: '0.04em',
                 padding: '4px 12px',
                 borderRadius: 6,
                 border: 'none',
                 cursor: 'pointer',
                 background:
                   viewMode === mode
-                    ? 'rgba(231, 186, 144, 0.15)'
-                    : 'rgba(255, 255, 255, 0.04)',
+                    ? 'var(--gold-muted)'
+                    : 'var(--surface-faint)',
                 color:
                   viewMode === mode
                     ? '#e7ba90'
-                    : 'rgba(212, 207, 199, 0.5)',
+                    : 'var(--text-muted)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -120,11 +117,9 @@ export default function PickerLab() {
           <h1
             className="gold-text gold-text-shadow"
             style={{
-              fontFamily: "'EB Garamond', serif",
+              ...typeTitle,
               fontSize: 28,
-              fontWeight: 500,
-              fontVariant: 'small-caps',
-              letterSpacing: '0.04em',
+              letterSpacing: '0.06em',
               marginBottom: 8,
             }}
           >
@@ -132,9 +127,9 @@ export default function PickerLab() {
           </h1>
           <p
             style={{
-              fontFamily: "'Source Sans 3', sans-serif",
+              fontFamily: typeBody.fontFamily,
               fontSize: 13,
-              color: 'rgba(231, 186, 144, 0.5)',
+              color: 'var(--gold-secondary)',
               lineHeight: 1.5,
               maxWidth: 420,
               margin: '0 auto',
@@ -142,7 +137,7 @@ export default function PickerLab() {
           >
             Exploring compact "flattened" card layouts for mobile-friendly
             domain card selection. Demo uses{' '}
-            <strong style={{ color: 'rgba(231, 186, 144, 0.7)' }}>{DEMO_CLASS}</strong>{' '}
+            <strong style={{ color: 'var(--gold)' }}>{DEMO_CLASS}</strong>{' '}
             ({domainCards.length} cards from{' '}
             <GameBadge color={DOMAIN_COLORS.Codex}>Codex</GameBadge>{' '}
             <GameBadge color={DOMAIN_COLORS.Splendor}>Splendor</GameBadge>)
@@ -191,7 +186,7 @@ export default function PickerLab() {
                 domainCards={domainCards}
                 selected={selected}
                 maxSelected={maxSelected}
-                onToggle={toggleCard}
+                onToggle={handleTap}
               />
             </motion.div>
           )}
@@ -208,7 +203,7 @@ export default function PickerLab() {
                 domainCards={domainCards}
                 selected={selected}
                 maxSelected={maxSelected}
-                onToggle={toggleCard}
+                onToggle={handleTap}
               />
             </motion.div>
           )}
@@ -225,9 +220,29 @@ export default function PickerLab() {
                 domainCards={domainCards}
                 selected={selected}
                 maxSelected={maxSelected}
-                onToggle={toggleCard}
+                onToggle={handleTap}
               />
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Card zoom overlay */}
+        <AnimatePresence>
+          {zoomedCard && (
+            <CardZoom layoutId={zoomedCard} onClose={closeZoom}>
+              {domainCards
+                .filter((c) => `domain-${c.props.title}` === zoomedCard)
+                .map(({ props, bodyText }) => (
+                  <DomainCard key={props.title} {...props}>
+                    {parseAbilityText(bodyText).map((ability, i) => (
+                      <p key={i} className="mb-1">
+                        {ability.name && <strong>{ability.name}: </strong>}
+                        {ability.text}
+                      </p>
+                    ))}
+                  </DomainCard>
+                ))}
+            </CardZoom>
           )}
         </AnimatePresence>
 
@@ -237,18 +252,18 @@ export default function PickerLab() {
             marginTop: 48,
             padding: 20,
             borderRadius: 12,
-            border: '1px solid rgba(231, 186, 144, 0.1)',
-            background: 'rgba(231, 186, 144, 0.02)',
+            border: '1px solid var(--gold-muted)',
+            background: 'var(--gold-muted)',
           }}
         >
           <h3
             style={{
               fontFamily: "'EB Garamond', serif",
-              fontSize: 15,
+              fontSize: 13,
               fontWeight: 600,
               fontVariant: 'small-caps',
-              letterSpacing: '0.04em',
-              color: '#e7ba90',
+              letterSpacing: '0.06em',
+              color: 'var(--gold)',
               marginBottom: 12,
             }}
           >
@@ -258,7 +273,7 @@ export default function PickerLab() {
             style={{
               fontSize: 12.5,
               lineHeight: 1.6,
-              color: 'rgba(212, 207, 199, 0.6)',
+              color: 'var(--text-secondary)',
               paddingLeft: 16,
               display: 'flex',
               flexDirection: 'column',
@@ -266,47 +281,47 @@ export default function PickerLab() {
             }}
           >
             <li>
-              <strong style={{ color: 'rgba(212, 207, 199, 0.8)' }}>
-                Domain color stripe:
+              <strong style={{ color: 'var(--text-primary)' }}>
+                Artwork bleed with gradient fade:
               </strong>{' '}
-              3px left border in the domain's color serves as a quick visual
-              grouping cue (Codex = navy, Splendor = gold).
+              ~130px artwork bleeds from the left with a smooth rightward
+              gradient dissolve into the page background, replacing the old
+              80px hard-edged thumbnail.
             </li>
             <li>
-              <strong style={{ color: 'rgba(212, 207, 199, 0.8)' }}>
-                Artwork thumbnail (80px):
+              <strong style={{ color: 'var(--text-primary)' }}>
+                Pennant banner:
               </strong>{' '}
-              Small enough to not dominate, large enough to show card art.
-              Level number top-left, domain icon bottom-right.
+              The full DomainCard banner (level + domain icon) is scaled to
+              0.55 and positioned top-left within the artwork area.
             </li>
             <li>
-              <strong style={{ color: 'rgba(212, 207, 199, 0.8)' }}>
-                Body text clamped to 3 lines:
+              <strong style={{ color: 'var(--text-primary)' }}>
+                Name-only text:
               </strong>{' '}
-              Users can scan quickly without being overwhelmed. Full card can
-              be viewed on tap in a future expansion.
+              EB Garamond 16px small-caps for fast scanning. Gold on
+              selected, warm on unselected. No metadata or ability text.
             </li>
             <li>
-              <strong style={{ color: 'rgba(212, 207, 199, 0.8)' }}>
-                Recall badge:
+              <strong style={{ color: 'var(--text-primary)' }}>
+                Tap to select, tap again to expand:
               </strong>{' '}
-              Square badge on the right edge with domain-tinted background.
-              Recall 0 cards (Grimoires) omit it entirely.
+              First tap selects the card. Tapping an already-selected card
+              opens it as a full-size DomainCard in a zoom overlay.
             </li>
             <li>
-              <strong style={{ color: 'rgba(212, 207, 199, 0.8)' }}>
-                Selected state:
+              <strong style={{ color: 'var(--text-primary)' }}>
+                Selection state:
               </strong>{' '}
-              Gold border + gold tinted background + checkmark circle. Matches
-              the app's gold accent language rather than green outlines.
+              Gold glow + gold border + checkmark circle. Unchanged from
+              previous design.
             </li>
             <li>
-              <strong style={{ color: 'rgba(212, 207, 199, 0.8)' }}>
-                Comparison:
+              <strong style={{ color: 'var(--text-primary)' }}>
+                Split view:
               </strong>{' '}
-              Toggle between flat, full-size, and split views to compare
-              scannability. Flat cards show ~6 options in the viewport where
-              full cards show ~1.
+              Still shows flat cards on left and full cards on right for
+              side-by-side comparison.
             </li>
           </ul>
         </div>
@@ -334,7 +349,7 @@ function FlatCardList({
 }: CardListProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {domainCards.map(({ props, bodyText }) => {
+      {domainCards.map(({ props }) => {
         const isSelected = selected.includes(props.title)
         const isDimmed = maxSelected && !isSelected
 
@@ -343,11 +358,10 @@ function FlatCardList({
             key={props.title}
             title={props.title}
             domain={props.domain}
-            type={props.type}
             level={props.level}
             recall={props.recall}
             artworkSrc={props.artworkSrc}
-            abilities={parseAbilityText(bodyText)}
+            layoutId={`domain-${props.title}`}
             selected={isSelected}
             dimmed={isDimmed}
             onClick={() => onToggle(props.title)}
@@ -423,12 +437,8 @@ function SplitView({
       <div>
         <h3
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 13,
-            fontWeight: 600,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.06em',
-            color: 'rgba(231, 186, 144, 0.6)',
+            ...typeSubtitle,
+            color: 'var(--gold-secondary)',
             marginBottom: 12,
             textAlign: 'center',
           }}
@@ -436,7 +446,7 @@ function SplitView({
           Flat Cards (proposed)
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {domainCards.map(({ props, bodyText }) => {
+          {domainCards.map(({ props }) => {
             const isSelected = selected.includes(props.title)
             const isDimmed = maxSelected && !isSelected
 
@@ -445,11 +455,9 @@ function SplitView({
                 key={props.title}
                 title={props.title}
                 domain={props.domain}
-                type={props.type}
                 level={props.level}
                 recall={props.recall}
                 artworkSrc={props.artworkSrc}
-                abilities={parseAbilityText(bodyText)}
                 selected={isSelected}
                 dimmed={isDimmed}
                 onClick={() => onToggle(props.title)}
@@ -463,12 +471,8 @@ function SplitView({
       <div>
         <h3
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 13,
-            fontWeight: 600,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.06em',
-            color: 'rgba(231, 186, 144, 0.6)',
+            ...typeSubtitle,
+            color: 'var(--gold-secondary)',
             marginBottom: 12,
             textAlign: 'center',
           }}

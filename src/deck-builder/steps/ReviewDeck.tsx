@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { typeTitle, typeSubtitle, typeBody } from '../../ui/typography'
 import { getSubclassCards, getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { SRDCard } from '../../cards/SRDCard'
 import { DomainCard } from '../../cards/DomainCard'
@@ -44,10 +45,8 @@ export function ReviewDeck() {
         <h1
           className="gold-text"
           style={{
-            fontFamily: "'EB Garamond', serif",
+            ...typeTitle,
             fontSize: 24,
-            fontWeight: 500,
-            fontVariant: 'small-caps',
             textAlign: 'center',
           }}
         >
@@ -56,12 +55,8 @@ export function ReviewDeck() {
       </motion.div>
       <p
         style={{
-          fontFamily: "'EB Garamond', serif",
-          fontSize: 13,
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          fontVariant: 'small-caps',
-          color: '#e7ba90',
+          ...typeSubtitle,
+          color: 'var(--gold)',
           textAlign: 'center',
           marginBottom: 24,
         }}
@@ -119,7 +114,7 @@ export function ReviewDeck() {
       )}
 
       {/* Summary info */}
-      <div className="w-full max-w-xs flex flex-col gap-3 mb-6">
+      <div className="w-full max-w-[360px] flex flex-col gap-3 mb-6">
         {/* Traits */}
         {traits && (
           <div className="mt-2">
@@ -132,21 +127,18 @@ export function ReviewDeck() {
                   <span
                     className="block"
                     style={{
-                      fontFamily: "'Source Sans 3', sans-serif",
+                      fontFamily: typeBody.fontFamily,
                       fontSize: 15,
                       fontWeight: 700,
-                      color: '#e7ba90',
+                      color: 'var(--gold)',
                     }}
                   >
                     {formatTraitValue(traits[name as TraitName] ?? 0)}
                   </span>
                   <span
                     style={{
-                      fontFamily: "'EB Garamond', serif",
-                      fontSize: 13,
-                      fontVariant: 'small-caps',
-                      letterSpacing: '0.04em',
-                      color: 'rgba(212, 207, 199, 0.5)',
+                      ...typeSubtitle,
+                      color: 'var(--text-muted)',
                     }}
                   >
                     {name}
@@ -158,30 +150,29 @@ export function ReviewDeck() {
         )}
 
         {/* Experiences */}
-        {experiences.filter((e) => e.text.trim()).length > 0 && (
+        {(experiences || []).filter((e) => e?.text?.trim()).length > 0 && (
           <div className="mt-2">
             <div className="mb-3">
               <SectionHeader>Experiences</SectionHeader>
             </div>
             <div className="flex flex-col gap-2">
-              {experiences
-                .filter((e) => e.text.trim())
+              {(experiences || [])
+                .filter((e) => e?.text?.trim())
                 .map((exp, i) => (
                   <div
                     key={i}
                     className="flex items-center justify-between"
                     style={{
                       padding: '8px 12px',
-                      background: 'rgba(255, 255, 255, 0.03)',
+                      background: 'var(--surface-faint)',
                       borderRadius: 8,
-                      border: '1px solid rgba(231, 186, 144, 0.1)',
+                      border: '1px solid var(--gold-muted)',
                     }}
                   >
                     <span
                       style={{
-                        fontFamily: "'Source Sans 3', sans-serif",
-                        fontSize: 13.5,
-                        color: 'rgba(212, 207, 199, 0.9)',
+                        ...typeBody,
+                        color: 'var(--text-primary)',
                       }}
                     >
                       {exp.text}
@@ -194,22 +185,20 @@ export function ReviewDeck() {
         )}
 
         {/* Background */}
-        {backgroundAnswers.filter((a) => a?.trim()).length > 0 && (
+        {(backgroundAnswers || []).filter((a) => a?.trim()).length > 0 && (
           <div className="mt-2">
             <div className="mb-3">
               <SectionHeader>Background</SectionHeader>
             </div>
             <div className="flex flex-col gap-2">
-              {backgroundAnswers
+              {(backgroundAnswers || [])
                 .filter((a) => a?.trim())
                 .map((answer, i) => (
                   <p
                     key={i}
                     style={{
-                      fontFamily: "'Source Sans 3', sans-serif",
-                      fontSize: 13.5,
-                      lineHeight: 1.4,
-                      color: 'rgba(212, 207, 199, 0.9)',
+                      ...typeBody,
+                      color: 'var(--text-primary)',
                       fontStyle: 'italic',
                     }}
                   >
@@ -221,22 +210,20 @@ export function ReviewDeck() {
         )}
 
         {/* Connections */}
-        {connectionAnswers.filter((a) => a?.trim()).length > 0 && (
+        {(connectionAnswers || []).filter((a) => a?.trim()).length > 0 && (
           <div className="mt-2">
             <div className="mb-3">
               <SectionHeader>Connections</SectionHeader>
             </div>
             <div className="flex flex-col gap-2">
-              {connectionAnswers
+              {(connectionAnswers || [])
                 .filter((a) => a?.trim())
                 .map((answer, i) => (
                   <p
                     key={i}
                     style={{
-                      fontFamily: "'Source Sans 3', sans-serif",
-                      fontSize: 13.5,
-                      lineHeight: 1.4,
-                      color: 'rgba(212, 207, 199, 0.9)',
+                      ...typeBody,
+                      color: 'var(--text-primary)',
                       fontStyle: 'italic',
                     }}
                   >

@@ -6,6 +6,7 @@ import { SectionHeader } from '../../ui/SectionHeader'
 import { StepInstruction } from '../../ui/StepInstruction'
 import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
+import { typeSubtitle, typeBody } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { getClassByName } from '../../data/srd'
 
@@ -88,7 +89,7 @@ export function AssignTraits() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <h2 className="w-full max-w-xs mb-2">
+      <h2 className="w-full max-w-[360px] mb-2">
         <SectionHeader>Assign Traits</SectionHeader>
       </h2>
       <StepInstruction>Tap a trait to unassign, tap a pill to assign</StepInstruction>
@@ -101,14 +102,10 @@ export function AssignTraits() {
             whileTap={{ scale: 0.9 }}
             onClick={() => handlePillTap(value, poolIndex)}
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontWeight: 600,
-              fontSize: 15,
-              fontVariant: 'small-caps',
-              letterSpacing: '0.04em',
-              background: 'rgba(3, 7, 13, 0.8)',
-              border: '1px solid #e7ba90',
-              color: '#e7ba90',
+              ...typeSubtitle,
+              background: 'var(--bg-overlay)',
+              border: '1px solid var(--gold)',
+              color: 'var(--gold)',
               textShadow: '0px 1px 1px #4d381e',
               borderRadius: 9999,
               padding: '6px 16px',
@@ -127,7 +124,7 @@ export function AssignTraits() {
                 fontFamily: "'EB Garamond', serif",
                 fontStyle: 'italic',
                 fontSize: 11,
-                color: 'rgba(231, 186, 144, 0.4)',
+                color: 'var(--gold-secondary)',
               }}
             >
               Suggested traits applied
@@ -137,7 +134,7 @@ export function AssignTraits() {
       </div>
 
       {/* Trait slots */}
-      <div className="flex flex-col gap-3 w-full max-w-xs">
+      <div className="flex flex-col gap-3 w-full max-w-[360px]">
         {TRAIT_NAMES.map((traitName) => {
           const value = assignments[traitName]
           const isAssigned = value !== null
@@ -151,31 +148,27 @@ export function AssignTraits() {
               className="flex items-center justify-between"
               style={{
                 background: isAssigned
-                  ? 'rgba(231, 186, 144, 0.06)'
-                  : 'rgba(255, 255, 255, 0.03)',
+                  ? 'var(--gold-muted)'
+                  : 'var(--surface-faint)',
                 border: isAssigned
-                  ? '1px solid rgba(231, 186, 144, 0.2)'
-                  : '1px solid rgba(255, 255, 255, 0.08)',
+                  ? '1px solid var(--gold-muted)'
+                  : '1px solid var(--surface-light)',
               }}
             >
               <span
                 style={{
-                  fontFamily: "'EB Garamond', serif",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  fontVariant: 'small-caps',
-                  letterSpacing: '0.04em',
-                  color: isAssigned ? '#e7ba90' : 'rgba(212, 207, 199, 0.4)',
+                  ...typeSubtitle,
+                  color: isAssigned ? 'var(--gold)' : 'var(--text-muted)',
                 }}
               >
                 {traitName}
               </span>
               <span
                 style={{
-                  fontFamily: "'Source Sans 3', sans-serif",
+                  fontFamily: typeBody.fontFamily,
                   fontSize: 15,
                   fontWeight: 700,
-                  color: isAssigned ? '#e7ba90' : 'rgba(212, 207, 199, 0.2)',
+                  color: isAssigned ? 'var(--gold)' : 'var(--text-muted)',
                   minWidth: 32,
                   textAlign: 'right',
                 }}

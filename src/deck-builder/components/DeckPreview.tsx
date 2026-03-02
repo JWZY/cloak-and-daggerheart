@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { typeSubtitle, typeTitle, typeMicro } from '../../ui/typography'
 import { SRDCard } from '../../cards/SRDCard'
 import { DomainCard } from '../../cards/DomainCard'
 import { AncestryCard } from '../../cards/AncestryCard'
@@ -53,7 +54,7 @@ export function DeckPreview() {
         overflowX: 'hidden',
         padding: '16px 20px',
         scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(231, 186, 144, 0.15) transparent',
+        scrollbarColor: 'var(--gold-muted) transparent',
       }}
     >
       {/* Title */}
@@ -61,11 +62,7 @@ export function DeckPreview() {
         <p
           className="gold-text"
           style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: 13,
-            fontWeight: 600,
-            fontVariant: 'small-caps',
-            letterSpacing: '0.06em',
+            ...typeSubtitle,
           }}
         >
           Character Preview
@@ -74,7 +71,7 @@ export function DeckPreview() {
           style={{
             height: 1,
             margin: '8px 0',
-            background: 'linear-gradient(90deg, transparent, rgba(231, 186, 144, 0.15), transparent)',
+            background: 'linear-gradient(90deg, transparent, var(--gold-muted), transparent)',
           }}
         />
       </div>
@@ -87,7 +84,7 @@ export function DeckPreview() {
               fontFamily: "'EB Garamond', serif",
               fontStyle: 'italic',
               fontSize: 13,
-              color: 'rgba(212, 207, 199, 0.3)',
+              color: 'var(--text-muted)',
             }}
           >
             Selections will appear here
@@ -102,10 +99,8 @@ export function DeckPreview() {
             <p
               className="gold-text gold-text-shadow"
               style={{
-                fontFamily: "'EB Garamond', serif",
+                ...typeTitle,
                 fontSize: 24,
-                fontWeight: 500,
-                fontVariant: 'small-caps',
                 letterSpacing: '0.02em',
               }}
             >
@@ -194,21 +189,18 @@ export function DeckPreview() {
                   <span
                     style={{
                       display: 'block',
-                      fontFamily: "'Source Sans 3', sans-serif",
-                      fontSize: 15,
+                      fontFamily: typeMicro.fontFamily,
+                      fontSize: 13,
                       fontWeight: 700,
-                      color: '#e7ba90',
+                      color: 'var(--gold)',
                     }}
                   >
                     {formatTraitValue(traits[name as TraitName] ?? 0)}
                   </span>
                   <span
                     style={{
-                      fontFamily: "'EB Garamond', serif",
-                      fontSize: 11,
-                      fontVariant: 'small-caps',
-                      letterSpacing: '0.04em',
-                      color: 'rgba(212, 207, 199, 0.4)',
+                      ...typeMicro,
+                      color: 'var(--text-muted)',
                     }}
                   >
                     {name}

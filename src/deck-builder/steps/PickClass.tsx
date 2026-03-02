@@ -1,6 +1,7 @@
 import { SectionHeader } from '../../ui/SectionHeader'
 import { StepInstruction } from '../../ui/StepInstruction'
 import { SelectableOption } from '../../ui/SelectableOption'
+import { typeSubtitle, typeBody, typeMicro } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { classes } from '../../data/srd'
 
@@ -10,12 +11,12 @@ export function PickClass() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <h2 className="w-full max-w-xs mb-4">
+      <h2 className="w-full max-w-[360px] mb-4">
         <SectionHeader>Choose Your Class</SectionHeader>
       </h2>
       <StepInstruction>Each class has unique domains, subclasses, and play style</StepInstruction>
 
-      <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
+      <div className="flex flex-col gap-3 w-full max-w-[360px] mt-4">
         {classes.map((cls) => {
           const isSelected = selectedClass === cls.name
           const isDimmed = selectedClass !== null && !isSelected
@@ -30,21 +31,18 @@ export function PickClass() {
               <div className="flex items-center justify-between mb-1">
                 <span
                   style={{
-                    fontFamily: "'EB Garamond', serif",
+                    ...typeSubtitle,
                     fontSize: 18,
-                    fontWeight: 600,
-                    fontVariant: 'small-caps',
-                    letterSpacing: '0.04em',
-                    color: isSelected ? '#e7ba90' : 'rgba(212, 207, 199, 0.7)',
+                    color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
                   }}
                 >
                   {cls.name}
                 </span>
                 <span
                   style={{
-                    fontFamily: "'Source Sans 3', sans-serif",
-                    fontSize: 11,
-                    color: 'rgba(212, 207, 199, 0.4)',
+                    fontFamily: typeMicro.fontFamily,
+                    fontSize: typeMicro.fontSize,
+                    color: 'var(--text-muted)',
                   }}
                 >
                   {cls.domain_1} · {cls.domain_2}
@@ -52,10 +50,8 @@ export function PickClass() {
               </div>
               <p
                 style={{
-                  fontFamily: "'Source Sans 3', sans-serif",
-                  fontSize: 13.5,
-                  lineHeight: 1.4,
-                  color: isSelected ? 'rgba(231, 186, 144, 0.7)' : 'rgba(212, 207, 199, 0.5)',
+                  ...typeBody,
+                  color: isSelected ? 'var(--gold)' : 'var(--text-muted)',
                 }}
               >
                 {cls.description.split('. ')[0]}.

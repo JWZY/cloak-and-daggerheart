@@ -133,14 +133,18 @@ export const useDeckStore = create<DeckDraft>()(
 
       setBackgroundAnswer: (index: number, answer: string) =>
         set((state) => {
-          const answers = [...state.backgroundAnswers]
+          const answers = [...(state.backgroundAnswers || [])]
           answers[index] = answer
           return { backgroundAnswers: answers }
         }),
 
       setExperience: (index: number, text: string) =>
         set((state) => {
-          const experiences = [...state.experiences]
+          const experiences = [...(state.experiences || [])]
+          // Fill any gaps to prevent sparse arrays with null/undefined entries
+          while (experiences.length <= index) {
+            experiences.push({ text: '', bonus: 2 })
+          }
           experiences[index] = { text, bonus: 2 }
           return { experiences }
         }),
@@ -149,7 +153,7 @@ export const useDeckStore = create<DeckDraft>()(
 
       setConnectionAnswer: (index: number, answer: string) =>
         set((state) => {
-          const answers = [...state.connectionAnswers]
+          const answers = [...(state.connectionAnswers || [])]
           answers[index] = answer
           return { connectionAnswers: answers }
         }),
@@ -191,7 +195,7 @@ export const useDeckStore = create<DeckDraft>()(
           case 6:
             return state.traits !== null
           case 7: // Experiences — need 2 non-empty
-            return state.experiences.filter((e) => e.text.trim()).length >= 2
+            return (state.experiences || []).filter((e) => e?.text?.trim()).length >= 2
           case 8: // Background — optional per SRD
             return true
           case 9: // Connections — skippable per SRD
@@ -207,6 +211,20 @@ export const useDeckStore = create<DeckDraft>()(
     }),
     {
       name: 'cloak-deck-draft-v2',
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as Partial<DeckDraft>),
+        // Ensure array fields added after initial release always have defaults
+        // when hydrating from localStorage that predates these fields
+        experiences:
+          (persisted as Partial<DeckDraft>)?.experiences ?? initialState.experiences,
+        backgroundAnswers:
+          (persisted as Partial<DeckDraft>)?.backgroundAnswers ??
+          initialState.backgroundAnswers,
+        connectionAnswers:
+          (persisted as Partial<DeckDraft>)?.connectionAnswers ??
+          initialState.connectionAnswers,
+      }),
     }
   )
 )

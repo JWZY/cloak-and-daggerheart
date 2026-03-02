@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react'
+import { typeMicro } from './typography'
 
 export interface GameBadgeProps {
   children: ReactNode
@@ -17,11 +18,7 @@ export function GameBadge({ children, color }: GameBadgeProps) {
         borderRadius: 9999,
         background: `${badgeColor}1A`,
         border: `1px solid ${badgeColor}4D`,
-        fontFamily: "'Source Sans 3', sans-serif",
-        fontSize: 11,
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
+        ...typeMicro,
         color: badgeColor,
       }}
     >

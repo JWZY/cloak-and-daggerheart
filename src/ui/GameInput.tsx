@@ -1,4 +1,5 @@
 import { forwardRef } from 'react'
+import { typeSubtitle, typeBody } from './typography'
 
 export interface GameInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
@@ -12,12 +13,8 @@ export const GameInput = forwardRef<HTMLInputElement, GameInputProps>(
           <label
             style={{
               display: 'block',
-              fontFamily: "'EB Garamond', serif",
-              fontSize: 13,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              fontVariant: 'small-caps',
-              color: '#e7ba90',
+              ...typeSubtitle,
+              color: 'var(--gold)',
               marginBottom: 6,
             }}
           >
@@ -30,24 +27,24 @@ export const GameInput = forwardRef<HTMLInputElement, GameInputProps>(
           style={{
             width: '100%',
             padding: '12px 16px',
-            background: 'rgba(3, 7, 13, 0.6)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--surface-border)',
             borderRadius: 8,
-            color: 'rgba(212, 207, 199, 0.9)',
-            fontFamily: "'Source Sans 3', sans-serif",
-            fontSize: 13.5,
+            color: 'var(--text-primary)',
+            fontFamily: typeBody.fontFamily,
+            fontSize: typeBody.fontSize,
             outline: 'none',
             transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-            caretColor: '#e7ba90',
+            caretColor: 'var(--gold)',
             ...style,
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#e7ba90'
-            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(231, 186, 144, 0.15)'
+            e.currentTarget.style.borderColor = 'var(--gold)'
+            e.currentTarget.style.boxShadow = '0 0 0 2px var(--gold-muted)'
             props.onFocus?.(e)
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+            e.currentTarget.style.borderColor = 'var(--surface-border)'
             e.currentTarget.style.boxShadow = 'none'
             props.onBlur?.(e)
           }}

@@ -1,6 +1,7 @@
 import { useId, useRef, useEffect, useState } from 'react'
 import { type DomainIconName, getDomainIconPath } from './domain-icons'
 import { AutoFitTitle } from '../ui/AutoFitTitle'
+import { typeTitle, typeBody } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
@@ -251,11 +252,10 @@ export function SRDCard({
             <AutoFitTitle
               maxFontSize={titleFontSize ?? 36}
               style={{
-                fontFamily: "'EB Garamond', serif",
-                fontWeight: 500,
+                ...typeTitle,
                 lineHeight: titleLineHeight ?? '32px',
-                letterSpacing: titleLetterSpacing ?? '0.01em',
-                ...(titleSmallCaps ? { fontVariant: 'small-caps' as const } : {}),
+                letterSpacing: titleLetterSpacing ?? typeTitle.letterSpacing,
+                ...(titleSmallCaps ? {} : { fontVariant: 'normal' as const }),
                 ...(titleTextTransform ? { textTransform: titleTextTransform as 'uppercase' | 'lowercase' | 'capitalize' | 'none' } : {}),
                 ...goldGradientStyle,
                 textAlign: 'center',
@@ -271,14 +271,14 @@ export function SRDCard({
             <div className="flex items-center flex-1">
               <div
                 className="flex-1"
-                style={{ height: separatorStyle === 'figma' ? 2 : 1, background: 'linear-gradient(90deg, transparent, #e7ba90)' }}
+                style={{ height: separatorStyle === 'figma' ? 2 : 1, background: 'linear-gradient(90deg, transparent, var(--gold))' }}
               />
               <div
                 className="mx-0.5"
                 style={{
                   width: separatorStyle === 'figma' ? 4 : 5,
                   height: separatorStyle === 'figma' ? 4 : 5,
-                  background: '#e7ba90',
+                  background: 'var(--gold)',
                   transform: 'rotate(45deg)',
                 }}
               />
@@ -298,13 +298,13 @@ export function SRDCard({
                 style={{
                   width: separatorStyle === 'figma' ? 4 : 5,
                   height: separatorStyle === 'figma' ? 4 : 5,
-                  background: '#e7ba90',
+                  background: 'var(--gold)',
                   transform: 'rotate(45deg)',
                 }}
               />
               <div
                 className="flex-1"
-                style={{ height: separatorStyle === 'figma' ? 2 : 1, background: 'linear-gradient(90deg, #e7ba90, transparent)' }}
+                style={{ height: separatorStyle === 'figma' ? 2 : 1, background: 'linear-gradient(90deg, var(--gold), transparent)' }}
               />
             </div>
           </div>
@@ -314,10 +314,10 @@ export function SRDCard({
         <div
           style={{
             flex: 1,
-            fontSize: bodyFontSize ?? 13.5,
-            fontFamily: bodyFontFamily ?? "'Source Sans 3', sans-serif",
+            fontSize: bodyFontSize ?? typeBody.fontSize,
+            fontFamily: bodyFontFamily ?? typeBody.fontFamily,
             lineHeight: bodyLineHeight ?? '1.4',
-            color: 'rgba(212, 207, 199, 0.9)',
+            color: 'var(--text-primary)',
             ...(bodyTextShadow ? { textShadow: '0px 1px 1px #4d381e' } : {}),
             ...(contentLayout === 'figma' ? { display: 'flex', flexDirection: 'column' as const, gap: 12 } : {}),
           }}

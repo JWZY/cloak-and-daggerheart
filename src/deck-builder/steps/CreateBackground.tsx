@@ -1,22 +1,21 @@
 import { useDeckStore } from '../../store/deck-store'
 import { SectionHeader } from '../../ui/SectionHeader'
 import { StepInstruction } from '../../ui/StepInstruction'
+import { typeBody } from '../../ui/typography'
 import { getClassByName } from '../../data/srd'
 
 const textareaStyle: React.CSSProperties = {
   width: '100%',
   padding: 12,
-  background: 'rgba(255, 255, 255, 0.05)',
-  border: '1px solid rgba(231, 186, 144, 0.15)',
+  background: 'var(--surface-light)',
+  border: '1px solid var(--gold-muted)',
   borderRadius: 8,
   color: '#D4CFC7',
-  fontFamily: "'Source Sans 3', sans-serif",
-  fontSize: 13.5,
-  lineHeight: 1.4,
+  ...typeBody,
   resize: 'vertical',
   minHeight: 80,
   outline: 'none',
-  caretColor: '#e7ba90',
+  caretColor: 'var(--gold)',
 }
 
 export function CreateBackground() {
@@ -41,11 +40,9 @@ export function CreateBackground() {
           <div key={index} className="flex flex-col gap-2">
             <p
               style={{
-                fontFamily: "'Source Sans 3', sans-serif",
-                fontSize: 13.5,
-                lineHeight: 1.4,
+                ...typeBody,
                 fontStyle: 'italic',
-                color: 'rgba(212, 207, 199, 0.9)',
+                color: 'var(--text-primary)',
               }}
             >
               {bg.question}
@@ -56,13 +53,13 @@ export function CreateBackground() {
               placeholder="Write your answer..."
               style={textareaStyle}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#e7ba90'
+                e.currentTarget.style.borderColor = 'var(--gold)'
                 e.currentTarget.style.boxShadow =
-                  '0 0 0 2px rgba(231, 186, 144, 0.15)'
+                  '0 0 0 2px var(--gold-muted)'
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor =
-                  'rgba(231, 186, 144, 0.15)'
+                  'var(--gold-muted)'
                 e.currentTarget.style.boxShadow = 'none'
               }}
             />

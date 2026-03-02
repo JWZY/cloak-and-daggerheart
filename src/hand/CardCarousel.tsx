@@ -135,7 +135,7 @@ function DotIndicators({
               background:
                 i === selectedIndex
                   ? '#d4af37'
-                  : 'rgba(212, 207, 199, 0.3)',
+                  : 'var(--text-muted)',
               borderRadius: i === selectedIndex ? 3 : '50%',
             }}
           />
