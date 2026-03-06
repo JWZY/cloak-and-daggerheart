@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { springs } from '../design-system/tokens/animations'
 import { StepIndicator } from './components/StepIndicator'
 import { DeckPreview } from './components/DeckPreview'
 import { PickClass } from './steps/PickClass'
@@ -50,9 +51,7 @@ const slideVariants = {
 
 const slideTransition = {
   type: 'spring' as const,
-  stiffness: 300,
-  damping: 30,
-  mass: 0.8,
+  ...springs.smooth,
 }
 
 interface DeckBuilderProps {
@@ -94,12 +93,17 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
     store.prevStep()
   }, [store])
 
+  // Steps that use FullBleedPicker and provide their own nav chrome.
+  // Add step indices here as they are converted: 0, 1, 2, 3, 4
+  const FULL_BLEED_STEPS = new Set<number>([0, 1, 2, 3, 4])
+  const isFullBleed = FULL_BLEED_STEPS.has(store.currentStep)
+
   const stepComponents = [
-    <PickClass key="step-0" />,
-    <PickSubclass key="step-1" />,
-    <PickDomainCards key="step-2" />,
-    <PickAncestry key="step-3" />,
-    <PickCommunity key="step-4" />,
+    <PickClass key="step-0" onBack={handleBack} onNext={handleNext} />,
+    <PickSubclass key="step-1" onBack={handleBack} onNext={handleNext} />,
+    <PickDomainCards key="step-2" onBack={handleBack} onNext={handleNext} />,
+    <PickAncestry key="step-3" onBack={handleBack} onNext={handleNext} />,
+    <PickCommunity key="step-4" onBack={handleBack} onNext={handleNext} />,
     <PickEquipment key="step-5" />,
     <AssignTraits key="step-6" />,
     <CreateExperiences key="step-7" />,
@@ -152,16 +156,18 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
 
       {/* Main content column */}
       <div className="flex flex-col flex-1 min-w-0 relative z-10">
-        {/* Header */}
-        <div className="shrink-0">
-          <StepIndicator
-            currentStep={store.currentStep}
-            totalSteps={TOTAL_STEPS}
-          />
-        </div>
+        {/* Header — hidden for full-bleed picker steps */}
+        {!isFullBleed && (
+          <div className="shrink-0">
+            <StepIndicator
+              currentStep={store.currentStep}
+              totalSteps={TOTAL_STEPS}
+            />
+          </div>
+        )}
 
         {/* Step content */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        <div className={`flex-1 ${isFullBleed ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={store.currentStep}
@@ -171,46 +177,48 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
               animate="center"
               exit="exit"
               transition={slideTransition}
-              className="w-full py-4"
+              className={`w-full ${isFullBleed ? 'h-full' : 'py-4'}`}
             >
               {stepComponents[store.currentStep]}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Bottom nav */}
-        <div
-          className="shrink-0 flex items-center justify-between px-6 py-4"
-          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
-        >
-          {store.currentStep > 0 ? (
-            <GameButton variant="ghost" size="sm" onClick={handleBack}>
-              Back
-            </GameButton>
-          ) : (
-            <div />
-          )}
-
-          <motion.div
-            animate={
-              showPulse
-                ? {
-                    scale: [1, 1.06, 1],
-                    transition: { duration: 0.4, ease: 'easeOut' },
-                  }
-                : { scale: 1 }
-            }
+        {/* Bottom nav — hidden for full-bleed picker steps */}
+        {!isFullBleed && (
+          <div
+            className="shrink-0 flex items-center justify-between px-6 py-4"
+            style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
           >
-            <GameButton
-              variant={canProceed ? 'primary' : 'secondary'}
-              size={isReview ? 'lg' : 'md'}
-              disabled={!canProceed}
-              onClick={handleNext}
+            {store.currentStep > 0 ? (
+              <GameButton variant="ghost" size="sm" onClick={handleBack}>
+                Back
+              </GameButton>
+            ) : (
+              <div />
+            )}
+
+            <motion.div
+              animate={
+                showPulse
+                  ? {
+                      scale: [1, 1.06, 1],
+                      transition: { duration: 0.4, ease: 'easeOut' },
+                    }
+                  : { scale: 1 }
+              }
             >
-              {buttonLabel}
-            </GameButton>
-          </motion.div>
-        </div>
+              <GameButton
+                variant={canProceed ? 'primary' : 'secondary'}
+                size={isReview ? 'lg' : 'md'}
+                disabled={!canProceed}
+                onClick={handleNext}
+              >
+                {buttonLabel}
+              </GameButton>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   )

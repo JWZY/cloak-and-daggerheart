@@ -46,13 +46,11 @@ test.describe('Character Creation Flow (v2)', () => {
       page.locator('h2:has-text("Choose Your Domain Cards")')
     ).toBeVisible({ timeout: 3000 })
 
-    // Select 3 cards (force: true needed due to 0.52 scale transform)
-    await page.locator('text=Book of Ava').first().click({ force: true })
-    await page.waitForTimeout(200)
-    await page.locator('text=Book of Illiat').first().click({ force: true })
-    await page.waitForTimeout(200)
-    await page.locator('text=Bolt Beacon').first().click({ force: true })
-    await page.waitForTimeout(200)
+    // dispatchEvent('click') needed — Playwright's click() can't map coordinates through CSS scale()
+    for (const name of ['Book of Ava', 'Book of Illiat', 'Bolt Beacon']) {
+      await page.locator(`text=${name}`).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
+      await page.waitForTimeout(200)
+    }
 
     await page.locator('button:has-text("Continue")').click()
 
@@ -60,14 +58,14 @@ test.describe('Character Creation Flow (v2)', () => {
     await expect(
       page.locator('h2:has-text("Choose Your Ancestry")')
     ).toBeVisible({ timeout: 3000 })
-    await page.getByText('Clank', { exact: true }).first().click({ force: true })
+    await page.getByText('Clank', { exact: true }).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
     await page.locator('button:has-text("Continue")').click()
 
     // Step 4: Select Community (InfoCards at 0.52 scale inside CardSelector)
     await expect(
       page.locator('h2:has-text("Choose Your Community")')
     ).toBeVisible({ timeout: 3000 })
-    await page.getByText('Highborne', { exact: true }).first().click({ force: true })
+    await page.getByText('Highborne', { exact: true }).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
     await page.locator('button:has-text("Continue")').click()
 
     // Step 5: Choose Equipment (defaults pre-selected: Leather Armor + Greatstaff)
@@ -169,13 +167,11 @@ test.describe('Character Creation Flow (v2)', () => {
       page.locator('h2:has-text("Choose Your Domain Cards")')
     ).toBeVisible({ timeout: 3000 })
 
-    // Select 3 cards (force: true needed due to 0.52 scale transform)
-    await page.locator('text=Book of Ava').first().click({ force: true })
-    await page.waitForTimeout(200)
-    await page.locator('text=Mending Touch').first().click({ force: true })
-    await page.waitForTimeout(200)
-    await page.locator('text=Bolt Beacon').first().click({ force: true })
-    await page.waitForTimeout(200)
+    // dispatchEvent('click') needed — Playwright's click() can't map coordinates through CSS scale()
+    for (const name of ['Book of Ava', 'Mending Touch', 'Bolt Beacon']) {
+      await page.locator(`text=${name}`).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
+      await page.waitForTimeout(200)
+    }
 
     await page.locator('button:has-text("Continue")').click()
 
@@ -183,14 +179,14 @@ test.describe('Character Creation Flow (v2)', () => {
     await expect(
       page.locator('h2:has-text("Choose Your Ancestry")')
     ).toBeVisible({ timeout: 3000 })
-    await page.getByText('Human', { exact: true }).first().click({ force: true })
+    await page.getByText('Human', { exact: true }).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
     await page.locator('button:has-text("Continue")').click()
 
     // Step 4: Select Community (InfoCards at 0.52 scale inside CardSelector)
     await expect(
       page.locator('h2:has-text("Choose Your Community")')
     ).toBeVisible({ timeout: 3000 })
-    await page.getByText('Wanderborne', { exact: true }).first().click({ force: true })
+    await page.getByText('Wanderborne', { exact: true }).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
     await page.locator('button:has-text("Continue")').click()
 
     // Step 5: Choose Equipment (accept defaults)

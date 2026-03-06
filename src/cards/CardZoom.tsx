@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { springs } from '../design-system/tokens/animations'
 
 export interface CardZoomProps {
   layoutId: string
@@ -40,8 +41,7 @@ export function CardZoom({ layoutId, onClose, children }: CardZoomProps) {
           }}
           transition={{
             type: 'spring',
-            stiffness: 300,
-            damping: 30,
+            ...springs.smooth,
           }}
         >
           {children}

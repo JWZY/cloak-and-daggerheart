@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
 import { typeMicro, typeBody } from '../ui/typography'
+import { springs } from '../design-system/tokens/animations'
 import { GameBadge } from '../ui/GameBadge'
 import { GlassPanel } from '../ui/GlassPanel'
 import { useCharacterStore } from '../store/character-store'
@@ -17,10 +18,10 @@ const pipScale = {
   animate: {
     scale: [0.5, 1.3, 1],
     opacity: 1,
-    transition: { type: 'spring' as const, stiffness: 500, damping: 15, mass: 0.6 },
+    transition: { type: 'spring' as const, ...springs.pip },
   },
   exit: { scale: 0.5, opacity: 0 },
-  transition: { type: 'spring' as const, stiffness: 400, damping: 20 },
+  transition: { type: 'spring' as const, ...springs.pipExit },
 }
 
 function StatButton({

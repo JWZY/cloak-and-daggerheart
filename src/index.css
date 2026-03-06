@@ -540,7 +540,7 @@ button, a {
 
 /* Gold gradient text */
 .gold-text {
-  background: linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%);
+  background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

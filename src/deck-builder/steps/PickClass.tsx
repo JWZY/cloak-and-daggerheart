@@ -1,65 +1,109 @@
-import { SectionHeader } from '../../ui/SectionHeader'
-import { StepInstruction } from '../../ui/StepInstruction'
-import { SelectableOption } from '../../ui/SelectableOption'
-import { typeSubtitle, typeBody, typeMicro } from '../../ui/typography'
+import { useState } from 'react'
+import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
+import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
-import { classes } from '../../data/srd'
+import { classes, getSubclassesForClass } from '../../data/srd'
 
-export function PickClass() {
+const BASE_URL = import.meta.env.BASE_URL
+
+function kebabCase(str: string): string {
+  return str.toLowerCase().replace(/['']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+}
+
+function Separator({ text }: { text: string }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      width: '100%',
+      justifyContent: 'center',
+    }}>
+      <div style={{ flex: 1, maxWidth: 60, height: 2, background: 'linear-gradient(90deg, transparent, rgba(231,186,144,0.4))' }} />
+      <span style={{
+        ...typeSubtitle,
+        background: goldGradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      }}>
+        {text}
+      </span>
+      <div style={{ flex: 1, maxWidth: 60, height: 2, background: 'linear-gradient(270deg, transparent, rgba(231,186,144,0.4))' }} />
+    </div>
+  )
+}
+
+interface StepProps {
+  onBack: () => void
+  onNext: () => void
+}
+
+export function PickClass({ onBack, onNext }: StepProps) {
   const selectedClass = useDeckStore((s) => s.selectedClass)
   const setClass = useDeckStore((s) => s.setClass)
 
+  const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
+
+  const pickerItems: PickerItem[] = classes.map((cls) => {
+    const firstSubName = getSubclassesForClass(cls.name)[0]?.name ?? ''
+    return {
+      id: cls.name,
+      name: cls.name,
+      illustrationSrc: `${BASE_URL}images/cards/subclasses/${kebabCase(firstSubName)}.avif`,
+    }
+  })
+
+  const handleFocus = (id: string) => {
+    setFocusedId(id)
+    setClass(id)
+  }
+
+  const handleConfirm = () => {
+    if (selectedClass) onNext()
+  }
+
+  const focusedClass = classes.find((c) => c.name === focusedId)
+
   return (
-    <div className="flex flex-col items-center px-4">
-      <h2 className="w-full max-w-[360px] mb-4">
-        <SectionHeader>Choose Your Class</SectionHeader>
-      </h2>
-      <StepInstruction>Each class has unique domains, subclasses, and play style</StepInstruction>
-
-      <div className="flex flex-col gap-3 w-full max-w-[360px] mt-4">
-        {classes.map((cls) => {
-          const isSelected = selectedClass === cls.name
-          const isDimmed = selectedClass !== null && !isSelected
-
-          return (
-            <SelectableOption
-              key={cls.name}
-              selected={isSelected}
-              dimmed={isDimmed}
-              onClick={() => setClass(cls.name)}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span
-                  style={{
-                    ...typeSubtitle,
-                    fontSize: 18,
-                    color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
-                  }}
-                >
-                  {cls.name}
-                </span>
-                <span
-                  style={{
-                    fontFamily: typeMicro.fontFamily,
-                    fontSize: typeMicro.fontSize,
-                    color: 'var(--text-muted)',
-                  }}
-                >
-                  {cls.domain_1} · {cls.domain_2}
-                </span>
-              </div>
-              <p
-                style={{
-                  ...typeBody,
-                  color: isSelected ? 'var(--gold)' : 'var(--text-muted)',
-                }}
-              >
-                {cls.description.split('. ')[0]}.
-              </p>
-            </SelectableOption>
-          )
-        })}
-      </div>
-    </div>
+    <FullBleedPicker
+      title="Class"
+      items={pickerItems}
+      focusedId={focusedId}
+      selectedIds={selectedClass ? [selectedClass] : []}
+      onFocus={handleFocus}
+      onBack={onBack}
+      onConfirm={handleConfirm}
+      canConfirm={!!selectedClass}
+    >
+      {focusedClass && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <h2 style={{
+            ...typeTitle,
+            fontSize: 36,
+            fontWeight: 400,
+            background: goldGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            margin: 0,
+            lineHeight: 1,
+            textShadow: 'none',
+          }}>
+            {focusedClass.name}
+          </h2>
+          <Separator text={`${focusedClass.domain_1} · ${focusedClass.domain_2}`} />
+          <p style={{
+            ...typeBody,
+            color: 'rgba(212,207,199,0.9)',
+            textShadow: '0px 1px 1px #4d381e',
+            textAlign: 'center',
+            margin: 0,
+          }}>
+            {focusedClass.description.split('. ')[0]}.
+          </p>
+        </div>
+      )}
+    </FullBleedPicker>
   )
 }

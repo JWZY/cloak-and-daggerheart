@@ -1,5 +1,6 @@
 import { type ReactNode, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import { springs } from '../design-system/tokens/animations'
 
 export interface CardFlipProps {
   front: ReactNode
@@ -40,8 +41,7 @@ export function CardFlip({ front, back, flipped: controlledFlipped, onFlip, widt
         animate={{ rotateY: isFlipped ? 0 : 180 }}
         transition={{
           type: 'spring',
-          stiffness: 300,
-          damping: 30,
+          ...springs.smooth,
           duration: 0.6,
         }}
         style={{

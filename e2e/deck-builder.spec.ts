@@ -45,10 +45,10 @@ test.describe('Deck Builder Flow (v2)', () => {
     ).toBeVisible({ timeout: 3000 })
     await expect(page.locator('text=0 of 3 selected')).toBeVisible()
 
-    // Select 3 cards by tapping (force: true needed due to 0.52 scale transform)
+    // dispatchEvent('click') needed — Playwright's click() can't map coordinates through CSS scale()
     const cardsToSelect = ['Book of Ava', 'Book of Illiat', 'Bolt Beacon']
     for (const name of cardsToSelect) {
-      await page.locator(`text=${name}`).first().click({ force: true })
+      await page.locator(`text=${name}`).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
       await page.waitForTimeout(200)
     }
 
@@ -62,7 +62,7 @@ test.describe('Deck Builder Flow (v2)', () => {
       page.locator('h2:has-text("Choose Your Ancestry")')
     ).toBeVisible({ timeout: 3000 })
     await expect(page.locator('button:has-text("Continue")')).toBeDisabled()
-    await page.getByText('Human', { exact: true }).first().click({ force: true })
+    await page.getByText('Human', { exact: true }).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
     await expect(page.locator('button:has-text("Continue")')).toBeEnabled()
     await page.locator('button:has-text("Continue")').click()
 
@@ -70,7 +70,7 @@ test.describe('Deck Builder Flow (v2)', () => {
     await expect(
       page.locator('h2:has-text("Choose Your Community")')
     ).toBeVisible({ timeout: 3000 })
-    await page.getByText('Highborne', { exact: true }).first().click({ force: true })
+    await page.getByText('Highborne', { exact: true }).first().evaluate((el) => el.dispatchEvent(new Event('click', { bubbles: true })))
     await page.locator('button:has-text("Continue")').click()
 
     // Step 5: Choose Equipment (defaults pre-selected: Leather Armor + Greatstaff)

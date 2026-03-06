@@ -2,7 +2,8 @@ import { useId } from 'react'
 import { motion } from 'framer-motion'
 import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from './domain-colors'
 import { DomainBanner } from './DomainBanner'
-import { typeTitle } from '../ui/typography'
+import { typeTitle, goldLight, goldDark } from '../ui/typography'
+import { springs, tapFeedback } from '../design-system/tokens/animations'
 
 // ---------------------------------------------------------------------------
 // FlatDomainCard — compact ~60px row with artwork bleed, pennant banner,
@@ -54,8 +55,8 @@ export function FlatDomainCard({
     <motion.button
       type="button"
       onClick={onClick}
-      whileTap={onClick ? { scale: 0.98 } : undefined}
-      transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.8 }}
+      whileTap={onClick ? tapFeedback.subtle : undefined}
+      transition={{ type: 'spring', ...springs.snappy }}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -223,7 +224,7 @@ export function FlatDomainCard({
             width: 20,
             height: 20,
             borderRadius: '50%',
-            background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
+            background: `linear-gradient(180deg, ${goldLight} 0%, ${goldDark} 100%)`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

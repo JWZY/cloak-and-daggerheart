@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { tapFeedback } from '../design-system/tokens/animations'
 
 export interface CardBackProps {
   variant: 'subclass' | 'domain'
@@ -16,7 +17,7 @@ export function CardBack({ variant, onClick }: CardBackProps) {
   return (
     <motion.div
       whileHover={onClick ? { y: -4 } : undefined}
-      whileTap={onClick ? { scale: 0.98 } : undefined}
+      whileTap={onClick ? tapFeedback.subtle : undefined}
       onClick={onClick}
       style={{
         width,

@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { typeMicro } from './typography'
+import { typeMicro, goldDark } from './typography'
 
 export interface GameBadgeProps {
   children: ReactNode
@@ -7,7 +7,7 @@ export interface GameBadgeProps {
 }
 
 export function GameBadge({ children, color }: GameBadgeProps) {
-  const badgeColor = color ?? '#e7ba90'
+  const badgeColor = color ?? goldDark
 
   return (
     <span

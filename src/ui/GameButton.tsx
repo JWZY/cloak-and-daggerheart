@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { typeSubtitle } from './typography'
+import { springs, tapFeedback } from '../design-system/tokens/animations'
 
 /**
  * Small diamond rivet ornament for button corners.
@@ -88,8 +89,8 @@ export function GameButton({
   if (variant === 'primary') {
     return (
       <motion.button
-        whileTap={disabled ? undefined : { scale: 0.97 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.8 }}
+        whileTap={disabled ? undefined : tapFeedback.medium}
+        transition={{ type: 'spring', ...springs.snappy }}
         onClick={onClick}
         disabled={disabled}
         className={className}
@@ -177,8 +178,8 @@ export function GameButton({
   if (variant === 'secondary') {
     return (
       <motion.button
-        whileTap={disabled ? undefined : { scale: 0.97 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.8 }}
+        whileTap={disabled ? undefined : tapFeedback.medium}
+        transition={{ type: 'spring', ...springs.snappy }}
         onClick={onClick}
         disabled={disabled}
         className={className}
@@ -231,8 +232,8 @@ export function GameButton({
   // ghost
   return (
     <motion.button
-      whileTap={disabled ? undefined : { scale: 0.97 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.8 }}
+      whileTap={disabled ? undefined : tapFeedback.medium}
+      transition={{ type: 'spring', ...springs.snappy }}
       onClick={onClick}
       disabled={disabled}
       className={`group ${className}`}
@@ -253,7 +254,7 @@ export function GameButton({
           left: 16,
           right: 16,
           height: 1,
-          background: 'linear-gradient(90deg, transparent, #e7ba90, transparent)',
+          background: 'linear-gradient(90deg, transparent, var(--gold), transparent)',
           opacity: 0,
           transition: 'opacity 0.15s ease',
         }}

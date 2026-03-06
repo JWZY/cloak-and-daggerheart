@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
+import { tapFeedback } from '../design-system/tokens/animations'
 
 export interface SelectableOptionProps {
   selected: boolean
@@ -26,7 +27,7 @@ export function SelectableOption({
   return (
     <motion.button
       layout={layoutProp}
-      whileTap={disabled ? undefined : { scale: 0.97 }}
+      whileTap={disabled ? undefined : tapFeedback.medium}
       onClick={disabled ? undefined : onClick}
       className={`w-full text-left rounded-xl px-4 py-3 ${className}`}
       style={{

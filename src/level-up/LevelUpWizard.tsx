@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradient } from '../ui/typography'
+import { SelectableOption } from '../ui/SelectableOption'
 import { X, ChevronRight, ChevronLeft, Check, Sparkles } from 'lucide-react'
 import { useLevelUpStore } from '../store/level-up-store'
 import { useCharacterStore } from '../store/character-store'
@@ -35,16 +36,6 @@ const ADVANCEMENT_LABELS: Record<AdvancementType, string> = {
   increase_proficiency: '+1 Proficiency',
 }
 
-const ADVANCEMENT_DESCRIPTIONS: Record<AdvancementType, string> = {
-  increase_traits: 'Increase 2 unmarked traits by +1 (marks them)',
-  add_hp: 'Add 1 HP slot to your maximum',
-  add_stress: 'Add 1 Stress slot to your maximum',
-  boost_experiences: 'Increase 2 experience bonuses by +1',
-  add_domain_card: 'Add a new domain card (level \u2264 2)',
-  increase_evasion: 'Increase your evasion score by 1',
-  upgrade_subclass: 'Foundation \u2192 Specialization (2 slots)',
-  increase_proficiency: 'Increase proficiency bonus by 1 (2 slots)',
-}
 
 export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
   const store = useLevelUpStore()
@@ -387,8 +378,7 @@ function StepAdvancements({
   onRemove: (index: number) => void
   canAdd: (cost: number) => boolean
 }) {
-  const [pickingTraits, setPickingTraits] = useState(false)
-  const [pickingExperiences, setPickingExperiences] = useState(false)
+  const [expandedType, setExpandedType] = useState<AdvancementType | null>(null)
   const [selectedTraits, setSelectedTraits] = useState<TraitName[]>([])
   const [selectedExpIndices, setSelectedExpIndices] = useState<number[]>([])
 
@@ -396,23 +386,66 @@ function StepAdvancements({
   const tier = getTier(newLevel)
   const availableTypes = getAvailableAdvancementTypes(tier)
 
-  // Count how many times each type was picked in this tier (past advancements + current picks)
-  const tierPickCounts = useMemo(() => {
+  // Count past-tier picks (advancements from previous levels in this tier)
+  const pastTierPickCounts = useMemo(() => {
     const counts: Partial<Record<AdvancementType, number>> = {}
-    // Count past advancements in the same tier
     for (const a of character.advancements) {
       if (getTier(a.level) === tier) {
         counts[a.type] = (counts[a.type] ?? 0) + 1
       }
     }
-    // Count current level-up picks
+    return counts
+  }, [character.advancements, tier])
+
+  // Count current level-up picks per type
+  const currentPickCounts = useMemo(() => {
+    const counts: Partial<Record<AdvancementType, number>> = {}
     for (const a of advancements) {
       counts[a.type] = (counts[a.type] ?? 0) + 1
     }
     return counts
-  }, [character.advancements, advancements, tier])
+  }, [advancements])
 
-  const handleSelectAdvancement = (type: AdvancementType) => {
+  // Combined tier pick counts (past + current)
+  const tierPickCounts = useMemo(() => {
+    const counts: Partial<Record<AdvancementType, number>> = {}
+    for (const type of availableTypes) {
+      counts[type] = (pastTierPickCounts[type] ?? 0) + (currentPickCounts[type] ?? 0)
+    }
+    return counts
+  }, [pastTierPickCounts, currentPickCounts, availableTypes])
+
+  const handleCheckboxTap = (type: AdvancementType, checkboxIndex: number) => {
+    const pastCount = pastTierPickCounts[type] ?? 0
+    const currentCount = currentPickCounts[type] ?? 0
+
+    // If tapping a filled checkbox that belongs to a current pick, undo it
+    if (checkboxIndex >= pastCount && checkboxIndex < pastCount + currentCount) {
+      // Find the index of the nth current pick for this type
+      const currentPickOffset = checkboxIndex - pastCount
+      let found = 0
+      for (let i = 0; i < advancements.length; i++) {
+        if (advancements[i].type === type) {
+          if (found === currentPickOffset) {
+            // Also collapse if this type's expansion is open
+            if (expandedType === type) {
+              setExpandedType(null)
+              setSelectedTraits([])
+              setSelectedExpIndices([])
+            }
+            onRemove(i)
+            return
+          }
+          found++
+        }
+      }
+      return
+    }
+
+    // If tapping a past-filled checkbox, do nothing
+    if (checkboxIndex < pastCount) return
+
+    // Tapping an empty checkbox — try to add
     const cost = getAdvancementCost(type)
     if (!canAdd(cost)) return
     const picksUsed = tierPickCounts[type] ?? 0
@@ -420,13 +453,15 @@ function StepAdvancements({
 
     if (type === 'increase_traits') {
       setSelectedTraits([])
-      setPickingTraits(true)
+      setSelectedExpIndices([])
+      setExpandedType(type)
       return
     }
 
     if (type === 'boost_experiences') {
       setSelectedExpIndices([])
-      setPickingExperiences(true)
+      setSelectedTraits([])
+      setExpandedType(type)
       return
     }
 
@@ -441,23 +476,25 @@ function StepAdvancements({
         type: 'increase_traits',
         traits: [selectedTraits[0], selectedTraits[1]],
       })
-      setPickingTraits(false)
+      setExpandedType(null)
       setSelectedTraits([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTraits])
 
-  const handleConfirmExperiences = () => {
+  // Auto-confirm when 2 experiences are selected
+  useEffect(() => {
     if (selectedExpIndices.length === 2) {
       onAdd({
         level: newLevel,
         type: 'boost_experiences',
         experienceIndices: [selectedExpIndices[0], selectedExpIndices[1]],
       })
-      setPickingExperiences(false)
+      setExpandedType(null)
       setSelectedExpIndices([])
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedExpIndices])
 
   const toggleTrait = (trait: TraitName) => {
     setSelectedTraits(prev => {
@@ -501,228 +538,212 @@ function StepAdvancements({
         </div>
       </div>
 
-      {/* Selected advancements */}
-      {advancements.length > 0 && (
-        <div className="flex flex-col gap-2">
-          {advancements.map((a, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between px-3 py-2 rounded-xl"
-              style={{
-                background: 'var(--gold-muted)',
-                border: '1px solid var(--gold-muted)',
-              }}
-            >
-              <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--gold)' }}>
-                {ADVANCEMENT_LABELS[a.type]}
-                {a.traits && ` (${a.traits.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ')})`}
-                {a.experienceIndices && ` (Exp ${a.experienceIndices.map(idx => idx + 1).join(', ')})`}
-              </span>
-              <button
-                onClick={() => onRemove(i)}
-                className="p-1 rounded"
-                style={{ color: 'var(--gold-secondary)' }}
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Advancement rows */}
+      <div className="flex flex-col gap-2">
+        {availableTypes.map(type => {
+          const cost = getAdvancementCost(type)
+          const canAfford = canAdd(cost)
+          const pickLimit = getAdvancementPickLimit(type)
+          const pastCount = pastTierPickCounts[type] ?? 0
+          const currentCount = currentPickCounts[type] ?? 0
+          const totalPicked = tierPickCounts[type] ?? 0
+          const atTierLimit = totalPicked >= pickLimit
+          const isDisabled = (!canAfford && currentCount === 0) || (atTierLimit && currentCount === 0)
+          const isTwoSlot = cost === 2
 
-      {/* Trait picker — full-width rows matching AssignTraits pattern */}
-      {pickingTraits && (
-        <div className="flex flex-col gap-3 p-3 rounded-xl" style={{ background: 'var(--gold-muted)', border: '1px solid var(--gold-muted)' }}>
-          <div className="flex items-center justify-between">
-            <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--gold)' }}>
-              Pick 2 unmarked traits to increase
-            </span>
-            <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
-              {selectedTraits.length} / 2
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            {TRAIT_NAMES.map(trait => {
-              const isMarked = markedTraits.has(trait)
-              const isSelected = selectedTraits.includes(trait)
-              return (
-                <button
-                  key={trait}
-                  onClick={() => !isMarked && toggleTrait(trait)}
-                  disabled={isMarked}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all"
-                  style={{
-                    background: isSelected
-                      ? 'var(--gold-muted)'
-                      : 'var(--surface-faint)',
-                    border: isSelected
-                      ? '1px solid var(--gold-muted)'
-                      : '1px solid var(--surface-light)',
-                    boxShadow: isSelected
-                      ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
-                      : 'none',
-                    opacity: isMarked ? 0.35 : 1,
-                    cursor: isMarked ? 'default' : 'pointer',
-                  }}
-                >
-                  <span
-                    style={{
-                      ...typeSubtitle,
-                      color: isMarked
-                        ? 'var(--text-muted)'
-                        : isSelected
-                          ? 'var(--gold)'
-                          : 'var(--text-secondary)',
-                    }}
-                  >
-                    {trait}
-                    {isMarked && (
-                      <span style={{ fontSize: 11, marginLeft: 6, color: 'var(--text-muted)' }}>marked</span>
-                    )}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: typeBody.fontFamily,
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: isMarked
-                        ? 'var(--text-muted)'
-                        : isSelected
-                          ? 'var(--gold)'
-                          : 'var(--text-muted)',
-                      minWidth: 32,
-                      textAlign: 'right',
-                    }}
-                  >
-                    {formatTraitValue(character.traits[trait])}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-          <button
-            onClick={() => { setPickingTraits(false); setSelectedTraits([]) }}
-            className="self-start px-3 py-1.5 text-sm rounded-lg"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            Cancel
-          </button>
-        </div>
-      )}
-
-      {/* Experience picker sub-modal */}
-      {pickingExperiences && (
-        <div className="flex flex-col gap-3 p-3 rounded-xl" style={{ background: 'var(--gold-muted)', border: '1px solid var(--gold-muted)' }}>
-          <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--gold)' }}>
-            Pick 2 experiences to boost
-          </span>
-          <div className="flex flex-col gap-2">
-            {(character.experiences || []).map((exp, idx) => {
-              if (!exp?.text) return null
-              const isSelected = selectedExpIndices.includes(idx)
-              return (
-                <button
-                  key={idx}
-                  onClick={() => toggleExpIndex(idx)}
-                  className="px-3 py-2 rounded-lg text-left transition-all"
-                  style={{
-                    fontFamily: typeBody.fontFamily,
-                    fontSize: 13,
-                    background: isSelected ? 'var(--gold-muted)' : 'var(--surface-faint)',
-                    border: isSelected ? '1px solid var(--gold-secondary)' : '1px solid var(--surface-light)',
-                    color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
-                  }}
-                >
-                  {exp.text} (+{exp.bonus})
-                </button>
-              )
-            })}
-          </div>
-          <div className="flex justify-end gap-2">
-            <button onClick={() => setPickingExperiences(false)} className="px-3 py-1.5 text-sm rounded-lg" style={{ color: 'var(--text-muted)' }}>
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirmExperiences}
-              disabled={selectedExpIndices.length !== 2}
-              className="px-3 py-1.5 text-sm rounded-lg"
-              style={{
-                background: selectedExpIndices.length === 2 ? 'var(--gold-muted)' : 'transparent',
-                color: selectedExpIndices.length === 2 ? 'var(--gold)' : 'var(--text-muted)',
-                border: '1px solid var(--gold-muted)',
-              }}
-            >
-              Confirm
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Available advancements */}
-      {slotsUsed < 2 && !pickingTraits && !pickingExperiences && (
-        <div className="flex flex-col gap-2">
-          <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--text-muted)' }}>
-            Available Advancements
-          </span>
-          {availableTypes.map(type => {
-            const cost = getAdvancementCost(type)
-            const canAfford = canAdd(cost)
-            const pickLimit = getAdvancementPickLimit(type)
-            const picksUsed = tierPickCounts[type] ?? 0
-            const atTierLimit = picksUsed >= pickLimit
-            const isDisabled = !canAfford || atTierLimit
-            return (
-              <button
-                key={type}
-                onClick={() => handleSelectAdvancement(type)}
-                disabled={isDisabled}
-                className="flex flex-col px-3 py-2.5 rounded-xl text-left transition-all"
+          return (
+            <div key={type}>
+              {/* Checkbox row */}
+              <div
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
                 style={{
-                  background: !isDisabled ? 'var(--surface-faint)' : 'transparent',
-                  border: '1px solid var(--gold-muted)',
+                  background: currentCount > 0 ? 'var(--gold-muted)' : 'var(--surface-faint)',
+                  border: currentCount > 0 ? '1px solid var(--gold-muted)' : '1px solid var(--gold-muted)',
                   opacity: isDisabled ? 0.35 : 1,
                 }}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-2">
-                    <span style={{ fontFamily: typeBody.fontFamily, fontSize: 14, fontWeight: 600, color: '#D4CFC7' }}>
-                      {ADVANCEMENT_LABELS[type]}
-                    </span>
-                    {/* Per-tier pick limit checkboxes */}
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: pickLimit }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="rounded-sm"
-                          style={{
-                            width: 10,
-                            height: 10,
-                            background: i < picksUsed
-                              ? 'linear-gradient(180deg, #f9f8f3, #e7ba90)'
-                              : 'transparent',
-                            border: i < picksUsed
-                              ? '1px solid var(--gold)'
-                              : '1px solid var(--gold-muted)',
-                            boxShadow: i < picksUsed
-                              ? '0 0 4px var(--gold-muted)'
-                              : 'none',
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
-                    {cost} {cost === 1 ? 'slot' : 'slots'}
-                  </span>
+                {/* Tier pick-limit checkboxes */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: pickLimit }).map((_, i) => {
+                    const isFilled = i < totalPicked
+                    const isPastPick = i < pastCount
+                    const isCurrentPick = isFilled && !isPastPick
+                    const isTappable = isCurrentPick || (!isFilled && canAfford && !atTierLimit)
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => isTappable && handleCheckboxTap(type, i)}
+                        disabled={!isTappable}
+                        className="rounded-sm"
+                        style={{
+                          width: 12,
+                          height: 12,
+                          background: isFilled
+                            ? 'linear-gradient(180deg, #f9f8f3, #e7ba90)'
+                            : 'transparent',
+                          border: isFilled
+                            ? '1px solid var(--gold)'
+                            : '1px solid var(--gold-muted)',
+                          boxShadow: isFilled
+                            ? '0 0 4px var(--gold-muted)'
+                            : 'none',
+                          cursor: isTappable ? 'pointer' : 'default',
+                          opacity: isPastPick ? 0.6 : 1,
+                          padding: 0,
+                        }}
+                      />
+                    )
+                  })}
                 </div>
-                <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                  {ADVANCEMENT_DESCRIPTIONS[type]}
+
+                {/* Label */}
+                <span
+                  className="flex-1"
+                  style={{
+                    fontFamily: typeBody.fontFamily,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: currentCount > 0 ? 'var(--gold)' : '#D4CFC7',
+                  }}
+                >
+                  {ADVANCEMENT_LABELS[type]}
                 </span>
-              </button>
-            )
-          })}
-        </div>
-      )}
+
+                {/* Slot cost for 2-slot types */}
+                {isTwoSlot && (
+                  <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
+                    2 slots
+                  </span>
+                )}
+              </div>
+
+              {/* Inline trait picker */}
+              <AnimatePresence initial={false}>
+                {expandedType === type && type === 'increase_traits' && (
+                  <motion.div
+                    key="content"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div className="flex flex-col gap-2 pt-2 pb-1">
+                      <div className="flex items-center justify-between px-1">
+                        <span style={{ ...typeSubtitle, fontSize: 13, color: 'var(--gold)' }}>
+                          Pick 2 unmarked traits
+                        </span>
+                        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
+                          {selectedTraits.length} / 2
+                        </span>
+                      </div>
+                      {TRAIT_NAMES.map(trait => {
+                        const isMarked = markedTraits.has(trait)
+                        const isSelected = selectedTraits.includes(trait)
+                        const isDimmed = !isMarked && !isSelected && selectedTraits.length >= 2
+                        return (
+                          <SelectableOption
+                            key={trait}
+                            selected={isSelected}
+                            dimmed={isDimmed}
+                            disabled={isMarked}
+                            onClick={() => toggleTrait(trait)}
+                            layout={false}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span
+                                style={{
+                                  ...typeSubtitle,
+                                  color: isMarked
+                                    ? 'var(--text-muted)'
+                                    : isSelected
+                                      ? 'var(--gold)'
+                                      : 'var(--text-secondary)',
+                                }}
+                              >
+                                {trait}
+                                {isMarked && (
+                                  <span style={{ fontSize: 11, marginLeft: 6, color: 'var(--text-muted)' }}>marked</span>
+                                )}
+                              </span>
+                              <span
+                                style={{
+                                  fontFamily: typeBody.fontFamily,
+                                  fontSize: 15,
+                                  fontWeight: 700,
+                                  color: isMarked
+                                    ? 'var(--text-muted)'
+                                    : isSelected
+                                      ? 'var(--gold)'
+                                      : 'var(--text-muted)',
+                                  minWidth: 32,
+                                  textAlign: 'right',
+                                }}
+                              >
+                                {formatTraitValue(character.traits[trait])}
+                              </span>
+                            </div>
+                          </SelectableOption>
+                        )
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Inline experience picker */}
+              <AnimatePresence initial={false}>
+                {expandedType === type && type === 'boost_experiences' && (
+                  <motion.div
+                    key="content"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div className="flex flex-col gap-2 pt-2 pb-1">
+                      <div className="flex items-center justify-between px-1">
+                        <span style={{ ...typeSubtitle, fontSize: 13, color: 'var(--gold)' }}>
+                          Pick 2 experiences to boost
+                        </span>
+                        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
+                          {selectedExpIndices.length} / 2
+                        </span>
+                      </div>
+                      {(character.experiences || []).map((exp, idx) => {
+                        if (!exp?.text) return null
+                        const isSelected = selectedExpIndices.includes(idx)
+                        const isDimmed = !isSelected && selectedExpIndices.length >= 2
+                        return (
+                          <SelectableOption
+                            key={idx}
+                            selected={isSelected}
+                            dimmed={isDimmed}
+                            disabled={false}
+                            onClick={() => toggleExpIndex(idx)}
+                            layout={false}
+                          >
+                            <span
+                              style={{
+                                fontFamily: typeBody.fontFamily,
+                                fontSize: 13,
+                                color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
+                              }}
+                            >
+                              {exp.text} (+{exp.bonus})
+                            </span>
+                          </SelectableOption>
+                        )
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -1,67 +1,113 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { getSubclassCards } from '../../data/card-mapper'
-import { SRDCard } from '../../cards/SRDCard'
-import { CardZoom } from '../../cards/CardZoom'
-import { CardSelector } from '../../cards/CardSelector'
-import { useCardZoom } from '../../cards/useCardZoom'
-import { SectionHeader } from '../../ui/SectionHeader'
-import { StepInstruction } from '../../ui/StepInstruction'
+import { useState } from 'react'
+import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
+import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
+import { getSubclassesForClass } from '../../data/srd'
 
-export function PickSubclass() {
+const BASE_URL = import.meta.env.BASE_URL
+
+function kebabCase(str: string): string {
+  return str.toLowerCase().replace(/['']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+}
+
+function Separator({ text }: { text: string }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      width: '100%',
+      justifyContent: 'center',
+    }}>
+      <div style={{ flex: 1, maxWidth: 60, height: 2, background: 'linear-gradient(90deg, transparent, rgba(231,186,144,0.4))' }} />
+      <span style={{
+        ...typeSubtitle,
+        background: goldGradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      }}>
+        {text}
+      </span>
+      <div style={{ flex: 1, maxWidth: 60, height: 2, background: 'linear-gradient(270deg, transparent, rgba(231,186,144,0.4))' }} />
+    </div>
+  )
+}
+
+interface StepProps {
+  onBack: () => void
+  onNext: () => void
+}
+
+export function PickSubclass({ onBack, onNext }: StepProps) {
   const subclass = useDeckStore((s) => s.subclass)
   const setSubclass = useDeckStore((s) => s.setSubclass)
   const selectedClass = useDeckStore((s) => s.selectedClass)
-  const subclassCards = getSubclassCards(selectedClass ?? 'Wizard')
-  const { zoomedCard, openZoom, closeZoom } = useCardZoom()
 
-  const handleTap = (name: string) => {
-    if (subclass === name) {
-      openZoom(`subclass-${name}`)
-    } else {
-      setSubclass(name)
-    }
+  const subclassData = getSubclassesForClass(selectedClass ?? 'Wizard')
+
+  const [focusedId, setFocusedId] = useState<string | null>(subclass ?? subclassData[0]?.name ?? null)
+
+  const pickerItems: PickerItem[] = subclassData.map((sub) => ({
+    id: sub.name,
+    name: sub.name,
+    illustrationSrc: `${BASE_URL}images/cards/subclasses/${kebabCase(sub.name)}.avif`,
+  }))
+
+  const handleFocus = (id: string) => {
+    setFocusedId(id)
+    setSubclass(id)
   }
 
+  const handleConfirm = () => {
+    if (subclass) onNext()
+  }
+
+  const focusedSub = subclassData.find((s) => s.name === focusedId)
+
+  // Build description: use the subclass description field, falling back to first foundation text
+  const descriptionText = focusedSub
+    ? (focusedSub.description || (focusedSub.foundations[0]?.text?.split('. ')[0] + '.') || '')
+    : ''
+
   return (
-    <div className="flex flex-col items-center">
-      <h2 className="w-full max-w-[360px] mb-4 px-4">
-        <SectionHeader>Choose Your Subclass</SectionHeader>
-      </h2>
-      <StepInstruction>Tap to select — tap again to zoom</StepInstruction>
-
-      <div className="flex justify-center gap-4">
-        {subclassCards.map((props) => {
-          const layoutId = `subclass-${props.name}`
-          const isSelected = subclass === props.name
-          const isDimmed = subclass !== null && !isSelected
-
-          return (
-            <CardSelector
-              key={props.name}
-              selected={isSelected}
-              dimmed={isDimmed}
-              onSelect={() => handleTap(props.name)}
-            >
-              <motion.div layoutId={layoutId}>
-                <SRDCard {...props} />
-              </motion.div>
-            </CardSelector>
-          )
-        })}
-      </div>
-
-      <AnimatePresence>
-        {zoomedCard && (
-          <CardZoom layoutId={zoomedCard} onClose={closeZoom}>
-            {subclassCards
-              .filter((p) => `subclass-${p.name}` === zoomedCard)
-              .map((props) => (
-                <SRDCard key={props.name} {...props} />
-              ))}
-          </CardZoom>
-        )}
-      </AnimatePresence>
-    </div>
+    <FullBleedPicker
+      title="Subclass"
+      items={pickerItems}
+      focusedId={focusedId}
+      selectedIds={subclass ? [subclass] : []}
+      onFocus={handleFocus}
+      onBack={onBack}
+      onConfirm={handleConfirm}
+      canConfirm={!!subclass}
+    >
+      {focusedSub && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <h2 style={{
+            ...typeTitle,
+            fontSize: 36,
+            fontWeight: 400,
+            background: goldGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            margin: 0,
+            lineHeight: 1,
+          }}>
+            {focusedSub.name}
+          </h2>
+          <Separator text={selectedClass ?? ''} />
+          <p style={{
+            ...typeBody,
+            color: 'rgba(212,207,199,0.9)',
+            textShadow: '0px 1px 1px #4d381e',
+            textAlign: 'center',
+            margin: 0,
+          }}>
+            {descriptionText}
+          </p>
+        </div>
+      )}
+    </FullBleedPicker>
   )
 }

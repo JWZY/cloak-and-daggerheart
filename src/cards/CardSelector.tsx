@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
+import { springs } from '../design-system/tokens/animations'
 
 export interface CardSelectorProps {
   selected: boolean
@@ -26,8 +27,7 @@ export function CardSelector({
       }}
       transition={{
         type: 'spring',
-        stiffness: 400,
-        damping: 25,
+        ...springs.select,
       }}
       style={{
         cursor: 'pointer',

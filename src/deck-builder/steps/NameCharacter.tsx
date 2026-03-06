@@ -12,7 +12,7 @@ export function NameCharacter() {
   const selectedClass = useDeckStore((s) => s.selectedClass)
 
   return (
-    <div className="flex flex-col items-center justify-center px-6 min-h-[400px] relative">
+    <div className="flex flex-col items-center justify-center px-4 min-h-[400px] relative">
       {/* Atmosphere texture */}
       <div
         style={{
@@ -39,7 +39,7 @@ export function NameCharacter() {
         {subclass ?? selectedClass ?? ''}
       </p>
 
-      <h2 className="w-full max-w-[360px] mb-8">
+      <h2 className="w-full max-w-[360px] mb-2 px-4">
         <SectionHeader>Name Your Character</SectionHeader>
       </h2>
 

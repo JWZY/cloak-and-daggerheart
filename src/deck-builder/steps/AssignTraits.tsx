@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { tapFeedback } from '../../design-system/tokens/animations'
 import { TRAIT_NAMES, parseSuggestedTraits, formatTraitValue, getRemainingTraitValues } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
 import { SectionHeader } from '../../ui/SectionHeader'
@@ -89,7 +90,7 @@ export function AssignTraits() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <h2 className="w-full max-w-[360px] mb-2">
+      <h2 className="w-full max-w-[360px] mb-2 px-4">
         <SectionHeader>Assign Traits</SectionHeader>
       </h2>
       <StepInstruction>Tap a trait to unassign, tap a pill to assign</StepInstruction>
@@ -99,7 +100,7 @@ export function AssignTraits() {
         {pillValues.map(({ value, poolIndex }, i) => (
           <motion.button
             key={`${value}-${i}`}
-            whileTap={{ scale: 0.9 }}
+            whileTap={tapFeedback.strong}
             onClick={() => handlePillTap(value, poolIndex)}
             style={{
               ...typeSubtitle,
@@ -121,7 +122,7 @@ export function AssignTraits() {
             <GameBadge>All values assigned</GameBadge>
             <span
               style={{
-                fontFamily: "'EB Garamond', serif",
+                fontFamily: typeSubtitle.fontFamily,
                 fontStyle: 'italic',
                 fontSize: 11,
                 color: 'var(--gold-secondary)',

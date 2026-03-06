@@ -5,14 +5,24 @@
  * iOS-native spring physics configurations for Framer Motion
  */
 export const springs = {
-  /** Fast, snappy interactions */
+  /** Fast, snappy interactions (buttons, cards) */
   snappy: { stiffness: 400, damping: 30, mass: 0.8 },
-  /** Smooth, natural feel - default iOS-like spring */
+  /** Smooth, natural feel — default iOS-like spring */
   smooth: { stiffness: 300, damping: 30, mass: 0.8 },
   /** Slightly bouncy, playful */
   bouncy: { stiffness: 500, damping: 25, mass: 0.8 },
   /** Gentle, slow transitions */
   gentle: { stiffness: 200, damping: 30, mass: 1 },
+  /** View entrance — slow, weighty slide-in */
+  entrance: { stiffness: 200, damping: 28, mass: 1 },
+  /** View entrance — faster variant for secondary views */
+  entranceFast: { stiffness: 260, damping: 28, mass: 0.8 },
+  /** Stat pip pop-in — very bouncy, lightweight */
+  pip: { stiffness: 500, damping: 15, mass: 0.6 },
+  /** Stat pip exit — snappy fade-out */
+  pipExit: { stiffness: 400, damping: 20 },
+  /** Selection indicator — dot/card select spring */
+  select: { stiffness: 400, damping: 25 },
 } as const
 
 /**
@@ -50,8 +60,10 @@ export const transitions = {
  * Tap feedback scale for buttons/cards
  */
 export const tapFeedback = {
-  /** Subtle press effect */
+  /** Subtle press effect (cards) */
   subtle: { scale: 0.98 },
+  /** Medium press effect (buttons, selectable options) */
+  medium: { scale: 0.97 },
   /** Standard press effect */
   standard: { scale: 0.95 },
   /** Strong press effect for larger elements */

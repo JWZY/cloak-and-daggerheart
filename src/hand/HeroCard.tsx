@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { tapFeedback } from '../design-system/tokens/animations'
 import { SRDCard } from '../cards/SRDCard'
 import { subclassToCardProps } from '../data/card-mapper'
 import { getSubclassByName, getClassForSubclass } from '../data/srd'
@@ -16,7 +17,7 @@ export function HeroCard({ onTap, subclass }: HeroCardProps) {
   return (
     <motion.div
       layoutId="hero-card"
-      whileTap={{ scale: 0.97 }}
+      whileTap={tapFeedback.medium}
       onClick={onTap}
       style={{ cursor: 'pointer' }}
     >

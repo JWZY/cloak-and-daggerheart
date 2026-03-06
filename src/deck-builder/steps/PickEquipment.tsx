@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { springs } from '../../design-system/tokens/animations'
 import { SectionHeader } from '../../ui/SectionHeader'
 import { StepInstruction } from '../../ui/StepInstruction'
 import { SelectableOption } from '../../ui/SelectableOption'
@@ -312,7 +313,7 @@ export function PickEquipment() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <h2 className="w-full max-w-sm mb-2">
+      <h2 className="w-full max-w-[360px] mb-2 px-4">
         <SectionHeader>Choose Your Equipment</SectionHeader>
       </h2>
       <StepInstruction>{selectedClass ?? 'Class'} suggested build pre-selected</StepInstruction>
@@ -320,7 +321,7 @@ export function PickEquipment() {
       {/* ----------------------------------------------------------------- */}
       {/* Armor Section                                                     */}
       {/* ----------------------------------------------------------------- */}
-      <div className="w-full max-w-sm mb-6">
+      <div className="w-full max-w-[360px] mb-6">
         <div className="mb-3">
           <SectionHeader>Armor</SectionHeader>
         </div>
@@ -345,7 +346,7 @@ export function PickEquipment() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                  transition={{ type: 'spring', ...springs.smooth }}
                 >
                   <ArmorOption
                     armor={armor}
@@ -363,7 +364,7 @@ export function PickEquipment() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                transition={{ type: 'spring', ...springs.smooth }}
               >
                 <ArmorOption
                   armor={selectedArmorData}
@@ -381,7 +382,7 @@ export function PickEquipment() {
       {/* ----------------------------------------------------------------- */}
       {/* Primary Weapon Section                                            */}
       {/* ----------------------------------------------------------------- */}
-      <div className="w-full max-w-sm mb-6">
+      <div className="w-full max-w-[360px] mb-6">
         <div className="mb-3">
           <SectionHeader>Primary Weapon</SectionHeader>
         </div>
@@ -395,16 +396,12 @@ export function PickEquipment() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                transition={{ type: 'spring', ...springs.smooth }}
                 className="mb-4"
               >
                 <p
                   style={{
-                    fontFamily: "'EB Garamond', serif",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    fontVariant: 'small-caps',
-                    letterSpacing: '0.06em',
+                    ...typeSubtitle,
                     color: 'var(--text-muted)',
                     marginBottom: 8,
                     paddingLeft: 4,
@@ -434,7 +431,7 @@ export function PickEquipment() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+              transition={{ type: 'spring', ...springs.smooth }}
             >
               <WeaponOption
                 weapon={selectedPrimaryData}
@@ -451,7 +448,7 @@ export function PickEquipment() {
       {/* ----------------------------------------------------------------- */}
       {/* Secondary Weapon Section (always visible)                         */}
       {/* ----------------------------------------------------------------- */}
-      <div className="w-full max-w-sm mb-6">
+      <div className="w-full max-w-[360px] mb-6">
         <div className="mb-3">
           <SectionHeader>Secondary Weapon</SectionHeader>
         </div>
@@ -460,8 +457,7 @@ export function PickEquipment() {
         {isSecondaryDisabled && (
           <p
             style={{
-              fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 13.5,
+              ...typeBody,
               color: 'var(--text-muted)',
               textAlign: 'center',
               fontStyle: 'italic',
@@ -476,8 +472,7 @@ export function PickEquipment() {
         {!isSecondaryDisabled && (
           <p
             style={{
-              fontFamily: "'Source Sans 3', sans-serif",
-              fontSize: 13.5,
+              ...typeBody,
               color: 'var(--text-muted)',
               textAlign: 'center',
               marginBottom: 12,
@@ -497,16 +492,12 @@ export function PickEquipment() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                transition={{ type: 'spring', ...springs.smooth }}
                 className="mb-4"
               >
                 <p
                   style={{
-                    fontFamily: "'EB Garamond', serif",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    fontVariant: 'small-caps',
-                    letterSpacing: '0.06em',
+                    ...typeSubtitle,
                     color: 'var(--text-muted)',
                     marginBottom: 8,
                     paddingLeft: 4,
@@ -536,7 +527,7 @@ export function PickEquipment() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+              transition={{ type: 'spring', ...springs.smooth }}
             >
               <WeaponOption
                 weapon={selectedSecondaryData}

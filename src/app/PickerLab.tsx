@@ -95,7 +95,7 @@ export default function PickerLab() {
                     : 'var(--surface-faint)',
                 color:
                   viewMode === mode
-                    ? '#e7ba90'
+                    ? 'var(--gold)'
                     : 'var(--text-muted)',
                 transition: 'all 0.15s ease',
               }}
@@ -258,11 +258,7 @@ export default function PickerLab() {
         >
           <h3
             style={{
-              fontFamily: "'EB Garamond', serif",
-              fontSize: 13,
-              fontWeight: 600,
-              fontVariant: 'small-caps',
-              letterSpacing: '0.06em',
+              ...typeSubtitle,
               color: 'var(--gold)',
               marginBottom: 12,
             }}

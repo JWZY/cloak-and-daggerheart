@@ -5,6 +5,7 @@
  */
 
 import { motion } from 'framer-motion'
+import { tapFeedback } from '../design-system/tokens/animations'
 import { typeTitle, typeBody } from '../ui/typography'
 import {
   goldGradientStyle,
@@ -253,7 +254,7 @@ export function InfoCard({
   if (scale !== 1 || onClick) {
     return (
       <motion.div
-        whileTap={onClick ? { scale: 0.98 } : undefined}
+        whileTap={onClick ? tapFeedback.subtle : undefined}
         whileHover={onClick ? { y: -4 } : undefined}
         onClick={onClick}
         style={{

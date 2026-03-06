@@ -140,7 +140,7 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
         <span
           style={{
             ...typeMicro,
-            color: 'rgba(231, 186, 144, 0.4)',
+            color: 'var(--gold-secondary)',
           }}
         >
           Gold

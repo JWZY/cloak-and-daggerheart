@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { typeTitle } from '../ui/typography'
+import { springs } from '../design-system/tokens/animations'
 import { DeckBuilder } from '../deck-builder/DeckBuilder'
 import { HandView } from '../hand/HandView'
 import { useCharacterStore } from '../store/character-store'
@@ -17,9 +18,7 @@ const builderVariants = {
     y: 0,
     transition: {
       type: 'spring' as const,
-      stiffness: 200,
-      damping: 28,
-      mass: 1,
+      ...springs.entrance,
     },
   },
   exit: {
@@ -37,9 +36,7 @@ const handVariants = {
     scale: 1,
     transition: {
       type: 'spring' as const,
-      stiffness: 260,
-      damping: 28,
-      mass: 0.8,
+      ...springs.entranceFast,
       delay: 0.15,
     },
   },

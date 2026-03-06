@@ -3,6 +3,8 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { DomainCard } from '../cards/DomainCard'
 import { AncestryCard } from '../cards/AncestryCard'
 import { CommunityCard } from '../cards/CommunityCard'
+import { ScaledCard } from '../cards/ScaledCard'
+import { cardScale } from '../cards/card-tokens'
 import { domainCardToProps, parseAbilityText } from '../data/card-mapper'
 import type { Character } from '../types/character'
 
@@ -33,36 +35,28 @@ export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
               <div
                 key={card.name}
                 className="flex-shrink-0"
-                style={{ width: 144 }}
               >
-                <div
-                  className="relative"
-                  style={{
-                    width: 144,
-                    height: 200,
-                    overflow: 'hidden',
-                    borderRadius: 10,
-                  }}
+                <ScaledCard
+                  scale={cardScale.small}
+                  style={{ overflow: 'hidden', borderRadius: 10 }}
                 >
-                  <div style={{ transform: 'scale(0.4)', transformOrigin: 'top left' }}>
-                    <DomainCard
-                      {...mapped.props}
-                      scale={1}
-                      onClick={() => onCardTap(card.name)}
-                    >
-                      {bodyParts.map((part, i) => (
-                        <p key={i} className={i > 0 ? 'mt-2' : ''}>
-                          {part.name && (
-                            <>
-                              <span className="font-bold">{part.name}:</span>{' '}
-                            </>
-                          )}
-                          {part.text}
-                        </p>
-                      ))}
-                    </DomainCard>
-                  </div>
-                </div>
+                  <DomainCard
+                    {...mapped.props}
+                    scale={1}
+                    onClick={() => onCardTap(card.name)}
+                  >
+                    {bodyParts.map((part, i) => (
+                      <p key={i} className={i > 0 ? 'mt-2' : ''}>
+                        {part.name && (
+                          <>
+                            <span className="font-bold">{part.name}:</span>{' '}
+                          </>
+                        )}
+                        {part.text}
+                      </p>
+                    ))}
+                  </DomainCard>
+                </ScaledCard>
               </div>
             )
           })}

@@ -4,6 +4,8 @@ import { SRDCard } from '../../cards/SRDCard'
 import { DomainCard } from '../../cards/DomainCard'
 import { AncestryCard } from '../../cards/AncestryCard'
 import { CommunityCard } from '../../cards/CommunityCard'
+import { ScaledCard } from '../../cards/ScaledCard'
+import { cardScale } from '../../cards/card-tokens'
 import { SectionHeader } from '../../ui/SectionHeader'
 import { GameBadge } from '../../ui/GameBadge'
 import { getSubclassCards, getDomainCards, parseAbilityText } from '../../data/card-mapper'
@@ -81,7 +83,7 @@ export function DeckPreview() {
         <div style={{ textAlign: 'center', marginTop: 60 }}>
           <p
             style={{
-              fontFamily: "'EB Garamond', serif",
+              fontFamily: typeSubtitle.fontFamily,
               fontStyle: 'italic',
               fontSize: 13,
               color: 'var(--text-muted)',
@@ -113,11 +115,9 @@ export function DeckPreview() {
         {heroCard && (
           <motion.div key="subclass" {...fadeIn} style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: 360 * 0.55, height: 508 * 0.55, position: 'relative' }}>
-                <div style={{ transform: 'scale(0.55)', transformOrigin: 'top left' }}>
-                  <SRDCard {...heroCard} />
-                </div>
-              </div>
+              <ScaledCard scale={cardScale.medium}>
+                <SRDCard {...heroCard} />
+              </ScaledCard>
             </div>
           </motion.div>
         )}
@@ -130,27 +130,20 @@ export function DeckPreview() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
               {selectedDomains.map(({ props, bodyText }) => (
-                <div
+                <ScaledCard
                   key={props.title}
-                  style={{
-                    width: 360 * 0.28,
-                    height: 508 * 0.28,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    borderRadius: 6,
-                  }}
+                  scale={cardScale.thumbnail}
+                  style={{ overflow: 'hidden', borderRadius: 6 }}
                 >
-                  <div style={{ transform: 'scale(0.28)', transformOrigin: 'top left' }}>
-                    <DomainCard {...props}>
-                      {parseAbilityText(bodyText).map((ability, i) => (
-                        <p key={i} className="mb-1">
-                          {ability.name && <strong>{ability.name}: </strong>}
-                          {ability.text}
-                        </p>
-                      ))}
-                    </DomainCard>
-                  </div>
-                </div>
+                  <DomainCard {...props}>
+                    {parseAbilityText(bodyText).map((ability, i) => (
+                      <p key={i} className="mb-1">
+                        {ability.name && <strong>{ability.name}: </strong>}
+                        {ability.text}
+                      </p>
+                    ))}
+                  </DomainCard>
+                </ScaledCard>
               ))}
             </div>
           </motion.div>

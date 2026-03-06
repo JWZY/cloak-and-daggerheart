@@ -44,3 +44,12 @@ export const CONTENT_OVERLAY_GRADIENT = 'linear-gradient(180deg, rgba(31, 58, 96
 
 // Illustration mask — bottom fade for illustration areas
 export const ILLUSTRATION_MASK = 'linear-gradient(to bottom, black calc(100% - 10px), transparent 100%)'
+
+// Card scale tokens — named presets for common scale factors
+export const cardScale = {
+  thumbnail: 0.28,  // tiny preview (DeckPreview domain cards)
+  small: 0.4,       // carousel cards, review deck
+  medium: 0.55,     // deck preview hero
+  large: 0.75,      // mobile hero card
+  hero: 0.85,       // desktop hero card
+} as const

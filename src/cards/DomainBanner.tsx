@@ -1,4 +1,5 @@
 import { type DomainIconName, getDomainIconPath } from './domain-icons'
+import { typeTitle, goldLight, goldDark } from '../ui/typography'
 
 // Single-domain masked banner — shared between DomainCard and FlatDomainCard
 export function DomainBanner({ outerColor, innerColor, uid, domain, basePath, level, scale = 1.2 }: {
@@ -41,8 +42,8 @@ export function DomainBanner({ outerColor, innerColor, uid, domain, basePath, le
           <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill={innerColor} stroke={`url(#${uid}-m-fg)`} />
           <defs>
             <linearGradient id={`${uid}-m-fg`} x1="15" y1="0" x2="15" y2="80" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#F9F8F3"/>
-              <stop offset="1" stopColor="#E7BA90"/>
+              <stop stopColor={goldLight}/>
+              <stop offset="1" stopColor={goldDark}/>
             </linearGradient>
           </defs>
         </svg>
@@ -51,7 +52,7 @@ export function DomainBanner({ outerColor, innerColor, uid, domain, basePath, le
       <div className="absolute flex flex-col items-center justify-center" style={{ top: 4, left: 10, width: 24, height: 60, gap: 0, ...maskAt(-10, -4) }}>
         {level != null && (
           <span style={{
-            fontFamily: "'EB Garamond', serif",
+            fontFamily: typeTitle.fontFamily,
             fontSize: 27,
             fontWeight: 400,
             lineHeight: 0,

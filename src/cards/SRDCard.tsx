@@ -5,6 +5,8 @@ import { typeTitle, typeBody } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
+  goldLight,
+  goldDark,
   CARD_WIDTH,
   CARD_HEIGHT,
   CARD_BORDER_RADIUS,
@@ -93,8 +95,8 @@ function MaskedBanner({ color = '#BD0C70', innerColor = '#1E1E1E', uid, domainIc
           <path d="M29.4854 0.5L27.5059 69.748L15 79.3691L2.49316 69.748L0.514648 0.5H29.4854Z" fill={innerColor} stroke={`url(#${uid}-m-fg)`}/>
           <defs>
             <linearGradient id={`${uid}-m-fg`} x1="15" y1="0" x2="15" y2="80" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#F9F8F3"/>
-              <stop offset="1" stopColor="#E7BA90"/>
+              <stop stopColor={goldLight}/>
+              <stop offset="1" stopColor={goldDark}/>
             </linearGradient>
           </defs>
         </svg>

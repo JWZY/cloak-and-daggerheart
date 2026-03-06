@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { springs } from '../../design-system/tokens/animations'
 
 interface StepIndicatorProps {
   currentStep: number
@@ -20,8 +21,7 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
             }}
             transition={{
               type: 'spring',
-              stiffness: 400,
-              damping: 25,
+              ...springs.select,
             }}
             style={{
               width: 8,

@@ -12,24 +12,24 @@ export function CreateExperiences() {
   const setExperience = useDeckStore((s) => s.setExperience)
 
   return (
-    <div className="flex flex-col items-center px-6">
+    <div className="flex flex-col items-center px-4">
       <StepInstruction>
         Create two Experiences — words or phrases that describe your
         character's skills and history. Each adds +2 to relevant action rolls.
       </StepInstruction>
 
-      <div className="w-full max-w-md mb-6">
+      <h2 className="w-full max-w-[360px] mb-2 px-4">
         <SectionHeader>Create Experiences</SectionHeader>
-      </div>
+      </h2>
 
-      <div className="w-full max-w-md flex flex-col gap-5">
+      <div className="w-full max-w-[360px] flex flex-col gap-5">
         {EXPERIENCE_LABELS.map((label, index) => (
           <div key={index} className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span
                 style={{
                   ...typeSubtitle,
-                  color: '#e7ba90',
+                  color: 'var(--gold)',
                 }}
               >
                 {label}

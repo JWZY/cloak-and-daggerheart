@@ -10,9 +10,8 @@ export function StepInstruction({ children, style }: StepInstructionProps) {
   return (
     <p
       style={{
-        fontFamily: typeSubtitle.fontFamily,
+        ...typeSubtitle,
         fontStyle: 'italic',
-        fontSize: typeSubtitle.fontSize,
         color: 'var(--gold-secondary)',
         textAlign: 'center',
         marginBottom: 24,

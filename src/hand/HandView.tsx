@@ -14,6 +14,8 @@ import { SRDCard } from '../cards/SRDCard'
 import { DomainCard } from '../cards/DomainCard'
 import { AncestryCard } from '../cards/AncestryCard'
 import { CommunityCard } from '../cards/CommunityCard'
+import { ScaledCard } from '../cards/ScaledCard'
+import { cardScale } from '../cards/card-tokens'
 import { useCardZoom } from '../cards/useCardZoom'
 import { subclassToCardProps, domainCardToProps, parseAbilityText } from '../data/card-mapper'
 import { getSubclassByName, getClassForSubclass } from '../data/srd'
@@ -121,35 +123,28 @@ export function HandView({ character }: HandViewProps) {
         const mapped = domainCardToProps(card)
         const bodyParts = parseAbilityText(mapped.bodyText)
         return (
-          <div
+          <ScaledCard
             key={card.name}
-            className="relative"
-            style={{
-              width: 360 * 0.5,
-              height: 508 * 0.5,
-              overflow: 'hidden',
-              borderRadius: 10,
-            }}
+            scale={0.5}
+            style={{ overflow: 'hidden', borderRadius: 10 }}
           >
-            <div style={{ transform: 'scale(0.5)', transformOrigin: 'top left' }}>
-              <DomainCard
-                {...mapped.props}
-                scale={1}
-                onClick={() => handleCardTap(card.name)}
-              >
-                {bodyParts.map((part, i) => (
-                  <p key={i} className={i > 0 ? 'mt-2' : ''}>
-                    {part.name && (
-                      <>
-                        <span className="font-bold">{part.name}:</span>{' '}
-                      </>
-                    )}
-                    {part.text}
-                  </p>
-                ))}
-              </DomainCard>
-            </div>
-          </div>
+            <DomainCard
+              {...mapped.props}
+              scale={1}
+              onClick={() => handleCardTap(card.name)}
+            >
+              {bodyParts.map((part, i) => (
+                <p key={i} className={i > 0 ? 'mt-2' : ''}>
+                  {part.name && (
+                    <>
+                      <span className="font-bold">{part.name}:</span>{' '}
+                    </>
+                  )}
+                  {part.text}
+                </p>
+              ))}
+            </DomainCard>
+          </ScaledCard>
         )
       })}
     </div>
@@ -315,11 +310,9 @@ export function HandView({ character }: HandViewProps) {
               )}
 
               {/* Hero card at 0.85 scale */}
-              <div style={{ width: 360 * 0.85, height: 508 * 0.85, position: 'relative', flexShrink: 0 }}>
-                <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left' }}>
-                  <HeroCard subclass={character.subclass} onTap={handleHeroTap} />
-                </div>
-              </div>
+              <ScaledCard scale={cardScale.hero} style={{ flexShrink: 0 }}>
+                <HeroCard subclass={character.subclass} onTap={handleHeroTap} />
+              </ScaledCard>
             </div>
 
             {/* Right column: cards grid + stats + panels */}
@@ -392,11 +385,9 @@ export function HandView({ character }: HandViewProps) {
 
           {/* Hero Card — natural height, centered */}
           <div className="flex items-center justify-center px-4 py-3">
-            <div style={{ width: 360 * 0.75, height: 508 * 0.75, position: 'relative', flexShrink: 0 }}>
-              <div style={{ transform: 'scale(0.75)', transformOrigin: 'top left' }}>
-                <HeroCard subclass={character.subclass} onTap={handleHeroTap} />
-              </div>
-            </div>
+            <ScaledCard scale={cardScale.large} style={{ flexShrink: 0 }}>
+              <HeroCard subclass={character.subclass} onTap={handleHeroTap} />
+            </ScaledCard>
           </div>
 
           {/* Card Carousel */}

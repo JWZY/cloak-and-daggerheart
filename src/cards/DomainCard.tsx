@@ -1,5 +1,6 @@
 import { ReactNode, useId, useRef, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { tapFeedback } from '../design-system/tokens/animations'
 import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from './domain-colors'
 import { AutoFitTitle } from '../ui/AutoFitTitle'
 import { DomainBanner } from './DomainBanner'
@@ -263,7 +264,7 @@ export function DomainCard({
   if (scale !== 1 || onClick) {
     return (
       <motion.div
-        whileTap={onClick ? { scale: 0.98 } : undefined}
+        whileTap={onClick ? tapFeedback.subtle : undefined}
         whileHover={onClick ? { y: -4 } : undefined}
         onClick={onClick}
         style={{
