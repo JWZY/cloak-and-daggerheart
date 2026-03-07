@@ -56,7 +56,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
   const pickerItems: PickerItem[] = domainCards.map((card) => ({
     id: card.props.title,
     name: card.props.title,
-    illustrationSrc: `${BASE_URL}images/cards/domains/${kebabCase(card.props.title)}.webp`,
+    illustrationSrc: `${BASE_URL}images/cards/domains/${kebabCase(card.props.title)}.avif`,
   }))
 
   const handleFocus = (id: string) => {

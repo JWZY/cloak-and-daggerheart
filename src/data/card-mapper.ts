@@ -95,7 +95,7 @@ export function domainCardToProps(card: DomainCard): MappedDomainCard {
       type: card.type,
       level: card.level,
       recall: card.recall,
-      artworkSrc: `${BASE_URL}images/cards/domains/${kebabCase(card.name)}.webp`,
+      artworkSrc: `${BASE_URL}images/cards/domains/${kebabCase(card.name)}.avif`,
     },
     bodyText: card.text,
   }

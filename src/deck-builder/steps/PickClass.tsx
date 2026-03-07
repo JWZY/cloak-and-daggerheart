@@ -2,12 +2,21 @@ import { useState } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
 import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
-import { classes, getSubclassesForClass } from '../../data/srd'
+import { classes } from '../../data/srd'
 
 const BASE_URL = import.meta.env.BASE_URL
 
-function kebabCase(str: string): string {
-  return str.toLowerCase().replace(/['']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+/** Hand-picked domain card artwork for each class splash image */
+const CLASS_ART: Record<string, string> = {
+  Guardian: 'unyielding-armor',
+  Sorcerer: 'eclipse',
+  Warrior: 'reapers-strike',
+  Druid: 'sage-touched',
+  Bard: 'grace-touched',
+  Wizard: 'codex-touched',
+  Rogue: 'midnight-spirit',
+  Ranger: 'natural-familiar',
+  Seraph: 'hold-the-line',
 }
 
 function Separator({ text }: { text: string }) {
@@ -45,14 +54,11 @@ export function PickClass({ onBack, onNext }: StepProps) {
 
   const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
 
-  const pickerItems: PickerItem[] = classes.map((cls) => {
-    const firstSubName = getSubclassesForClass(cls.name)[0]?.name ?? ''
-    return {
-      id: cls.name,
-      name: cls.name,
-      illustrationSrc: `${BASE_URL}images/cards/subclasses/${kebabCase(firstSubName)}.avif`,
-    }
-  })
+  const pickerItems: PickerItem[] = classes.map((cls) => ({
+    id: cls.name,
+    name: cls.name,
+    illustrationSrc: `${BASE_URL}images/cards/domains/${CLASS_ART[cls.name] ?? 'unyielding-armor'}.avif`,
+  }))
 
   const handleFocus = (id: string) => {
     setFocusedId(id)
