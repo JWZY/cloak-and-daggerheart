@@ -1,7 +1,7 @@
 import { useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FatesButton } from '../../ui/FatesButton'
-import { typeTitle, typeMicro, typeBody, goldGradient, goldDark } from '../../ui/typography'
+import { typeTitle, typeBody, goldGradient, goldDark } from '../../ui/typography'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -165,7 +165,7 @@ export function FullBleedPicker({
           top: 16,
           width: '100%',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'baseline',
           justifyContent: 'center',
           gap: 0,
           whiteSpace: 'nowrap',
@@ -176,13 +176,14 @@ export function FullBleedPicker({
           <>
             <motion.button
               onClick={onBack}
-              whileTap={{ scale: 0.92 }}
+              whileTap={{ scale: 0.95 }}
               style={{
-                ...typeMicro,
-                color: 'rgba(231,186,144,0.5)',
+                ...titleStyle,
+                fontSize: 36,
+                color: 'rgba(231,186,144,0.3)',
                 background: 'none',
                 border: 'none',
-                padding: '4px 0',
+                padding: '8px 4px',
                 cursor: 'pointer',
                 WebkitTapHighlightColor: 'transparent',
               }}
@@ -191,8 +192,9 @@ export function FullBleedPicker({
             </motion.button>
             <span
               style={{
-                ...typeMicro,
-                color: 'rgba(231,186,144,0.35)',
+                ...titleStyle,
+                fontSize: 36,
+                color: 'rgba(231,186,144,0.3)',
                 padding: '0 8px',
               }}
             >
@@ -203,6 +205,7 @@ export function FullBleedPicker({
         <span
           style={{
             ...titleStyle,
+            fontSize: 36,
             background: goldGradient,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -215,8 +218,9 @@ export function FullBleedPicker({
           <>
             <span
               style={{
-                ...typeMicro,
-                color: 'rgba(231,186,144,0.35)',
+                ...titleStyle,
+                fontSize: 36,
+                color: 'rgba(231,186,144,0.3)',
                 padding: '0 8px',
               }}
             >
@@ -224,14 +228,15 @@ export function FullBleedPicker({
             </span>
             <motion.button
               onClick={canConfirm ? onConfirm : undefined}
-              whileTap={canConfirm ? { scale: 0.92 } : undefined}
+              whileTap={canConfirm ? { scale: 0.95 } : undefined}
               style={{
-                ...typeMicro,
-                color: 'rgba(231,186,144,0.5)',
+                ...titleStyle,
+                fontSize: 36,
+                color: 'rgba(231,186,144,0.3)',
                 opacity: canConfirm ? 1 : 0.5,
                 background: 'none',
                 border: 'none',
-                padding: '4px 0',
+                padding: '8px 4px',
                 cursor: canConfirm ? 'pointer' : 'default',
                 WebkitTapHighlightColor: 'transparent',
               }}
@@ -252,8 +257,19 @@ export function FullBleedPicker({
           justifyContent: 'flex-end',
         }}
       >
-        {/* Info area (children from parent step) */}
-        <div style={{ padding: '0 24px', marginBottom: 8 }}>{children}</div>
+        {/* Info area — crossfades when focused item changes */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={focusedId}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            style={{ padding: '0 24px', marginBottom: 8 }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Badge */}
         {badge && <div style={badgeStyle}>{badge}</div>}

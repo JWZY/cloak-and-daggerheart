@@ -614,15 +614,3 @@ button, a {
   color: var(--text-secondary);
 }
 
-/* Deck Builder preview panel — desktop only */
-.deck-preview-panel {
-  display: none;
-  width: 0;
-}
-
-@media (min-width: 1024px) {
-  .deck-preview-panel {
-    display: block;
-    width: 320px;
-  }
-}

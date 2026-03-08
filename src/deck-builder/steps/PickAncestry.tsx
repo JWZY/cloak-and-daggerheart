@@ -40,6 +40,7 @@ interface StepProps {
 }
 
 export function PickAncestry({ onBack, onNext }: StepProps) {
+  const showFullInfo = new URLSearchParams(window.location.search).has('fullinfo')
   const ancestryName = useDeckStore((s) => s.ancestryName)
   const setAncestry = useDeckStore((s) => s.setAncestry)
 
@@ -93,27 +94,47 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
             {focusedAncestry.name}
           </h2>
           <Separator text="Ancestry" />
-          <p style={{
-            ...typeBody,
-            color: 'rgba(212,207,199,0.9)',
-            textShadow: '0px 1px 1px #4d381e',
-            textAlign: 'center',
-            margin: 0,
+          <div style={{
+            maxHeight: showFullInfo ? '40vh' : undefined,
+            overflowY: showFullInfo ? 'auto' : undefined,
+            maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
+            WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            {focusedAncestry.description.split('. ')[0]}.
-          </p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}>
-            {focusedAncestry.feats.map((f) => (
-              <span key={f.name} style={{
-                ...typeMicro,
-                color: goldDark,
-                background: 'rgba(231,186,144,0.1)',
-                padding: '2px 8px',
-                borderRadius: 4,
-              }}>
-                {f.name}
-              </span>
-            ))}
+            <p style={{
+              ...typeBody,
+              color: 'rgba(212,207,199,0.9)',
+              textShadow: '0px 1px 1px #4d381e',
+              textAlign: 'center',
+              margin: 0,
+            }}>
+              {showFullInfo ? focusedAncestry.description : `${focusedAncestry.description.split('. ')[0]}.`}
+            </p>
+            {showFullInfo ? (
+              focusedAncestry.feats.map((f) => (
+                <div key={f.name} style={{ marginTop: 8 }}>
+                  <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                    {f.name}
+                  </span>
+                  <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                    {f.text}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}>
+                {focusedAncestry.feats.map((f) => (
+                  <span key={f.name} style={{
+                    ...typeMicro,
+                    color: goldDark,
+                    background: 'rgba(231,186,144,0.1)',
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                  }}>
+                    {f.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

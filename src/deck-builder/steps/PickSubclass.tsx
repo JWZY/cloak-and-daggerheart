@@ -40,6 +40,7 @@ interface StepProps {
 }
 
 export function PickSubclass({ onBack, onNext }: StepProps) {
+  const showFullInfo = new URLSearchParams(window.location.search).has('fullinfo')
   const subclass = useDeckStore((s) => s.subclass)
   const setSubclass = useDeckStore((s) => s.setSubclass)
   const selectedClass = useDeckStore((s) => s.selectedClass)
@@ -99,15 +100,46 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
             {focusedSub.name}
           </h2>
           <Separator text={selectedClass ?? ''} />
-          <p style={{
-            ...typeBody,
-            color: 'rgba(212,207,199,0.9)',
-            textShadow: '0px 1px 1px #4d381e',
-            textAlign: 'center',
-            margin: 0,
+          <div style={{
+            maxHeight: showFullInfo ? '40vh' : undefined,
+            overflowY: showFullInfo ? 'auto' : undefined,
+            maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
+            WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            {descriptionText}
-          </p>
+            <p style={{
+              ...typeBody,
+              color: 'rgba(212,207,199,0.9)',
+              textShadow: '0px 1px 1px #4d381e',
+              textAlign: 'center',
+              margin: 0,
+            }}>
+              {showFullInfo ? (focusedSub.description || descriptionText) : descriptionText}
+            </p>
+            {showFullInfo && (
+              <>
+                {focusedSub.spellcast_trait && (
+                  <div style={{ marginTop: 8 }}>
+                    <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                      Spellcast Trait
+                    </span>
+                    <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                      {focusedSub.spellcast_trait}
+                    </p>
+                  </div>
+                )}
+                {focusedSub.foundations.map((foundation, i) => (
+                  <div key={i} style={{ marginTop: 8 }}>
+                    <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                      {foundation.name}
+                    </span>
+                    <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                      {foundation.text}
+                    </p>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
         </div>
       )}
     </FullBleedPicker>

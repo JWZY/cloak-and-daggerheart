@@ -49,6 +49,7 @@ interface StepProps {
 }
 
 export function PickClass({ onNext }: StepProps) {
+  const showFullInfo = new URLSearchParams(window.location.search).has('fullinfo')
   const selectedClass = useDeckStore((s) => s.selectedClass)
   const setClass = useDeckStore((s) => s.setClass)
 
@@ -99,15 +100,44 @@ export function PickClass({ onNext }: StepProps) {
             {focusedClass.name}
           </h2>
           <Separator text={`${focusedClass.domain_1} · ${focusedClass.domain_2}`} />
-          <p style={{
-            ...typeBody,
-            color: 'rgba(212,207,199,0.9)',
-            textShadow: '0px 1px 1px #4d381e',
-            textAlign: 'center',
-            margin: 0,
+          <div style={{
+            maxHeight: showFullInfo ? '40vh' : undefined,
+            overflowY: showFullInfo ? 'auto' : undefined,
+            maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
+            WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            {focusedClass.description.split('. ')[0]}.
-          </p>
+            <p style={{
+              ...typeBody,
+              color: 'rgba(212,207,199,0.9)',
+              textShadow: '0px 1px 1px #4d381e',
+              textAlign: 'center',
+              margin: 0,
+            }}>
+              {showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`}
+            </p>
+            {showFullInfo && (
+              <>
+                <div style={{ marginTop: 8 }}>
+                  <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                    {focusedClass.hope_feat_name}
+                  </span>
+                  <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                    {focusedClass.hope_feat_text}
+                  </p>
+                </div>
+                {focusedClass.class_feats.map((feat, i) => (
+                  <div key={i} style={{ marginTop: 8 }}>
+                    <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                      {feat.name}
+                    </span>
+                    <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                      {feat.text}
+                    </p>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
         </div>
       )}
     </FullBleedPicker>

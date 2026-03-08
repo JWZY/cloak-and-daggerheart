@@ -40,6 +40,7 @@ interface StepProps {
 }
 
 export function PickCommunity({ onBack, onNext }: StepProps) {
+  const showFullInfo = new URLSearchParams(window.location.search).has('fullinfo')
   const communityName = useDeckStore((s) => s.communityName)
   const setCommunity = useDeckStore((s) => s.setCommunity)
 
@@ -93,27 +94,47 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
             {focusedCommunity.name}
           </h2>
           <Separator text="Community" />
-          <p style={{
-            ...typeBody,
-            color: 'rgba(212,207,199,0.9)',
-            textShadow: '0px 1px 1px #4d381e',
-            textAlign: 'center',
-            margin: 0,
+          <div style={{
+            maxHeight: showFullInfo ? '40vh' : undefined,
+            overflowY: showFullInfo ? 'auto' : undefined,
+            maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
+            WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            {focusedCommunity.description.split('. ')[0]}.
-          </p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}>
-            {focusedCommunity.feats.map((f) => (
-              <span key={f.name} style={{
-                ...typeMicro,
-                color: goldDark,
-                background: 'rgba(231,186,144,0.1)',
-                padding: '2px 8px',
-                borderRadius: 4,
-              }}>
-                {f.name}
-              </span>
-            ))}
+            <p style={{
+              ...typeBody,
+              color: 'rgba(212,207,199,0.9)',
+              textShadow: '0px 1px 1px #4d381e',
+              textAlign: 'center',
+              margin: 0,
+            }}>
+              {showFullInfo ? focusedCommunity.description : `${focusedCommunity.description.split('. ')[0]}.`}
+            </p>
+            {showFullInfo ? (
+              focusedCommunity.feats.map((f) => (
+                <div key={f.name} style={{ marginTop: 8 }}>
+                  <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                    {f.name}
+                  </span>
+                  <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                    {f.text}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}>
+                {focusedCommunity.feats.map((f) => (
+                  <span key={f.name} style={{
+                    ...typeMicro,
+                    color: goldDark,
+                    background: 'rgba(231,186,144,0.1)',
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                  }}>
+                    {f.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

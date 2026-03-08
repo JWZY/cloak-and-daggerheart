@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springs } from '../design-system/tokens/animations'
 import { StepIndicator } from './components/StepIndicator'
-import { DeckPreview } from './components/DeckPreview'
 import { PickClass } from './steps/PickClass'
 import { PickSubclass } from './steps/PickSubclass'
 import { PickDomainCards } from './steps/PickDomainCards'
@@ -148,20 +147,6 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
           zIndex: 0,
         }}
       />
-
-      {/* Desktop preview panel — hidden on mobile via CSS */}
-      <div
-        className="deck-preview-panel"
-        style={{
-          position: 'relative',
-          zIndex: 10,
-          borderRight: '1px solid var(--gold-muted)',
-          background: 'var(--bg-surface)',
-          flexShrink: 0,
-        }}
-      >
-        <DeckPreview />
-      </div>
 
       {/* Main content column */}
       <div className="flex flex-col flex-1 min-w-0 relative z-10">

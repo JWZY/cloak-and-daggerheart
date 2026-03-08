@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
 import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
-import { getDomainCards } from '../../data/card-mapper'
+import { getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { getSubclassCardCount } from '../../core/rules/class-rules'
 
 const BASE_URL = import.meta.env.BASE_URL
@@ -41,6 +41,7 @@ interface StepProps {
 }
 
 export function PickDomainCards({ onBack, onNext }: StepProps) {
+  const showFullInfo = new URLSearchParams(window.location.search).has('fullinfo')
   const selectedDomainCards = useDeckStore((s) => s.selectedDomainCards)
   const subclass = useDeckStore((s) => s.subclass)
   const toggleDomainCard = useDeckStore((s) => s.toggleDomainCard)
@@ -104,18 +105,41 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
             {focusedCard.props.title}
           </h2>
           <Separator text={`${focusedCard.props.domain} · ${focusedCard.props.type} · L${focusedCard.props.level}`} />
-          <p style={{
-            ...typeBody,
-            color: 'rgba(212,207,199,0.9)',
-            textShadow: '0px 1px 1px #4d381e',
-            textAlign: 'center',
-            margin: 0,
-            maxHeight: 60,
-            overflow: 'hidden',
+          <div style={{
+            maxHeight: showFullInfo ? '40vh' : undefined,
+            overflowY: showFullInfo ? 'auto' : undefined,
+            maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
+            WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            {focusedCard.bodyText.split('\n\n')[0].replace(/\*\*.*?\*\*\s*/g, '').slice(0, 150)}
-            {focusedCard.bodyText.length > 150 ? '...' : ''}
-          </p>
+            {showFullInfo ? (
+              parseAbilityText(focusedCard.bodyText).map((ability, i) => (
+                <p key={i} style={{
+                  ...typeBody,
+                  color: 'rgba(212,207,199,0.9)',
+                  textShadow: '0px 1px 1px #4d381e',
+                  textAlign: 'center',
+                  margin: 0,
+                  marginTop: i > 0 ? 8 : 0,
+                }}>
+                  {ability.name && <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>{ability.name}: </span>}
+                  {ability.text}
+                </p>
+              ))
+            ) : (
+              <p style={{
+                ...typeBody,
+                color: 'rgba(212,207,199,0.9)',
+                textShadow: '0px 1px 1px #4d381e',
+                textAlign: 'center',
+                margin: 0,
+                maxHeight: 60,
+                overflow: 'hidden',
+              }}>
+                {focusedCard.bodyText.split('\n\n')[0].replace(/\*\*.*?\*\*\s*/g, '').slice(0, 150)}
+                {focusedCard.bodyText.length > 150 ? '...' : ''}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </FullBleedPicker>
