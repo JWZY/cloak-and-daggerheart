@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springs } from '../../design-system/tokens/animations'
-import { SectionHeader } from '../../ui/SectionHeader'
-import { StepInstruction } from '../../ui/StepInstruction'
 import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
-import { typeSubtitle, typeBody } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { tier1Armors, tier1PrimaryWeapons, tier1SecondaryWeapons, getSuggestedEquipment } from '../../data/srd'
 import { parseThresholds } from '../../core/character/armor'
@@ -313,18 +311,44 @@ export function PickEquipment() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <h2 className="w-full max-w-[360px] mb-2 px-4">
-        <SectionHeader>Choose Your Equipment</SectionHeader>
+      <h2 style={{
+        ...typeTitle,
+        fontSize: 28,
+        fontWeight: 400,
+        background: goldGradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        textAlign: 'center',
+        margin: '0 0 8px',
+      }}>
+        Choose Your Equipment
       </h2>
-      <StepInstruction>{selectedClass ?? 'Class'} suggested build pre-selected</StepInstruction>
+      <p style={{
+        ...typeSubtitle,
+        fontStyle: 'italic',
+        color: 'var(--gold-secondary)',
+        textAlign: 'center',
+        marginBottom: 24,
+      }}>
+        {selectedClass ?? 'Class'} suggested build pre-selected
+      </p>
 
       {/* ----------------------------------------------------------------- */}
       {/* Armor Section                                                     */}
       {/* ----------------------------------------------------------------- */}
       <div className="w-full max-w-[360px] mb-6">
-        <div className="mb-3">
-          <SectionHeader>Armor</SectionHeader>
-        </div>
+        <h3 style={{
+          ...typeSubtitle,
+          background: goldGradient,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textAlign: 'center',
+          marginBottom: 12,
+        }}>
+          Armor
+        </h3>
         <p
           style={{
             ...typeBody,
@@ -383,9 +407,17 @@ export function PickEquipment() {
       {/* Primary Weapon Section                                            */}
       {/* ----------------------------------------------------------------- */}
       <div className="w-full max-w-[360px] mb-6">
-        <div className="mb-3">
-          <SectionHeader>Primary Weapon</SectionHeader>
-        </div>
+        <h3 style={{
+          ...typeSubtitle,
+          background: goldGradient,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textAlign: 'center',
+          marginBottom: 12,
+        }}>
+          Primary Weapon
+        </h3>
         <AnimatePresence mode="popLayout" initial={false}>
           {isPrimaryExpanded ? (
             /* Expanded: show all weapon groups */
@@ -449,9 +481,17 @@ export function PickEquipment() {
       {/* Secondary Weapon Section (always visible)                         */}
       {/* ----------------------------------------------------------------- */}
       <div className="w-full max-w-[360px] mb-6">
-        <div className="mb-3">
-          <SectionHeader>Secondary Weapon</SectionHeader>
-        </div>
+        <h3 style={{
+          ...typeSubtitle,
+          background: goldGradient,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textAlign: 'center',
+          marginBottom: 12,
+        }}>
+          Secondary Weapon
+        </h3>
 
         {/* Disabled reason note */}
         {isSecondaryDisabled && (

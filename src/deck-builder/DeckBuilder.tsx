@@ -15,7 +15,7 @@ import { CreateExperiences } from './steps/CreateExperiences'
 import { NameCharacter } from './steps/NameCharacter'
 import { CreateConnections } from './steps/CreateConnections'
 import { ReviewDeck } from './steps/ReviewDeck'
-import { GameButton } from '../ui/GameButton'
+import { FatesButton } from '../ui/FatesButton'
 import { useDeckStore } from '../store/deck-store'
 import { calculateMaxHP } from '../core/character/hp'
 import { getArmorScore } from '../core/character/armor'
@@ -53,6 +53,15 @@ const slideTransition = {
   type: 'spring' as const,
   ...springs.smooth,
 }
+
+/** Full-bleed steps crossfade instead of sliding — less jarring */
+const fadeVariants = {
+  enter: () => ({ opacity: 0 }),
+  center: { opacity: 1 },
+  exit: () => ({ opacity: 0 }),
+}
+
+const fadeTransition = { duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }
 
 interface DeckBuilderProps {
   onComplete: (character: Character) => void
@@ -172,11 +181,11 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
             <motion.div
               key={store.currentStep}
               custom={direction}
-              variants={slideVariants}
+              variants={isFullBleed ? fadeVariants : slideVariants}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={slideTransition}
+              transition={isFullBleed ? fadeTransition : slideTransition}
               className={`w-full ${isFullBleed ? 'h-full' : 'py-4'}`}
             >
               {stepComponents[store.currentStep]}
@@ -191,9 +200,9 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
             style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
           >
             {store.currentStep > 0 ? (
-              <GameButton variant="ghost" size="sm" onClick={handleBack}>
+              <FatesButton variant="dark" onClick={handleBack}>
                 Back
-              </GameButton>
+              </FatesButton>
             ) : (
               <div />
             )}
@@ -208,14 +217,13 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
                   : { scale: 1 }
               }
             >
-              <GameButton
-                variant={canProceed ? 'primary' : 'secondary'}
-                size={isReview ? 'lg' : 'md'}
+              <FatesButton
+                variant="light"
                 disabled={!canProceed}
                 onClick={handleNext}
               >
                 {buttonLabel}
-              </GameButton>
+              </FatesButton>
             </motion.div>
           </div>
         )}

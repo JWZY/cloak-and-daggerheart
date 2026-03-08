@@ -164,49 +164,42 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
         border: '1px solid var(--surface-light)',
       }}
     >
-      {/* Row 1: HP and Armor */}
-      <div className="grid grid-cols-2 gap-3">
-        <StatRow
-          label="HP"
-          icon={Heart}
-          current={character.hp.current}
-          max={character.hp.max}
-          color="#A61118"
-          onDecrease={() => updateHP(character.id, -1)}
-          onIncrease={() => updateHP(character.id, 1)}
-        />
-        <StatRow
-          label="Armor"
-          icon={Shield}
-          current={character.armorSlots.current}
-          max={character.armorSlots.max}
-          color="#A3A9A8"
-          onDecrease={() => updateArmor(character.id, -1)}
-          onIncrease={() => updateArmor(character.id, 1)}
-        />
-      </div>
-
-      {/* Row 2: Hope and Stress */}
-      <div className="grid grid-cols-2 gap-3">
-        <StatRow
-          label="Hope"
-          icon={Star}
-          current={character.hope}
-          color="#BEA228"
-          onDecrease={() => updateHope(character.id, -1)}
-          onIncrease={() => updateHope(character.id, 1)}
-          showMax={false}
-        />
-        <StatRow
-          label="Stress"
-          icon={Circle}
-          current={character.stress.current}
-          max={character.stress.max}
-          color="#1E1E1E"
-          onDecrease={() => updateStress(character.id, -1)}
-          onIncrease={() => updateStress(character.id, 1)}
-        />
-      </div>
+      <StatRow
+        label="HP"
+        icon={Heart}
+        current={character.hp.current}
+        max={character.hp.max}
+        color="#A61118"
+        onDecrease={() => updateHP(character.id, -1)}
+        onIncrease={() => updateHP(character.id, 1)}
+      />
+      <StatRow
+        label="Armor"
+        icon={Shield}
+        current={character.armorSlots.current}
+        max={character.armorSlots.max}
+        color="#A3A9A8"
+        onDecrease={() => updateArmor(character.id, -1)}
+        onIncrease={() => updateArmor(character.id, 1)}
+      />
+      <StatRow
+        label="Hope"
+        icon={Star}
+        current={character.hope}
+        color="#BEA228"
+        onDecrease={() => updateHope(character.id, -1)}
+        onIncrease={() => updateHope(character.id, 1)}
+        showMax={false}
+      />
+      <StatRow
+        label="Stress"
+        icon={Circle}
+        current={character.stress.current}
+        max={character.stress.max}
+        color="#1E1E1E"
+        onDecrease={() => updateStress(character.id, -1)}
+        onIncrease={() => updateStress(character.id, 1)}
+      />
 
       {/* Evasion & Thresholds */}
       <div className="flex items-center justify-center gap-2 pt-1">

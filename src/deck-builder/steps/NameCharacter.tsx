@@ -1,7 +1,6 @@
 import { useDeckStore } from '../../store/deck-store'
 import { GameInput } from '../../ui/GameInput'
-import { SectionHeader } from '../../ui/SectionHeader'
-import { typeSubtitle, typeTitle } from '../../ui/typography'
+import { typeSubtitle, typeTitle, goldGradient } from '../../ui/typography'
 
 const BASE_PATH = import.meta.env.BASE_URL ?? '/'
 
@@ -39,8 +38,18 @@ export function NameCharacter() {
         {subclass ?? selectedClass ?? ''}
       </p>
 
-      <h2 className="w-full max-w-[360px] mb-2 px-4">
-        <SectionHeader>Name Your Character</SectionHeader>
+      <h2 style={{
+        ...typeTitle,
+        fontSize: 28,
+        fontWeight: 400,
+        background: goldGradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        textAlign: 'center',
+        margin: '0 0 16px',
+      }}>
+        Name Your Character
       </h2>
 
       <div className="w-full max-w-[360px] relative z-10">

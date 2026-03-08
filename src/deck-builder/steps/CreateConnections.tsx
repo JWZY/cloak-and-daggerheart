@@ -1,8 +1,6 @@
 import { useDeckStore } from '../../store/deck-store'
-import { SectionHeader } from '../../ui/SectionHeader'
-import { StepInstruction } from '../../ui/StepInstruction'
 import { GameTextarea } from '../../ui/GameTextarea'
-import { typeBody } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { getClassByName } from '../../data/srd'
 
 export function CreateConnections() {
@@ -13,14 +11,28 @@ export function CreateConnections() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <StepInstruction>
-        Establish relationships with other player characters. These are
-        optional — skip any that don't apply.
-      </StepInstruction>
-
-      <h2 className="w-full max-w-[360px] mb-2 px-4">
-        <SectionHeader>Create Connections</SectionHeader>
+      <h2 style={{
+        ...typeTitle,
+        fontSize: 28,
+        fontWeight: 400,
+        background: goldGradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        textAlign: 'center',
+        margin: '0 0 8px',
+      }}>
+        Create Connections
       </h2>
+      <p style={{
+        ...typeSubtitle,
+        fontStyle: 'italic',
+        color: 'var(--gold-secondary)',
+        textAlign: 'center',
+        marginBottom: 24,
+      }}>
+        Establish relationships with other player characters
+      </p>
 
       <div className="w-full max-w-[360px] flex flex-col gap-5">
         {(classData?.connections ?? []).map((conn, index) => (

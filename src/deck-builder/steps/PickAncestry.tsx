@@ -84,6 +84,8 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
       onBack={onBack}
       onConfirm={handleConfirm}
       canConfirm={!!ancestryName}
+      prevStepLabel="Domain Cards"
+      nextStepLabel="Community"
     >
       {focusedAncestry && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

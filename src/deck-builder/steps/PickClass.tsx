@@ -80,6 +80,7 @@ export function PickClass({ onNext }: StepProps) {
       onFocus={handleFocus}
       onConfirm={handleConfirm}
       canConfirm={!!selectedClass}
+      nextStepLabel="Subclass"
     >
       {focusedClass && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

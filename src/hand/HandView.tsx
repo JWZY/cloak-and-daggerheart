@@ -5,7 +5,6 @@ import { LevelUpWizard } from '../level-up/LevelUpWizard'
 import { HeroCard } from './HeroCard'
 import { CardCarousel } from './CardCarousel'
 import { StatBar } from './StatBar'
-import { CollapsiblePanel } from './panels/CollapsiblePanel'
 import { StatsPanel } from './panels/StatsPanel'
 import { EquipmentPanel } from './panels/EquipmentPanel'
 import { NotesPanel } from './panels/NotesPanel'
@@ -27,7 +26,23 @@ export interface HandViewProps {
   character: Character
 }
 
-type PanelId = 'stats' | 'equipment' | 'notes' | null
+function InlineSection({ title, icon: Icon, children }: {
+  title: string
+  icon: React.ElementType
+  children: React.ReactNode
+}) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 pb-2 mb-2" style={{ borderBottom: '1px solid var(--gold-muted)' }}>
+        <Icon size={14} color="var(--gold-secondary)" />
+        <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+          {title}
+        </span>
+      </div>
+      {children}
+    </div>
+  )
+}
 
 function useIsDesktop() {
   const [isDesktop, setIsDesktop] = useState(false)
@@ -54,15 +69,10 @@ function getAccentColor(character: Character): string {
 export function HandView({ character }: HandViewProps) {
   const deleteCharacter = useCharacterStore((s) => s.deleteCharacter)
   const { zoomedCard, openZoom, closeZoom } = useCardZoom()
-  const [openPanel, setOpenPanel] = useState<PanelId>(null)
   const [showLevelUp, setShowLevelUp] = useState(false)
   const isDesktop = useIsDesktop()
 
   const accentColor = useMemo(() => getAccentColor(character), [character])
-
-  const togglePanel = useCallback((panel: PanelId) => {
-    setOpenPanel((prev) => (prev === panel ? null : panel))
-  }, [])
 
   const handleHeroTap = useCallback(() => {
     openZoom('hero-card')
@@ -81,38 +91,20 @@ export function HandView({ character }: HandViewProps) {
 
   // Shared panels content
   const panelsContent = (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <StatBar character={character} accentColor={accentColor} />
 
-      <CollapsiblePanel
-        title="Traits"
-        icon={BarChart3}
-        isOpen={openPanel === 'stats'}
-        onToggle={() => togglePanel('stats')}
-        accentColor={accentColor}
-      >
+      <InlineSection title="Traits" icon={BarChart3}>
         <StatsPanel character={character} />
-      </CollapsiblePanel>
+      </InlineSection>
 
-      <CollapsiblePanel
-        title="Equipment"
-        icon={Sword}
-        isOpen={openPanel === 'equipment'}
-        onToggle={() => togglePanel('equipment')}
-        accentColor={accentColor}
-      >
+      <InlineSection title="Equipment" icon={Sword}>
         <EquipmentPanel character={character} />
-      </CollapsiblePanel>
+      </InlineSection>
 
-      <CollapsiblePanel
-        title="Notes"
-        icon={StickyNote}
-        isOpen={openPanel === 'notes'}
-        onToggle={() => togglePanel('notes')}
-        accentColor={accentColor}
-      >
+      <InlineSection title="Notes" icon={StickyNote}>
         <NotesPanel character={character} />
-      </CollapsiblePanel>
+      </InlineSection>
     </div>
   )
 

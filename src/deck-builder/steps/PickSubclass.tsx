@@ -80,6 +80,8 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
       onBack={onBack}
       onConfirm={handleConfirm}
       canConfirm={!!subclass}
+      prevStepLabel="Class"
+      nextStepLabel="Domain Cards"
     >
       {focusedSub && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

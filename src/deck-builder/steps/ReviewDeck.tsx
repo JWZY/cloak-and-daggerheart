@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { typeTitle, typeSubtitle, typeBody } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { getSubclassCards, getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { SRDCard } from '../../cards/SRDCard'
 import { DomainCard } from '../../cards/DomainCard'
@@ -9,7 +9,6 @@ import { ancestries, communities } from '../../data/srd'
 import { TRAIT_NAMES, formatTraitValue } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
 import { GameBadge } from '../../ui/GameBadge'
-import { SectionHeader } from '../../ui/SectionHeader'
 import { useDeckStore } from '../../store/deck-store'
 
 export function ReviewDeck() {
@@ -74,9 +73,17 @@ export function ReviewDeck() {
       {/* Domain cards row */}
       {selectedDomains.length > 0 && (
         <div className="mb-6 w-full">
-          <div className="mb-3">
-            <SectionHeader>Domain Cards</SectionHeader>
-          </div>
+          <h3 style={{
+            ...typeSubtitle,
+            background: goldGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            textAlign: 'center',
+            marginBottom: 12,
+          }}>
+            Domain Cards
+          </h3>
           <div className="flex justify-center gap-2">
             {selectedDomains.map(({ props, bodyText }) => (
               <DomainCard key={props.title} {...props} scale={0.4}>
@@ -95,9 +102,17 @@ export function ReviewDeck() {
       {/* Ancestry & Community cards */}
       {(ancestryName || communityName) && (
         <div className="mb-6 w-full">
-          <div className="mb-3">
-            <SectionHeader>Origin</SectionHeader>
-          </div>
+          <h3 style={{
+            ...typeSubtitle,
+            background: goldGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            textAlign: 'center',
+            marginBottom: 12,
+          }}>
+            Origin
+          </h3>
           <div className="flex justify-center gap-2">
             {ancestryName && (() => {
               const a = ancestries.find(x => x.name === ancestryName)
@@ -118,9 +133,17 @@ export function ReviewDeck() {
         {/* Traits */}
         {traits && (
           <div className="mt-2">
-            <div className="mb-3">
-              <SectionHeader>Traits</SectionHeader>
-            </div>
+            <h3 style={{
+              ...typeSubtitle,
+              background: goldGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textAlign: 'center',
+              marginBottom: 12,
+            }}>
+              Traits
+            </h3>
             <div className="grid grid-cols-3 gap-2">
               {TRAIT_NAMES.map((name) => (
                 <div key={name} className="text-center">
@@ -152,9 +175,17 @@ export function ReviewDeck() {
         {/* Experiences */}
         {(experiences || []).filter((e) => e?.text?.trim()).length > 0 && (
           <div className="mt-2">
-            <div className="mb-3">
-              <SectionHeader>Experiences</SectionHeader>
-            </div>
+            <h3 style={{
+              ...typeSubtitle,
+              background: goldGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textAlign: 'center',
+              marginBottom: 12,
+            }}>
+              Experiences
+            </h3>
             <div className="flex flex-col gap-2">
               {(experiences || [])
                 .filter((e) => e?.text?.trim())
@@ -187,9 +218,17 @@ export function ReviewDeck() {
         {/* Background */}
         {(backgroundAnswers || []).filter((a) => a?.trim()).length > 0 && (
           <div className="mt-2">
-            <div className="mb-3">
-              <SectionHeader>Background</SectionHeader>
-            </div>
+            <h3 style={{
+              ...typeSubtitle,
+              background: goldGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textAlign: 'center',
+              marginBottom: 12,
+            }}>
+              Background
+            </h3>
             <div className="flex flex-col gap-2">
               {(backgroundAnswers || [])
                 .filter((a) => a?.trim())
@@ -212,9 +251,17 @@ export function ReviewDeck() {
         {/* Connections */}
         {(connectionAnswers || []).filter((a) => a?.trim()).length > 0 && (
           <div className="mt-2">
-            <div className="mb-3">
-              <SectionHeader>Connections</SectionHeader>
-            </div>
+            <h3 style={{
+              ...typeSubtitle,
+              background: goldGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textAlign: 'center',
+              marginBottom: 12,
+            }}>
+              Connections
+            </h3>
             <div className="flex flex-col gap-2">
               {(connectionAnswers || [])
                 .filter((a) => a?.trim())

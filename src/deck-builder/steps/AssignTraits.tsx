@@ -3,11 +3,9 @@ import { motion } from 'framer-motion'
 import { tapFeedback } from '../../design-system/tokens/animations'
 import { TRAIT_NAMES, parseSuggestedTraits, formatTraitValue, getRemainingTraitValues } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
-import { SectionHeader } from '../../ui/SectionHeader'
-import { StepInstruction } from '../../ui/StepInstruction'
 import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
-import { typeSubtitle, typeBody } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { getClassByName } from '../../data/srd'
 
@@ -90,10 +88,28 @@ export function AssignTraits() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <h2 className="w-full max-w-[360px] mb-2 px-4">
-        <SectionHeader>Assign Traits</SectionHeader>
+      <h2 style={{
+        ...typeTitle,
+        fontSize: 28,
+        fontWeight: 400,
+        background: goldGradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        textAlign: 'center',
+        margin: '0 0 8px',
+      }}>
+        Assign Traits
       </h2>
-      <StepInstruction>Tap a trait to unassign, tap a pill to assign</StepInstruction>
+      <p style={{
+        ...typeSubtitle,
+        fontStyle: 'italic',
+        color: 'var(--gold-secondary)',
+        textAlign: 'center',
+        marginBottom: 24,
+      }}>
+        Tap a trait to unassign, tap a pill to assign
+      </p>
 
       {/* Available values (pills) */}
       <div className="flex gap-2 mb-6 justify-center">

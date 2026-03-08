@@ -95,6 +95,8 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
       onConfirm={handleConfirm}
       canConfirm={canConfirm}
       badge={`${selectedDomainCards.length} of ${maxCards} selected`}
+      prevStepLabel="Subclass"
+      nextStepLabel="Ancestry"
     >
       {focusedCard && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

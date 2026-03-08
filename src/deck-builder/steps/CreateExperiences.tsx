@@ -1,9 +1,7 @@
 import { useDeckStore } from '../../store/deck-store'
 import { GameInput } from '../../ui/GameInput'
 import { GameBadge } from '../../ui/GameBadge'
-import { SectionHeader } from '../../ui/SectionHeader'
-import { StepInstruction } from '../../ui/StepInstruction'
-import { typeSubtitle } from '../../ui/typography'
+import { typeTitle, typeSubtitle, goldGradient } from '../../ui/typography'
 
 const EXPERIENCE_LABELS = ['Experience 1', 'Experience 2'] as const
 
@@ -13,14 +11,28 @@ export function CreateExperiences() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <StepInstruction>
-        Create two Experiences — words or phrases that describe your
-        character's skills and history. Each adds +2 to relevant action rolls.
-      </StepInstruction>
-
-      <h2 className="w-full max-w-[360px] mb-2 px-4">
-        <SectionHeader>Create Experiences</SectionHeader>
+      <h2 style={{
+        ...typeTitle,
+        fontSize: 28,
+        fontWeight: 400,
+        background: goldGradient,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        textAlign: 'center',
+        margin: '0 0 8px',
+      }}>
+        Create Experiences
       </h2>
+      <p style={{
+        ...typeSubtitle,
+        fontStyle: 'italic',
+        color: 'var(--gold-secondary)',
+        textAlign: 'center',
+        marginBottom: 24,
+      }}>
+        Words or phrases that describe your character's skills and history. Each adds +2 to relevant action rolls.
+      </p>
 
       <div className="w-full max-w-[360px] flex flex-col gap-5">
         {EXPERIENCE_LABELS.map((label, index) => (
