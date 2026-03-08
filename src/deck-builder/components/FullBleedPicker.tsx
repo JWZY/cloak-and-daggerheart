@@ -23,7 +23,7 @@ export interface FullBleedPickerProps {
   /** Called when a thumbnail is tapped */
   onFocus: (id: string) => void
   /** Navigation callbacks */
-  onBack: () => void
+  onBack?: () => void
   onConfirm: () => void
   /** Whether the confirm/select button is enabled */
   canConfirm: boolean
@@ -66,8 +66,8 @@ export function FullBleedPicker({
   onBack,
   onConfirm,
   canConfirm,
-  confirmLabel = 'Select',
-  backLabel = 'Cancel',
+  confirmLabel = 'Next',
+  backLabel = 'Back',
   badge,
   children,
 }: FullBleedPickerProps) {
@@ -192,14 +192,15 @@ export function FullBleedPicker({
         {/* Badge */}
         {badge && <div style={badgeStyle}>{badge}</div>}
 
-        {/* Thumbnail carousel */}
+        {/* Thumbnail carousel — drum picker: focused item always centered */}
         <div
           ref={scrollRef}
           style={{
             display: 'flex',
             gap: 12,
             overflowX: 'auto',
-            padding: '0 24px 12px',
+            /* 50% - half thumb width so first/last items can center */
+            padding: '0 calc(50% - 40px) 12px',
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
@@ -212,7 +213,12 @@ export function FullBleedPicker({
             return (
               <motion.button
                 key={item.id}
-                whileTap={{ scale: 0.95 }}
+                animate={{
+                  scale: isFocused ? 1 : 0.85,
+                  opacity: isFocused ? 1 : 0.55,
+                }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 onClick={() => onFocus(item.id)}
                 style={{
                   position: 'relative',
@@ -273,14 +279,17 @@ export function FullBleedPicker({
             gap: 12,
             padding: '8px 24px',
             paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+            justifyContent: onBack ? 'space-between' : 'center',
           }}
         >
-          <div style={{ flex: 1 }}>
-            <FatesButton variant="dark" onClick={onBack}>
-              {backLabel}
-            </FatesButton>
-          </div>
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          {onBack && (
+            <div style={{ flex: 1 }}>
+              <FatesButton variant="dark" onClick={onBack}>
+                {backLabel}
+              </FatesButton>
+            </div>
+          )}
+          <div style={{ flex: onBack ? 1 : undefined, display: 'flex', justifyContent: onBack ? 'flex-end' : 'center' }}>
             <FatesButton
               variant="light"
               onClick={onConfirm}

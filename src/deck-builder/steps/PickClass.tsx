@@ -44,11 +44,11 @@ function Separator({ text }: { text: string }) {
 }
 
 interface StepProps {
-  onBack: () => void
+  onBack?: () => void
   onNext: () => void
 }
 
-export function PickClass({ onBack, onNext }: StepProps) {
+export function PickClass({ onNext }: StepProps) {
   const selectedClass = useDeckStore((s) => s.selectedClass)
   const setClass = useDeckStore((s) => s.setClass)
 
@@ -78,7 +78,6 @@ export function PickClass({ onBack, onNext }: StepProps) {
       focusedId={focusedId}
       selectedIds={selectedClass ? [selectedClass] : []}
       onFocus={handleFocus}
-      onBack={onBack}
       onConfirm={handleConfirm}
       canConfirm={!!selectedClass}
     >
