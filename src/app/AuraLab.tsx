@@ -194,22 +194,22 @@ export default function AuraLab() {
           <filter id="aura-turbulence" x="-50%" y="-50%" width="200%" height="200%">
             <feTurbulence
               type="fractalNoise"
-              baseFrequency="0.015"
-              numOctaves="3"
+              baseFrequency="0.012"
+              numOctaves="4"
               result="noise"
             >
               <animate
                 attributeName="seed"
                 from="0"
-                to="100"
-                dur="8s"
+                to="5"
+                dur="12s"
                 repeatCount="indefinite"
               />
             </feTurbulence>
             <feDisplacementMap
               in="SourceGraphic"
               in2="noise"
-              scale="12"
+              scale="8"
               xChannelSelector="R"
               yChannelSelector="G"
             />
