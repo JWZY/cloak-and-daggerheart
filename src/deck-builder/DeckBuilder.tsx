@@ -233,8 +233,8 @@ export function DeckBuilder({ onComplete, onExit }: DeckBuilderProps) {
                     paddingTop: 64,
                     paddingBottom: 80,
                     overscrollBehavior: 'none',
-                    maskImage: 'linear-gradient(to bottom, transparent 0px, black 64px, black calc(100% - 40px), transparent 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 64px, black calc(100% - 40px), transparent 100%)',
+                    maskImage: 'linear-gradient(to bottom, transparent 0px, transparent 48px, black 80px, black calc(100% - 60px), transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, transparent 48px, black 80px, black calc(100% - 60px), transparent 100%)',
                   }}
                 >
                   <div className="py-4">
