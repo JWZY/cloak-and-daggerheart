@@ -66,6 +66,17 @@ function Separator({ text }: { text: string }) {
   )
 }
 
+const featureBlockStyle: React.CSSProperties = {
+  marginTop: 12,
+  padding: '10px 14px',
+  borderRadius: 10,
+  background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.15) 100%)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.08), inset 0 -1px 1px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.2)',
+  border: '1px solid rgba(231,186,144,0.12)',
+}
+
 interface StepProps {
   onBack?: () => void
   onNext: () => void
@@ -147,7 +158,7 @@ export function PickClass({ onNext }: StepProps) {
               <FormatText text={showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`} />
             </div>
             {/* Hope Feature */}
-            <div style={{ marginTop: 12 }}>
+            <div style={featureBlockStyle}>
               <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                 {focusedClass.hope_feat_name}
               </span>
@@ -157,7 +168,7 @@ export function PickClass({ onNext }: StepProps) {
             </div>
             {/* Class Feats */}
             {focusedClass.class_feats.map((feat, i) => (
-              <div key={i} style={{ marginTop: 8 }}>
+              <div key={i} style={featureBlockStyle}>
                 <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                   {feat.name}
                 </span>
