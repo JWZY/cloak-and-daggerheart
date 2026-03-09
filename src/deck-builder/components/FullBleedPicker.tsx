@@ -65,6 +65,7 @@ export function FullBleedPicker({
   title,
   items,
   focusedId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   selectedIds,
   onFocus,
   onBack,
@@ -287,7 +288,6 @@ export function FullBleedPicker({
         >
           {items.map((item) => {
             const isFocused = item.id === focusedId
-            const isSelected = selectedIds.includes(item.id)
 
             return (
               <motion.button
@@ -330,22 +330,6 @@ export function FullBleedPicker({
                   }}
                 />
 
-                {/* Selected indicator — gold dot at top-right */}
-                {isSelected && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 6,
-                      right: 6,
-                      width: 10,
-                      height: 10,
-                      borderRadius: '50%',
-                      background: goldDark,
-                      border: `1.5px solid ${goldLightAlpha(0.9)}`,
-                      boxShadow: `0 0 6px ${goldDarkAlpha(0.6)}`,
-                    }}
-                  />
-                )}
               </motion.button>
             )
           })}
