@@ -22,7 +22,7 @@ export function CreateExperiences() {
         textAlign: 'center',
         marginBottom: 20,
       }}>
-        Words or phrases that describe your character's skills and history. Each adds +2 to relevant action rolls.
+        When relevant to an action roll, you can spend a Hope to add the Experience's modifier to the roll's result.
       </p>
 
       <div className="w-full max-w-[360px] flex flex-col gap-5">
