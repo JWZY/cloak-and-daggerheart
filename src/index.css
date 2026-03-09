@@ -614,36 +614,61 @@ button, a {
   color: var(--text-secondary);
 }
 
-/* ─── Aura glow — animated teal flame effect for selected thumbnails ────── */
-@keyframes aura-flicker {
-  0%, 100% {
-    box-shadow:
-      0 0 6px 2px rgba(0, 224, 208, 0.5),
-      0 0 14px 4px rgba(0, 224, 208, 0.25),
-      0 0 24px 8px rgba(0, 180, 200, 0.12);
-  }
-  25% {
-    box-shadow:
-      0 0 8px 3px rgba(0, 224, 208, 0.6),
-      0 0 18px 6px rgba(0, 224, 208, 0.3),
-      0 0 28px 10px rgba(0, 180, 200, 0.15);
-  }
-  50% {
-    box-shadow:
-      0 0 5px 1px rgba(0, 224, 208, 0.45),
-      0 0 12px 3px rgba(0, 224, 208, 0.2),
-      0 0 20px 6px rgba(0, 180, 200, 0.1);
-  }
-  75% {
-    box-shadow:
-      0 0 9px 3px rgba(0, 224, 208, 0.55),
-      0 0 16px 5px rgba(0, 224, 208, 0.28),
-      0 0 26px 9px rgba(0, 180, 200, 0.13);
-  }
+/* ─── Aura glow — two counter-rotating conic blobs for organic flame feel ─ */
+@keyframes aura-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .aura-glow {
-  animation: aura-flicker 2.5s ease-in-out infinite;
-  border-color: rgba(0, 224, 208, 0.7) !important;
+  position: relative;
+  border-color: rgba(0, 224, 208, 0.6) !important;
+  z-index: 0;
+}
+
+/* Outer rotating blob layer — clockwise, slower */
+.aura-glow::before,
+.aura-glow::after {
+  content: '';
+  position: absolute;
+  /* Bleed out beyond the card edges */
+  inset: -10px;
+  border-radius: 14px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.aura-glow::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(0, 224, 208, 0.6) 45deg,
+    transparent 90deg,
+    transparent 140deg,
+    rgba(0, 200, 220, 0.4) 180deg,
+    transparent 220deg,
+    rgba(0, 224, 208, 0.5) 290deg,
+    transparent 340deg
+  );
+  filter: blur(10px);
+  animation: aura-spin 4s linear infinite;
+}
+
+/* Inner rotating blob layer — counter-clockwise, faster, different spots */
+.aura-glow::after {
+  inset: -6px;
+  border-radius: 12px;
+  background: conic-gradient(
+    from 60deg,
+    transparent 0deg,
+    rgba(0, 240, 220, 0.5) 70deg,
+    transparent 120deg,
+    rgba(0, 210, 200, 0.35) 200deg,
+    transparent 260deg,
+    rgba(0, 230, 215, 0.45) 320deg,
+    transparent 360deg
+  );
+  filter: blur(8px);
+  animation: aura-spin 3s linear infinite reverse;
 }
 

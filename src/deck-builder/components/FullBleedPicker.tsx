@@ -70,6 +70,7 @@ export function FullBleedPicker({
   title,
   items,
   focusedId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   selectedIds: _selectedIds,
   onFocus,
   onBack,
@@ -152,11 +153,25 @@ export function FullBleedPicker({
                 inset: 0,
                 width: '100%',
                 height: '100%',
-                objectFit: heroMode === 'contain-blur' ? 'contain' : 'cover',
+                objectFit:
+                  heroMode === 'contain-blur'
+                    ? 'contain'
+                    : heroMode === 'blur-fill'
+                      ? 'contain'
+                      : 'cover',
                 objectPosition:
                   heroMode === 'position' && focusedItem.objectPosition
                     ? focusedItem.objectPosition
                     : undefined,
+                // Mode B: feather edges so contained image blends into blurred backdrop
+                ...(heroMode === 'blur-fill'
+                  ? {
+                      maskImage:
+                        'radial-gradient(ellipse 80% 70% at center, black 50%, transparent 100%)',
+                      WebkitMaskImage:
+                        'radial-gradient(ellipse 80% 70% at center, black 50%, transparent 100%)',
+                    }
+                  : {}),
               }}
             />
           </motion.div>
@@ -338,10 +353,10 @@ export function FullBleedPicker({
                   width: 80,
                   height: 120,
                   borderRadius: 10,
-                  overflow: 'hidden',
+                  overflow: 'visible',
                   flexShrink: 0,
                   scrollSnapAlign: 'center',
-                  border: `2px solid ${isFocused ? 'rgba(0, 224, 208, 0.7)' : goldLightAlpha(0.3)}`,
+                  border: `2px solid ${isFocused ? 'rgba(0, 224, 208, 0.6)' : goldLightAlpha(0.3)}`,
                   padding: 0,
                   background: 'none',
                   cursor: 'pointer',
@@ -356,6 +371,7 @@ export function FullBleedPicker({
                     height: '100%',
                     objectFit: 'cover',
                     pointerEvents: 'none',
+                    borderRadius: 8,
                   }}
                 />
 
