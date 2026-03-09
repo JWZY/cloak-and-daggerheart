@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { FullBleedPicker, type PickerItem, type HeroMode } from '../components/FullBleedPicker'
 import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
-import { DOMAIN_COLORS } from '../../cards/domain-colors'
+import { DOMAIN_COLORS_MUTED } from '../../cards/domain-colors'
 import { useDeckStore } from '../../store/deck-store'
 import { classes } from '../../data/srd'
 
@@ -88,18 +88,45 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-function featureBlockStyle(className: string): React.CSSProperties {
+/** Darken a hex color by mixing toward black */
+function darkenHex(hex: string, amount: number): string {
+  const r = Math.round(parseInt(hex.slice(1, 3), 16) * (1 - amount))
+  const g = Math.round(parseInt(hex.slice(3, 5), 16) * (1 - amount))
+  const b = Math.round(parseInt(hex.slice(5, 7), 16) * (1 - amount))
+  return `rgb(${r},${g},${b})`
+}
+
+type BlockVariant = 'glass' | 'glow'
+
+/**
+ * Variant A (glass): Glass card with muted domain gradient, no black
+ * Variant B (glow): Gradient blob behind text, no container edges
+ */
+function featureBlockStyle(className: string, variant: BlockVariant): React.CSSProperties {
   const domain = CLASS_DOMAIN[className] ?? 'Valor'
-  const color = DOMAIN_COLORS[domain] ?? '#EB5B00'
+  const muted = DOMAIN_COLORS_MUTED[domain] ?? '#8d3700'
+  const deepDark = darkenHex(muted, 0.6)
+
+  if (variant === 'glow') {
+    // Variant B: soft gradient blob — no borders, no box, just a diffuse glow behind text
+    return {
+      marginTop: 12,
+      padding: '12px 16px',
+      borderRadius: 16,
+      background: `radial-gradient(ellipse 100% 100% at 50% 50%, ${hexToRgba(muted, 0.7)} 0%, ${hexToRgba(muted, 0.3)} 50%, transparent 100%)`,
+    }
+  }
+
+  // Variant A: glass card with domain muted → deeper shade gradient
   return {
     marginTop: 12,
     padding: '10px 14px',
     borderRadius: 10,
-    background: `linear-gradient(180deg, ${hexToRgba(color, 0.35)} 0%, rgba(0,0,0,0.5) 100%)`,
+    background: `linear-gradient(180deg, ${hexToRgba(muted, 0.6)} 0%, ${deepDark} 100%)`,
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
-    boxShadow: `inset 0 1px 1px ${hexToRgba(color, 0.25)}, inset 0 -1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3)`,
-    border: `1px solid ${hexToRgba(color, 0.3)}`,
+    boxShadow: `inset 0 1px 1px ${hexToRgba(muted, 0.3)}, inset 0 -1px 2px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)`,
+    border: `1px solid ${hexToRgba(muted, 0.35)}`,
   }
 }
 
@@ -117,6 +144,7 @@ export function PickClass({ onNext }: StepProps) {
 
   const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
   const [heroMode, setHeroMode] = useState<HeroMode>('position')
+  const [blockVariant, setBlockVariant] = useState<BlockVariant>('glass')
 
   // Auto-select first item on mount for faster testing
   useEffect(() => {
@@ -175,6 +203,8 @@ export function PickClass({ onNext }: StepProps) {
             ...goldGradientStyle,
             margin: 0,
             lineHeight: 1,
+            textAlign: 'center',
+            width: '100%',
           }}>
             {focusedClass.name}
           </h2>
@@ -196,7 +226,7 @@ export function PickClass({ onNext }: StepProps) {
               <FormatText text={showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`} />
             </div>
             {/* Hope Feature */}
-            <div style={featureBlockStyle(focusedClass.name)}>
+            <div style={featureBlockStyle(focusedClass.name, blockVariant)}>
               <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                 {focusedClass.hope_feat_name}
               </span>
@@ -206,7 +236,7 @@ export function PickClass({ onNext }: StepProps) {
             </div>
             {/* Class Feats */}
             {focusedClass.class_feats.map((feat, i) => (
-              <div key={i} style={featureBlockStyle(focusedClass.name)}>
+              <div key={i} style={featureBlockStyle(focusedClass.name, blockVariant)}>
                 <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                   {feat.name}
                 </span>
@@ -220,29 +250,44 @@ export function PickClass({ onNext }: StepProps) {
       )}
     </FullBleedPicker>
 
-    {/* Dev toggle: hero image mode */}
+    {/* Dev toggles */}
     {showHeroTest && (
-      <button
-        onClick={cycleHeroMode}
-        style={{
-          position: 'fixed',
-          top: 52,
-          right: 12,
-          zIndex: 9999,
-          padding: '4px 10px',
-          borderRadius: 999,
-          border: '1px solid rgba(255,255,255,0.2)',
-          background: 'rgba(0,0,0,0.6)',
-          backdropFilter: 'blur(8px)',
-          color: '#fff',
-          fontSize: 11,
-          fontFamily: 'system-ui, sans-serif',
-          cursor: 'pointer',
-          WebkitTapHighlightColor: 'transparent',
-        }}
-      >
-        {HERO_MODE_LABELS[heroMode]}
-      </button>
+      <div style={{ position: 'fixed', top: 52, right: 12, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <button
+          onClick={cycleHeroMode}
+          style={{
+            padding: '4px 10px',
+            borderRadius: 999,
+            border: '1px solid rgba(255,255,255,0.2)',
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            color: '#fff',
+            fontSize: 11,
+            fontFamily: 'system-ui, sans-serif',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          {HERO_MODE_LABELS[heroMode]}
+        </button>
+        <button
+          onClick={() => setBlockVariant(v => v === 'glass' ? 'glow' : 'glass')}
+          style={{
+            padding: '4px 10px',
+            borderRadius: 999,
+            border: '1px solid rgba(255,255,255,0.2)',
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            color: '#fff',
+            fontSize: 11,
+            fontFamily: 'system-ui, sans-serif',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          Block: {blockVariant === 'glass' ? 'A: Glass' : 'B: Glow'}
+        </button>
+      </div>
     )}
     </>
   )
