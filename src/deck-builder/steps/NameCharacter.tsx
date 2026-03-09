@@ -1,78 +1,50 @@
 import { useDeckStore } from '../../store/deck-store'
 import { GameInput } from '../../ui/GameInput'
-import { typeSubtitle, typeTitle, goldGradient } from '../../ui/typography'
-
-const BASE_PATH = import.meta.env.BASE_URL ?? '/'
+import { typeTitle } from '../../ui/typography'
 
 export function NameCharacter() {
   const characterName = useDeckStore((s) => s.characterName)
   const setCharacterName = useDeckStore((s) => s.setCharacterName)
   const subclass = useDeckStore((s) => s.subclass)
   const selectedClass = useDeckStore((s) => s.selectedClass)
+  const ancestry = useDeckStore((s) => s.ancestryName)
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 min-h-[400px] relative">
-      {/* Atmosphere texture */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `url(${BASE_PATH}images/cards/atmosphere.png)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.04,
-          pointerEvents: 'none',
-          transform: 'scaleY(-1)',
-        }}
-      />
-
-      {/* Subtle background label */}
-      <p
-        style={{
-          ...typeSubtitle,
-          color: 'var(--text-muted)',
-          textAlign: 'center',
-          marginBottom: 8,
-        }}
-      >
-        {subclass ?? selectedClass ?? ''}
-      </p>
-
-      <h2 style={{
-        ...typeTitle,
-        fontSize: 28,
-        fontWeight: 400,
-        background: goldGradient,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
-        textAlign: 'center',
-        margin: '0 0 16px',
-      }}>
-        Name Your Character
-      </h2>
-
-      <div className="w-full max-w-[360px] relative z-10">
+    <div className="flex flex-col items-center justify-center px-4" style={{ height: '100%' }}>
+      <div className="w-full max-w-[360px]">
         <GameInput
           type="text"
           value={characterName}
           onChange={(e) => setCharacterName(e.target.value)}
           placeholder="Enter name..."
           autoFocus
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'transparent'
+            e.currentTarget.style.boxShadow = 'none'
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'transparent'
+            e.currentTarget.style.boxShadow = 'none'
+          }}
           style={{
             textAlign: 'center',
             fontSize: 22,
             fontFamily: typeTitle.fontFamily,
             fontWeight: typeTitle.fontWeight,
             padding: '14px 16px',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: 0,
+            boxShadow: 'none',
           }}
         />
       </div>
 
-      {characterName.trim() && (
-        <div className="gold-text-shadow-subtle mt-6 relative z-10">
+      {/* Fixed-position title preview — always occupies space to prevent layout shift */}
+      <div className="mt-6" style={{ minHeight: 36 }}>
+        {characterName.trim() && (
           <p
-            className="gold-text"
+            className="gold-text gold-text-shadow-subtle"
             style={{
               ...typeTitle,
               fontSize: 24,
@@ -80,10 +52,10 @@ export function NameCharacter() {
               textAlign: 'center',
             }}
           >
-            {characterName.trim()}, {subclass} {selectedClass}
+            {ancestry} {subclass} {selectedClass}
           </p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
