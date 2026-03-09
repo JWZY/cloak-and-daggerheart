@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { typeTitle, goldDarkAlpha } from '../ui/typography'
+import { typeTitle, typeSubtitle, goldDarkAlpha } from '../ui/typography'
 import { springs } from '../design-system/tokens/animations'
 import { DeckBuilder } from '../deck-builder/DeckBuilder'
 import { HandView } from '../hand/HandView'
 import { useCharacterStore } from '../store/character-store'
+import type { Character } from '../types/character'
 
 const splashVariants = {
   initial: { opacity: 1 },
@@ -51,6 +52,14 @@ export default function App() {
   const characters = useCharacterStore((s) => s.characters)
   const createCharacter = useCharacterStore((s) => s.createCharacter)
   const [splashDone, setSplashDone] = useState(false)
+  const [welcomeChar, setWelcomeChar] = useState<Character | null>(null)
+
+  const handleComplete = useCallback((character: Character) => {
+    setWelcomeChar(character)
+    createCharacter(character)
+    // After 2.5s, dismiss the welcome screen
+    setTimeout(() => setWelcomeChar(null), 2500)
+  }, [createCharacter])
 
   // Splash screen: brief branded loading state
   if (!splashDone) {
@@ -58,6 +67,13 @@ export default function App() {
       <AnimatePresence onExitComplete={() => setSplashDone(true)}>
         <Splash key="splash" onFinish={() => setSplashDone(true)} />
       </AnimatePresence>
+    )
+  }
+
+  // Welcome interstitial after character creation
+  if (welcomeChar) {
+    return (
+      <WelcomeScreen character={welcomeChar} />
     )
   }
 
@@ -72,7 +88,7 @@ export default function App() {
             animate="animate"
             exit="exit"
           >
-            <DeckBuilder onComplete={createCharacter} />
+            <DeckBuilder onComplete={handleComplete} />
           </motion.div>
         ) : (
           <motion.div
@@ -86,6 +102,90 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Welcome Screen — 2.5s interstitial after character creation
+// ---------------------------------------------------------------------------
+
+function WelcomeScreen({ character }: { character: Character }) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--bg-page)',
+        zIndex: 9999,
+        gap: 12,
+      }}
+    >
+      {/* Golden glow */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.6 }}
+        animate={{
+          opacity: [0, 0.5, 0.3],
+          scale: [0.6, 1.3, 1.1],
+          transition: { duration: 2, ease: 'easeOut' },
+        }}
+        style={{
+          position: 'absolute',
+          width: 200,
+          height: 200,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${goldDarkAlpha(0.35)} 0%, transparent 70%)`,
+          filter: 'blur(30px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* "Welcome," */}
+      <motion.span
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
+        style={{
+          ...typeSubtitle,
+          color: 'rgba(212,207,199,0.7)',
+          letterSpacing: '0.1em',
+        }}
+      >
+        Welcome,
+      </motion.span>
+
+      {/* Character name */}
+      <motion.span
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.6, ease: 'easeOut' }}
+        className="gold-text gold-text-shadow"
+        style={{
+          ...typeTitle,
+          fontSize: 36,
+          letterSpacing: '0.03em',
+        }}
+      >
+        {character.name}
+      </motion.span>
+
+      {/* Ancestry Subclass Class */}
+      <motion.span
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, duration: 0.6, ease: 'easeOut' }}
+        style={{
+          ...typeSubtitle,
+          color: 'rgba(212,207,199,0.6)',
+          letterSpacing: '0.06em',
+        }}
+      >
+        {character.ancestry.name} {character.subclass} {character.class}
+      </motion.span>
     </div>
   )
 }
