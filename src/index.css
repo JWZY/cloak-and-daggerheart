@@ -1014,7 +1014,7 @@ button, a {
   background-size: 30px 40px, 25px 30px, 35px 25px, 20px 35px, 28px 28px;
   background-repeat: no-repeat;
   filter: blur(8px);
-  animation: aura-mesh-drift 8s ease-in-out infinite alternate;
+  animation: aura-mesh-drift 1.6s ease-in-out infinite alternate;
 }
 
 .aura-v5-sm::after {
@@ -1032,7 +1032,7 @@ button, a {
   background-size: 22px 32px, 28px 22px, 25px 30px, 30px 25px;
   background-repeat: no-repeat;
   filter: blur(6px);
-  animation: aura-mesh-drift-alt 6s ease-in-out infinite alternate-reverse;
+  animation: aura-mesh-drift-alt 1.2s ease-in-out infinite alternate-reverse;
 }
 
 .aura-v5-sm-inner {
