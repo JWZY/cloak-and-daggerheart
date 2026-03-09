@@ -14,13 +14,13 @@ export function NameCharacter() {
   return (
     <>
       <EmberOverlay color={accentColor} rate={6} />
-      <div className="flex flex-col items-center justify-center px-4" style={{ minHeight: '100%' }}>
+      <div className="flex flex-col items-center justify-center px-4" style={{ height: 'calc(100dvh - 140px)' }}>
       <div className="w-full max-w-[360px]">
         <GameInput
           type="text"
           value={characterName}
           onChange={(e) => setCharacterName(e.target.value)}
-          placeholder="Enter name..."
+          placeholder="What shall they call you?"
           autoFocus
           onFocus={(e) => {
             e.currentTarget.style.borderColor = 'transparent'
