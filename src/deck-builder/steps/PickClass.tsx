@@ -161,14 +161,11 @@ export function PickClass({ onNext }: StepProps) {
       heroMode={heroMode}
     >
       {focusedClass && (
-        <div style={{
+        <div className="picker-info-column" style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
           gap: 4,
-          /* Desktop: push to right third */
-          marginLeft: 'auto',
-          maxWidth: 340,
           width: '100%',
         }}>
           <h2 style={{

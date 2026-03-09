@@ -33,9 +33,9 @@
   --gold-border-dark: #C29734;
   --card-bg-dark: #03070d;
   --card-bg-darkalt: #1e201f;
-  --text-primary: rgba(212, 207, 199, 0.9);
-  --text-secondary: rgba(212, 207, 199, 0.6);
-  --text-muted: rgba(212, 207, 199, 0.35);
+  --text-primary: rgba(220, 215, 207, 0.95);
+  --text-secondary: rgba(212, 207, 199, 0.75);
+  --text-muted: rgba(212, 207, 199, 0.45);
   --bg-page: #03070d;
   --bg-surface: rgba(3, 7, 13, 0.6);
   --bg-overlay: rgba(3, 7, 13, 0.92);
@@ -588,7 +588,7 @@ button, a {
 
 .type-body {
   /* maps to typeBody (with card-specific color/shadow) */
-  font-family: 'Inter', sans-serif;
+  font-family: 'Source Sans 3', sans-serif;
   font-size: 13.5px;
   line-height: 1.4;
   color: var(--text-primary);
@@ -612,6 +612,19 @@ button, a {
   font-variant: small-caps;
   letter-spacing: 0.06em;
   color: var(--text-secondary);
+}
+
+/* ─── Picker info column — centered on mobile, right-third on desktop ───── */
+.picker-info-column {
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .picker-info-column {
+    margin-left: auto;
+    margin-right: 0;
+  }
 }
 
 /* ─── Aura glow — two counter-rotating conic blobs for organic flame feel ─ */
