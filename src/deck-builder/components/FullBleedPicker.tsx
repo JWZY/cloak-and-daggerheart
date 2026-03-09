@@ -309,7 +309,7 @@ export function FullBleedPicker({
                   background: 'none',
                   cursor: 'pointer',
                   touchAction: 'manipulation',
-                  '--aura-scale': 0.5,
+                  '--aura-scale': 0.25,
                 } as React.CSSProperties}
               >
                 {/* V5 turbulence inner layer — focused only */}
