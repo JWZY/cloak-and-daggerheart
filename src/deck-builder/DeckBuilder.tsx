@@ -210,14 +210,6 @@ export function DeckBuilder({ onComplete, onExit }: DeckBuilderProps) {
             onGoToStep={handleGoToStep}
             maxReachableStep={maxReachableStep}
           />
-          {/* Gradient fade below carousel — masks scrolling content */}
-          {!isFullBleed && (
-            <div style={{
-              height: 32,
-              background: 'linear-gradient(180deg, var(--bg-page) 0%, transparent 100%)',
-              pointerEvents: 'none',
-            }} />
-          )}
         </div>
 
         {/* Step content — always fills available space */}
@@ -237,7 +229,13 @@ export function DeckBuilder({ onComplete, onExit }: DeckBuilderProps) {
                 stepComponents[store.currentStep]
               ) : (
                 <div className={`h-full overflow-x-hidden ${store.currentStep === 8 ? 'overflow-hidden' : 'overflow-y-auto'}`}
-                  style={{ paddingTop: 64, paddingBottom: 80, overscrollBehavior: 'none' }}
+                  style={{
+                    paddingTop: 64,
+                    paddingBottom: 80,
+                    overscrollBehavior: 'none',
+                    maskImage: 'linear-gradient(to bottom, transparent 0px, black 64px, black calc(100% - 40px), transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 64px, black calc(100% - 40px), transparent 100%)',
+                  }}
                 >
                   <div className="py-4">
                     {stepComponents[store.currentStep]}
