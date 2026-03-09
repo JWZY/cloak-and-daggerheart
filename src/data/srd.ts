@@ -83,11 +83,10 @@ export function getLevel1DomainCards(className: string): DomainCard[] {
   )
 }
 
-/** Look up a subclass by name */
-export function getSubclassByName(name: string): Subclass {
-  const sub = subclasses.find(s => s.name === name)
-  if (!sub) throw new Error(`Unknown subclass: ${name}`)
-  return sub
+/** Look up a subclass by name. Returns null if not found. */
+export function getSubclassByName(name: string | null | undefined): Subclass | null {
+  if (!name) return null
+  return subclasses.find(s => s.name === name) ?? null
 }
 
 /** Get suggested starting equipment names for a class */
@@ -110,11 +109,11 @@ export function getDomainCardsUpToLevel(className: string, maxLevel: number): Do
 
 /** Get specialization features for a subclass */
 export function getSpecializations(subclassName: string): SubclassFoundation[] {
-  return getSubclassByName(subclassName).specializations
+  return getSubclassByName(subclassName)?.specializations ?? []
 }
 
 /** Get mastery features for a subclass */
 export function getMasteries(subclassName: string): SubclassFoundation[] {
-  return getSubclassByName(subclassName).masteries
+  return getSubclassByName(subclassName)?.masteries ?? []
 }
 

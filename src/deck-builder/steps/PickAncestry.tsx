@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
 import { CardPreviewButton } from '../components/CardPreviewButton'
 import { CardZoom } from '../../cards/CardZoom'
@@ -48,6 +48,11 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
   const [focusedId, setFocusedId] = useState<string | null>(ancestryName ?? ancestries[0]?.name ?? null)
   const [showCard, setShowCard] = useState(false)
 
+  // Auto-select first item on mount for faster testing
+  useEffect(() => {
+    if (!ancestryName && ancestries[0]) setAncestry(ancestries[0].name)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const pickerItems: PickerItem[] = ancestries.map((ancestry) => ({
     id: ancestry.name,
     name: ancestry.name,
@@ -77,7 +82,6 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
   return (
     <>
     <FullBleedPicker
-      currentStep={3}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={ancestryName ? [ancestryName] : []}

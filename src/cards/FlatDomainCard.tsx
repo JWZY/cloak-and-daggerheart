@@ -4,6 +4,7 @@ import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from './domain-colors'
 import { DomainBanner } from './DomainBanner'
 import { typeTitle, goldLight, goldDark } from '../ui/typography'
 import { springs, tapFeedback } from '../design-system/tokens/animations'
+import { warmGlass, warmGlassSelectedBorder, RADIUS_OPTION } from '../design-system/tokens/surfaces'
 
 // ---------------------------------------------------------------------------
 // FlatDomainCard — compact ~60px row with artwork bleed, pennant banner,
@@ -64,13 +65,11 @@ export function FlatDomainCard({
         height: ROW_HEIGHT,
         textAlign: 'left',
         cursor: onClick ? 'pointer' : 'default',
-        background: selected
-          ? 'var(--gold-muted)'
-          : 'var(--surface-faint)',
+        ...warmGlass,
         border: selected
-          ? '1px solid var(--gold-secondary)'
-          : '1px solid var(--surface-light)',
-        borderRadius: 12,
+          ? warmGlassSelectedBorder
+          : warmGlass.border,
+        borderRadius: RADIUS_OPTION,
         overflow: 'hidden',
         position: 'relative',
         opacity: dimmed ? 0.4 : 1,

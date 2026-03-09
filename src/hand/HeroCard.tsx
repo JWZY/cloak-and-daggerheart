@@ -11,7 +11,8 @@ export interface HeroCardProps {
 
 export function HeroCard({ onTap, subclass }: HeroCardProps) {
   const subclassData = getSubclassByName(subclass)
-  const classData = getClassForSubclass(subclass)!
+  const classData = getClassForSubclass(subclass)
+  if (!subclassData || !classData) return null
   const cardProps = subclassToCardProps(subclassData, classData)
 
   return (

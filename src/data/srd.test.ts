@@ -20,27 +20,33 @@ describe('getSubclassCardCount', () => {
 describe('getSubclassByName', () => {
   it('returns School of Knowledge subclass correctly', () => {
     const subclass = getSubclassByName('School of Knowledge')
-    expect(subclass.name).toBe('School of Knowledge')
+    expect(subclass!.name).toBe('School of Knowledge')
   })
 
   it('returns School of War subclass correctly', () => {
     const subclass = getSubclassByName('School of War')
-    expect(subclass.name).toBe('School of War')
+    expect(subclass!.name).toBe('School of War')
   })
 
   it('returns Seraph subclasses correctly', () => {
     const divine = getSubclassByName('Divine Wielder')
-    expect(divine.name).toBe('Divine Wielder')
+    expect(divine!.name).toBe('Divine Wielder')
 
     const winged = getSubclassByName('Winged Sentinel')
-    expect(winged.name).toBe('Winged Sentinel')
+    expect(winged!.name).toBe('Winged Sentinel')
   })
 
   it('returns Druid subclasses correctly', () => {
     const elements = getSubclassByName('Warden of the Elements')
-    expect(elements.name).toBe('Warden of the Elements')
+    expect(elements!.name).toBe('Warden of the Elements')
 
     const renewal = getSubclassByName('Warden of Renewal')
-    expect(renewal.name).toBe('Warden of Renewal')
+    expect(renewal!.name).toBe('Warden of Renewal')
+  })
+
+  it('returns null for unknown subclass', () => {
+    expect(getSubclassByName('Nonexistent')).toBeNull()
+    expect(getSubclassByName(null)).toBeNull()
+    expect(getSubclassByName(undefined)).toBeNull()
   })
 })

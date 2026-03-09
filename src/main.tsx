@@ -5,6 +5,7 @@ import DesignSystemPage from './app/DesignSystem'
 import DesignLab from './app/DesignLab'
 import PickerLab from './app/PickerLab'
 import AuraLab from './app/AuraLab'
+import CardStyleLab from './app/CardStyleLab'
 import './index.css'
 
 const params = new URLSearchParams(window.location.search)
@@ -16,7 +17,9 @@ const Root = params.has('components') || params.has('audit')
       ? PickerLab
       : params.has('aura')
         ? AuraLab
-        : App
+        : params.has('styles')
+          ? CardStyleLab
+          : App
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

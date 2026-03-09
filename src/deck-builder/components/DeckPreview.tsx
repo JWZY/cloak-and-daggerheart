@@ -83,9 +83,8 @@ export function DeckPreview() {
         <div style={{ textAlign: 'center', marginTop: 60 }}>
           <p
             style={{
-              fontFamily: typeSubtitle.fontFamily,
+              ...typeSubtitle,
               fontStyle: 'italic',
-              fontSize: 13,
               color: 'var(--text-muted)',
             }}
           >
@@ -182,8 +181,7 @@ export function DeckPreview() {
                   <span
                     style={{
                       display: 'block',
-                      fontFamily: typeMicro.fontFamily,
-                      fontSize: 13,
+                      ...typeSubtitle,
                       fontWeight: 700,
                       color: 'var(--gold)',
                     }}

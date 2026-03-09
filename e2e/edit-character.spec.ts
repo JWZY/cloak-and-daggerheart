@@ -76,7 +76,7 @@ async function injectCharacterAndWait(page: Page) {
   await page.goto('/')
   await page.evaluate((charData) => {
     const storeData = {
-      state: { characters: [charData] },
+      state: { characters: [charData], activeCharacterId: charData.id },
       version: 0,
     }
     localStorage.setItem('cloak-characters-v3', JSON.stringify(storeData))

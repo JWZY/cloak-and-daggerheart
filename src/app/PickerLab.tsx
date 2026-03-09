@@ -44,7 +44,9 @@ export default function PickerLab() {
   return (
     <div
       style={{
-        minHeight: '100vh',
+        height: '100dvh',
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
         background: PAGE_BG,
         color: WARM,
         fontFamily: typeBody.fontFamily,

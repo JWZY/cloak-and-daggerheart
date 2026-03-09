@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
 import { CardPreviewButton } from '../components/CardPreviewButton'
 import { CardZoom } from '../../cards/CardZoom'
@@ -52,6 +52,11 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
   const [focusedId, setFocusedId] = useState<string | null>(subclass ?? subclassData[0]?.name ?? null)
   const [showCard, setShowCard] = useState(false)
 
+  // Auto-select first item on mount for faster testing
+  useEffect(() => {
+    if (!subclass && subclassData[0]) setSubclass(subclassData[0].name)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const pickerItems: PickerItem[] = subclassData.map((sub) => ({
     id: sub.name,
     name: sub.name,
@@ -77,7 +82,6 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
   return (
     <>
     <FullBleedPicker
-      currentStep={1}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={subclass ? [subclass] : []}
@@ -146,16 +150,15 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
       )}
     </FullBleedPicker>
 
-    {showCard && focusedSub && selectedClass && (
-      <CardZoom layoutId={`preview-${focusedSub.name}`} onClose={() => setShowCard(false)}>
-        <SRDCard
-          {...subclassToCardProps(
-            getSubclassByName(focusedSub.name),
-            getClassByName(selectedClass)
-          )}
-        />
-      </CardZoom>
-    )}
+    {showCard && focusedSub && selectedClass && (() => {
+      const sub = getSubclassByName(focusedSub.name)
+      if (!sub) return null
+      return (
+        <CardZoom layoutId={`preview-${focusedSub.name}`} onClose={() => setShowCard(false)}>
+          <SRDCard {...subclassToCardProps(sub, getClassByName(selectedClass))} />
+        </CardZoom>
+      )
+    })()}
     </>
   )
 }

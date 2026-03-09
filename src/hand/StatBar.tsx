@@ -126,8 +126,7 @@ function StatRow({
       {/* Count label */}
       <span
         style={{
-          fontFamily: typeBody.fontFamily,
-          fontSize: typeMicro.fontSize,
+          ...typeBody,
           fontWeight: 600,
           color: 'var(--text-secondary)',
           minWidth: 28,

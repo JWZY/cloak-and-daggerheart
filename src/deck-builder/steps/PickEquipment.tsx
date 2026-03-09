@@ -4,10 +4,8 @@ import { springs } from '../../design-system/tokens/animations'
 import { goldDarkAlpha } from '../../ui/typography'
 import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
-import { EmberOverlay } from '../../ui/EmberOverlay'
 import { typeSubtitle, typeBody } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
-import { getClassAccentColor } from '../../cards/domain-colors'
 import { tier1Armors, tier1PrimaryWeapons, tier1SecondaryWeapons, getSuggestedEquipment } from '../../data/srd'
 import { parseThresholds } from '../../core/character/armor'
 import type { Armor, Weapon } from '../../types/character'
@@ -306,11 +304,8 @@ export function PickEquipment() {
   const selectedPrimaryData = tier1PrimaryWeapons.find((w) => w.name === selectedPrimaryWeapon)
   const selectedSecondaryData = tier1SecondaryWeapons.find((w) => w.name === selectedSecondaryWeapon)
 
-  const accentColor = getClassAccentColor(selectedClass)
-
   return (
     <>
-      <EmberOverlay color={accentColor} rate={6} />
       <div className="flex flex-col items-center px-4" style={{ paddingTop: 48 }}>
       <p className="max-w-[360px]" style={{
         ...typeBody,

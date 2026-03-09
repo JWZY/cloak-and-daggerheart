@@ -2,10 +2,10 @@
  * Centralized Typography Tokens
  *
  * Single source of truth for all typography styles in the app.
- * Four tiers: Title, Subtitle, Body, Micro.
+ * Five tiers: Title, Subtitle (18px app), SubtitleCard (15px card), Body/BodyCard, Micro.
  *
  * Usage:
- *   import { typeTitle, typeSubtitle, typeBody, typeMicro } from '../ui/typography'
+ *   import { typeTitle, typeSubtitle, typeSubtitleCard, typeBody, typeMicro } from '../ui/typography'
  *   <h1 style={{ ...typeTitle, fontSize: 36 }}>Title</h1>
  *   <span style={{ ...typeSubtitle, color: goldDark }}>Label</span>
  */
@@ -25,22 +25,45 @@ export const typeTitle = {
 }
 
 /**
- * SUBTITLE — Labels, buttons, section headers, card subtitles, panel titles.
- * EB Garamond 600, small-caps, 0.06em tracking, 13px.
+ * SUBTITLE — Labels, buttons, section headers, panel titles, app-level subtitles.
+ * EB Garamond 600, small-caps, 0.06em tracking, 18px.
  */
 export const typeSubtitle = {
   fontFamily: "'EB Garamond', serif",
-  fontSize: 13,
+  fontSize: 18,
   fontWeight: 600 as const,
   fontVariant: 'small-caps' as const,
   letterSpacing: '0.06em',
 }
 
 /**
- * BODY — Card descriptions, form inputs, step instructions, body copy.
- * Source Sans 3 400, 13.5px, line-height 1.4.
+ * SUBTITLE (CARD) — Card subtitles, class name labels, footer text on SRD/Domain/Info cards.
+ * EB Garamond 600, small-caps, 0.06em tracking, 15px. Tuned for 360×508 card layout.
+ */
+export const typeSubtitleCard = {
+  fontFamily: "'EB Garamond', serif",
+  fontSize: 15,
+  fontWeight: 600 as const,
+  fontVariant: 'small-caps' as const,
+  letterSpacing: '0.06em',
+}
+
+/**
+ * BODY — App UI: step instructions, helper text, form labels, descriptions.
+ * Source Sans 3 400, 15px, line-height 1.45.
  */
 export const typeBody = {
+  fontFamily: "'Source Sans 3', sans-serif",
+  fontSize: 15,
+  fontWeight: 400 as const,
+  lineHeight: 1.45,
+}
+
+/**
+ * BODY (CARD) — Card descriptions, ability text, feat text on SRD/Domain/Info cards.
+ * Source Sans 3 400, 13.5px, line-height 1.4. Tuned for 360×508 card layout.
+ */
+export const typeBodyCard = {
   fontFamily: "'Source Sans 3', sans-serif",
   fontSize: 13.5,
   fontWeight: 400 as const,

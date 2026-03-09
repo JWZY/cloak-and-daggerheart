@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
-import { typeSubtitle, typeBody } from './typography'
+import { typeSubtitle, typeBody, goldDarkAlpha } from './typography'
+import { RADIUS_OPTION } from '../design-system/tokens/surfaces'
 
 export interface GameTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -28,9 +29,9 @@ export const GameTextarea = forwardRef<HTMLTextAreaElement, GameTextareaProps>(
           style={{
             width: '100%',
             padding: '12px 16px',
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--surface-border)',
-            borderRadius: 8,
+            background: 'linear-gradient(180deg, rgba(45,34,22,0.55), rgba(30,22,14,0.4))',
+            border: `1px solid ${goldDarkAlpha(0.15)}`,
+            borderRadius: RADIUS_OPTION,
             color: 'var(--text-primary)',
             fontFamily: typeBody.fontFamily,
             fontSize: typeBody.fontSize,
@@ -42,12 +43,12 @@ export const GameTextarea = forwardRef<HTMLTextAreaElement, GameTextareaProps>(
             ...style,
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'var(--gold)'
-            e.currentTarget.style.boxShadow = '0 0 0 2px var(--gold-muted)'
+            e.currentTarget.style.borderColor = goldDarkAlpha(0.4)
+            e.currentTarget.style.boxShadow = `0 0 0 2px ${goldDarkAlpha(0.2)}`
             props.onFocus?.(e)
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'var(--surface-border)'
+            e.currentTarget.style.borderColor = goldDarkAlpha(0.15)
             e.currentTarget.style.boxShadow = 'none'
             props.onBlur?.(e)
           }}

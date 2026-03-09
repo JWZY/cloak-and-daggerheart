@@ -45,9 +45,7 @@ function EquipmentRow({
           </span>
           <span
             style={{
-              fontFamily: typeSubtitle.fontFamily,
-              fontSize: typeSubtitle.fontSize,
-              fontWeight: typeSubtitle.fontWeight,
+              ...typeSubtitle,
               color: 'var(--text-primary)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -60,8 +58,8 @@ function EquipmentRow({
         {details && (
           <span
             style={{
+              ...typeMicro,
               fontFamily: typeBody.fontFamily,
-              fontSize: typeMicro.fontSize,
               display: 'block',
               marginTop: 2,
               color: 'var(--text-muted)',
@@ -147,8 +145,7 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
         </span>
         <span
           style={{
-            fontFamily: typeBody.fontFamily,
-            fontSize: 13,
+            ...typeBody,
             fontWeight: 700,
             color: 'var(--gold)',
           }}

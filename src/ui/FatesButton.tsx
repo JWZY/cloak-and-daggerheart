@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
+import { typeSubtitle } from './typography'
 import fatesLight from '../../assets/ui-exploration/button-bg-fates-light.avif'
 import fatesDark from '../../assets/ui-exploration/button-bg-fates-dark.avif'
 
@@ -38,7 +39,6 @@ export function FatesButton({
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.4 : 1,
         pointerEvents: disabled ? 'none' : 'auto',
-        overflow: 'hidden',
         touchAction: 'manipulation',
       }}
     >
@@ -51,7 +51,7 @@ export function FatesButton({
           inset: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'contain',
           borderRadius: 0,
           pointerEvents: 'none',
         }}
@@ -65,11 +65,8 @@ export function FatesButton({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: "'EB Garamond', serif",
-          fontSize: 15.6,
-          fontWeight: 500,
+          ...typeSubtitle,
           fontVariant: 'all-small-caps',
-          letterSpacing: '0.06em',
           color: textColor,
           pointerEvents: 'none',
         }}

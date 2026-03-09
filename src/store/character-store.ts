@@ -7,10 +7,12 @@ import type { LevelUpChoices } from '../core/character/level-up'
 
 interface CharacterStore {
   characters: Character[]
+  activeCharacterId: string | null
 
   // Actions
   createCharacter: (character: Character) => void
   deleteCharacter: (id: string) => void
+  setActiveCharacter: (id: string | null) => void
   updateHP: (id: string, delta: number) => void
   updateArmor: (id: string, delta: number) => void
   updateHope: (id: string, delta: number) => void
@@ -25,16 +27,23 @@ export const useCharacterStore = create<CharacterStore>()(
   persist(
     (set) => ({
       characters: [],
+      activeCharacterId: null,
 
       createCharacter: (character: Character) =>
         set((state) => ({
           characters: [...state.characters, character],
+          activeCharacterId: character.id,
         })),
 
       deleteCharacter: (id: string) =>
         set((state) => ({
           characters: state.characters.filter((c) => c.id !== id),
+          activeCharacterId:
+            state.activeCharacterId === id ? null : state.activeCharacterId,
         })),
+
+      setActiveCharacter: (id: string | null) =>
+        set(() => ({ activeCharacterId: id })),
 
       updateHP: (id: string, delta: number) =>
         set((state) => ({

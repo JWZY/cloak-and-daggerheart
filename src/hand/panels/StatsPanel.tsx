@@ -20,7 +20,7 @@ const traitLabels: Record<string, string> = {
 export function StatsPanel({ character }: StatsPanelProps) {
   // Determine spellcast trait from subclass data
   const subclassData = getSubclassByName(character.subclass)
-  const spellcastTrait = subclassData.spellcast_trait
+  const spellcastTrait = subclassData?.spellcast_trait ?? null
 
   return (
     <div className="flex flex-col gap-3">
@@ -64,8 +64,7 @@ export function StatsPanel({ character }: StatsPanelProps) {
               </span>
               <span
                 style={{
-                  fontFamily: typeBody.fontFamily,
-                  fontSize: 15,
+                  ...typeBody,
                   fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums',
                   color: value > 0

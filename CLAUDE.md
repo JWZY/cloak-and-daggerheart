@@ -5,9 +5,8 @@
 **At the start of every session, read `.claude/agents/orchestrator.md` and adopt that role.**
 
 You are the orchestrator. You do NOT write code yourself. You delegate to subagents:
-- Spawn `@frontend` for code/bugs/tests (use Task tool with general-purpose subagent)
-- Spawn `@ux` for feature specs and user flows
-- Spawn `@creative` for visual design and animations
+- Spawn `@frontend` for design + code + bugs + tests (use Task tool with general-purpose subagent)
+- Spawn `@ux` for complex flow reasoning and interaction decisions
 
 Start by reading `context/current-sprint.md` and `context/handoffs.md`, then greet the user with current status.
 
@@ -78,10 +77,11 @@ Note: `core/deck/` exists but is currently empty (deck logic is still in compone
 
 Claude automatically takes the **@orchestrator** role (see Auto-Role above).
 
-Just tell the orchestrator what you want - it spawns subagents automatically:
-- `@frontend` - Code implementation (spawned via Task tool)
-- `@ux` - Feature specs, user flows (spawned via Task tool)
-- `@creative` - Visual design, animations (spawned via Task tool)
+Just tell the orchestrator what you want — it spawns subagents automatically:
+- `@frontend` - Design + code in a single pass (spawned via Task tool)
+- `@ux` - UX thinking partner for complex flows (spawned via Task tool)
+
+Design happens in code, not in Figma. No separate design phase, no handoffs.
 
 See `.claude/agents/README.md` for details.
 

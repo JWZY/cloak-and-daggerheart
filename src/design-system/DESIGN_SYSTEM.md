@@ -830,7 +830,7 @@ whileTap={{ scale: 0.9 }}
 // Cards
 whileHover={{ y: -4 }}
 
-// Interactive panels
+// Source Sans 3active panels
 whileHover={{ y: -2 }}
 ```
 

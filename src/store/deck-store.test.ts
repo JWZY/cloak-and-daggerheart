@@ -171,10 +171,10 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().currentStep).toBe(1)
   })
 
-  it('nextStep clamps at 11', () => {
-    useDeckStore.setState({ currentStep: 11 })
+  it('nextStep clamps at 8', () => {
+    useDeckStore.setState({ currentStep: 8 })
     useDeckStore.getState().nextStep()
-    expect(useDeckStore.getState().currentStep).toBe(11)
+    expect(useDeckStore.getState().currentStep).toBe(8)
   })
 
   it('prevStep decrements currentStep', () => {
@@ -194,11 +194,11 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().currentStep).toBe(4)
   })
 
-  it('goToStep clamps between 0 and 11', () => {
+  it('goToStep clamps between 0 and 8', () => {
     useDeckStore.getState().goToStep(-1)
     expect(useDeckStore.getState().currentStep).toBe(0)
     useDeckStore.getState().goToStep(15)
-    expect(useDeckStore.getState().currentStep).toBe(11)
+    expect(useDeckStore.getState().currentStep).toBe(8)
   })
 
   // -------------------------------------------------------------------------
@@ -351,37 +351,19 @@ describe('deck-store', () => {
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  // Step 8: Background (optional)
-  it('canProceed returns true at step 8 (background is optional)', () => {
-    useDeckStore.setState({ currentStep: 8 })
-    expect(useDeckStore.getState().canProceed()).toBe(true)
-  })
-
-  // Step 9: Connections (optional)
-  it('canProceed returns true at step 9 (connections are optional)', () => {
-    useDeckStore.setState({ currentStep: 9 })
-    expect(useDeckStore.getState().canProceed()).toBe(true)
-  })
-
-  // Step 10: Name
-  it('canProceed returns false when step 10 has empty name', () => {
-    useDeckStore.setState({ currentStep: 10, characterName: '' })
+  // Step 8: Name
+  it('canProceed returns false when step 8 has empty name', () => {
+    useDeckStore.setState({ currentStep: 8, characterName: '' })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns false when step 10 has whitespace-only name', () => {
-    useDeckStore.setState({ currentStep: 10, characterName: '   ' })
+  it('canProceed returns false when step 8 has whitespace-only name', () => {
+    useDeckStore.setState({ currentStep: 8, characterName: '   ' })
     expect(useDeckStore.getState().canProceed()).toBe(false)
   })
 
-  it('canProceed returns true when step 10 has a name', () => {
-    useDeckStore.setState({ currentStep: 10, characterName: 'Gandalf' })
-    expect(useDeckStore.getState().canProceed()).toBe(true)
-  })
-
-  // Step 11: Review
-  it('canProceed returns true at step 11 (review)', () => {
-    useDeckStore.setState({ currentStep: 11 })
+  it('canProceed returns true when step 8 has a name', () => {
+    useDeckStore.setState({ currentStep: 8, characterName: 'Gandalf' })
     expect(useDeckStore.getState().canProceed()).toBe(true)
   })
 

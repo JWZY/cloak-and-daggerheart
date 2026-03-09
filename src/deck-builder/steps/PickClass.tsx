@@ -25,6 +25,7 @@ const CLASS_ART_POSITION: Record<string, string> = {
 const CLASS_COVER: Record<string, string> = {
   Guardian: 'valor-touched',
   Sorcerer: 'arcana-touched',
+  Bard: 'grace-touched',
   Warrior: 'reapers-strike',
 }
 
@@ -122,7 +123,6 @@ export function PickClass({ onNext }: StepProps) {
 
   return (
     <FullBleedPicker
-      currentStep={0}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={selectedClass ? [selectedClass] : []}

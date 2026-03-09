@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { tapFeedback } from '../design-system/tokens/animations'
+import { warmGlass, warmGlassSelectedBorder, RADIUS_OPTION } from '../design-system/tokens/surfaces'
 
 export interface SelectableOptionProps {
   selected: boolean
@@ -29,18 +30,12 @@ export function SelectableOption({
       layout={layoutProp}
       whileTap={disabled ? undefined : tapFeedback.medium}
       onClick={disabled ? undefined : onClick}
-      className={`w-full text-left rounded-xl px-4 py-3 ${className}`}
+      className={`w-full text-left px-4 py-3 ${className}`}
       style={{
         position: 'relative',
-        background: selected
-          ? 'var(--gold-muted)'
-          : 'var(--surface-faint)',
-        border: selected
-          ? '1px solid var(--gold-muted)'
-          : '1px solid var(--surface-light)',
-        boxShadow: selected
-          ? 'inset 0 1px 1px rgba(249, 248, 243, 0.1), 0 2px 8px rgba(0, 0, 0, 0.15)'
-          : 'none',
+        ...warmGlass,
+        borderRadius: RADIUS_OPTION,
+        border: selected ? warmGlassSelectedBorder : warmGlass.border,
         opacity: disabled ? 0.35 : dimmed ? 0.65 : 1,
         cursor: disabled ? 'default' : 'pointer',
         transition: 'opacity 0.2s',

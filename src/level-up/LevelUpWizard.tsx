@@ -279,7 +279,7 @@ function StepAutoGains({
   return (
     <div className="flex flex-col gap-5">
       <div className="text-center pb-2">
-        <p style={{ fontFamily: typeBody.fontFamily, fontSize: 14, color: 'var(--text-secondary)' }}>
+        <p style={{ ...typeBody, color: 'var(--text-secondary)' }}>
           These upgrades happen automatically at Level {character.level + 1}
         </p>
       </div>
@@ -310,7 +310,7 @@ function StepAutoGains({
         >
           New Experience (+2 bonus)
         </span>
-        <p style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+        <p style={{ ...typeBody, color: 'var(--text-muted)' }}>
           Describe something your character learned or went through
         </p>
         <input
@@ -320,8 +320,7 @@ function StepAutoGains({
           placeholder="e.g. Survived the Siege of Thornwall"
           className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
           style={{
-            fontFamily: typeBody.fontFamily,
-            fontSize: 14,
+            ...typeBody,
             background: 'var(--gold-muted)',
             border: '1px solid var(--gold-muted)',
             color: '#D4CFC7',
@@ -341,15 +340,15 @@ function GainRow({ label, from, to, changed }: { label: string; from: string; to
         border: '1px solid var(--gold-muted)',
       }}
     >
-      <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--text-secondary)' }}>
+      <span style={{ ...typeSubtitle, color: 'var(--text-secondary)' }}>
         {label}
       </span>
       <div className="flex items-center gap-2">
-        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 14, color: 'var(--text-muted)' }}>{from}</span>
+        <span style={{ ...typeBody, color: 'var(--text-muted)' }}>{from}</span>
         {changed && (
           <>
             <ChevronRight size={12} style={{ color: 'var(--gold)' }} />
-            <span style={{ fontFamily: typeBody.fontFamily, fontSize: 14, fontWeight: 700, color: 'var(--gold)' }}>{to}</span>
+            <span style={{ ...typeBody, fontWeight: 700, color: 'var(--gold)' }}>{to}</span>
           </>
         )}
       </div>
@@ -517,7 +516,7 @@ function StepAdvancements({
     <div className="flex flex-col gap-4">
       {/* Slots indicator */}
       <div className="flex items-center justify-center gap-3">
-        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--text-muted)' }}>
+        <span style={{ ...typeBody, color: 'var(--text-muted)' }}>
           Slots used:
         </span>
         <div className="flex gap-1.5">
@@ -598,8 +597,7 @@ function StepAdvancements({
                 <span
                   className="flex-1"
                   style={{
-                    fontFamily: typeBody.fontFamily,
-                    fontSize: 14,
+                    ...typeBody,
                     fontWeight: 600,
                     color: currentCount > 0 ? 'var(--gold)' : '#D4CFC7',
                   }}
@@ -609,7 +607,7 @@ function StepAdvancements({
 
                 {/* Slot cost for 2-slot types */}
                 {isTwoSlot && (
-                  <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
+                  <span style={{ ...typeBody, color: 'var(--gold-secondary)' }}>
                     2 slots
                   </span>
                 )}
@@ -628,10 +626,10 @@ function StepAdvancements({
                   >
                     <div className="flex flex-col gap-2 pt-2 pb-1">
                       <div className="flex items-center justify-between px-1">
-                        <span style={{ ...typeSubtitle, fontSize: 13, color: 'var(--gold)' }}>
+                        <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                           Pick 2 unmarked traits
                         </span>
-                        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
+                        <span style={{ ...typeBody, color: 'var(--gold-secondary)' }}>
                           {selectedTraits.length} / 2
                         </span>
                       </div>
@@ -661,13 +659,12 @@ function StepAdvancements({
                               >
                                 {trait}
                                 {isMarked && (
-                                  <span style={{ fontSize: 11, marginLeft: 6, color: 'var(--text-muted)' }}>marked</span>
+                                  <span style={{ ...typeBody, marginLeft: 6, color: 'var(--text-muted)' }}>marked</span>
                                 )}
                               </span>
                               <span
                                 style={{
-                                  fontFamily: typeBody.fontFamily,
-                                  fontSize: 15,
+                                  ...typeBody,
                                   fontWeight: 700,
                                   color: isMarked
                                     ? 'var(--text-muted)'
@@ -702,10 +699,10 @@ function StepAdvancements({
                   >
                     <div className="flex flex-col gap-2 pt-2 pb-1">
                       <div className="flex items-center justify-between px-1">
-                        <span style={{ ...typeSubtitle, fontSize: 13, color: 'var(--gold)' }}>
+                        <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                           Pick 2 experiences to boost
                         </span>
-                        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--gold-secondary)' }}>
+                        <span style={{ ...typeBody, color: 'var(--gold-secondary)' }}>
                           {selectedExpIndices.length} / 2
                         </span>
                       </div>
@@ -724,8 +721,7 @@ function StepAdvancements({
                           >
                             <span
                               style={{
-                                fontFamily: typeBody.fontFamily,
-                                fontSize: 13,
+                                ...typeBody,
                                 color: isSelected ? 'var(--gold)' : 'var(--text-secondary)',
                               }}
                             >
@@ -771,13 +767,13 @@ function StepDomainCard({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <p style={{ fontFamily: typeBody.fontFamily, fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center' }}>
+      <p style={{ ...typeBody, color: 'var(--text-secondary)', textAlign: 'center' }}>
         {maxCards === 1
           ? 'Choose a new domain card from your class domains'
           : `Choose ${maxCards} domain cards from your class domains`}
       </p>
       <div className="flex justify-center">
-        <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--gold-secondary)' }}>
+        <span style={{ ...typeBody, color: 'var(--gold-secondary)' }}>
           {selectedCards.length} of {maxCards} selected
         </span>
       </div>
@@ -800,14 +796,14 @@ function StepDomainCard({
               }}
             >
               <div className="flex items-center justify-between w-full">
-                <span style={{ fontFamily: typeSubtitle.fontFamily, fontSize: typeSubtitle.fontSize, fontWeight: typeSubtitle.fontWeight, color: isSelected ? 'var(--gold)' : '#D4CFC7' }}>
+                <span style={{ ...typeSubtitle, color: isSelected ? 'var(--gold)' : '#D4CFC7' }}>
                   {card.name}
                 </span>
                 <span style={{ ...typeMicro, color: 'var(--text-muted)' }}>
                   {card.domain} &middot; L{card.level}
                 </span>
               </div>
-              <div style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>
+              <div style={{ ...typeBody, color: 'var(--text-muted)', marginTop: 4 }}>
                 <FormatText text={card.text.length > 120 ? card.text.slice(0, 120) + '\u2026' : card.text} />
               </div>
             </button>
@@ -881,7 +877,7 @@ function StepReview({
 function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <span style={{ ...typeSubtitle, fontSize: 14, color: 'var(--gold)' }}>
+      <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
         {title}
       </span>
       <div className="flex flex-col gap-1.5 pl-2" style={{ borderLeft: '2px solid var(--gold-muted)' }}>
@@ -894,8 +890,8 @@ function ReviewSection({ title, children }: { title: string; children: React.Rea
 function ReviewItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, color: 'var(--text-secondary)' }}>{label}</span>
-      {value && <span style={{ fontFamily: typeBody.fontFamily, fontSize: 13, fontWeight: 600, color: 'var(--gold)' }}>{value}</span>}
+      <span style={{ ...typeBody, color: 'var(--text-secondary)' }}>{label}</span>
+      {value && <span style={{ ...typeBody, fontWeight: 600, color: 'var(--gold)' }}>{value}</span>}
     </div>
   )
 }

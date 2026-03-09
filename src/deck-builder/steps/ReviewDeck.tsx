@@ -151,8 +151,7 @@ export function ReviewDeck() {
                   <span
                     className="block"
                     style={{
-                      fontFamily: typeBody.fontFamily,
-                      fontSize: 15,
+                      ...typeBody,
                       fontWeight: 700,
                       color: 'var(--gold)',
                     }}

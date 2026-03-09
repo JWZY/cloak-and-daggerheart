@@ -8,6 +8,7 @@ import { DeckBuilder } from '../deck-builder/DeckBuilder'
 import { HandView } from '../hand/HandView'
 import { CharacterSelect } from '../character-select/CharacterSelect'
 import { useCharacterStore } from '../store/character-store'
+import { useDeckStore } from '../store/deck-store'
 import type { Character } from '../types/character'
 
 const splashVariants = {
@@ -29,6 +30,7 @@ const builderVariants = {
     opacity: 0,
     scale: 0.95,
     y: -20,
+    pointerEvents: 'none' as const,
     transition: { duration: 0.35, ease: [0.4, 0, 1, 1] },
   },
 }
@@ -47,6 +49,7 @@ const handVariants = {
   exit: {
     opacity: 0,
     scale: 0.95,
+    pointerEvents: 'none' as const,
     transition: { duration: 0.25, ease: 'easeIn' },
   },
 }
@@ -59,6 +62,7 @@ const selectVariants = {
   },
   exit: {
     opacity: 0,
+    pointerEvents: 'none' as const,
     transition: { duration: 0.2, ease: 'easeIn' },
   },
 }
@@ -137,13 +141,19 @@ export default function App() {
         )}
         {showHand && activeCharacter && (
           <motion.div
-            key="hand"
+            key={`hand-${activeCharacter.id}`}
             variants={handVariants}
             initial="initial"
             animate="animate"
             exit="exit"
           >
-            <HandView character={activeCharacter} />
+            <HandView
+              character={activeCharacter}
+              onEditCharacter={() => {
+                useDeckStore.getState().seedFromCharacter(activeCharacter)
+                setIsCreating(true)
+              }}
+            />
           </motion.div>
         )}
       </AnimatePresence>

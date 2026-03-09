@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getSubclassCardCount } from '../core/rules/class-rules'
 import { getSuggestedEquipment } from '../data/srd'
+import type { Character } from '../types/character'
 
 interface DeckDraft {
   // Step completion tracking
@@ -51,7 +52,7 @@ interface DeckDraft {
   setArmor: (name: string) => void
   setPrimaryWeapon: (name: string) => void
   setSecondaryWeapon: (name: string | null) => void
-  setTraits: (traits: Record<string, number>) => void
+  setTraits: (traits: Record<string, number> | null) => void
   setBackgroundAnswer: (index: number, answer: string) => void
   setExperience: (index: number, text: string) => void
   setCharacterName: (name: string) => void
@@ -60,6 +61,7 @@ interface DeckDraft {
   prevStep: () => void
   goToStep: (step: number) => void
   reset: () => void
+  seedFromCharacter: (character: Character) => void
 
   // Derived: can proceed to next step?
   canProceed: () => boolean
@@ -129,7 +131,7 @@ export const useDeckStore = create<DeckDraft>()(
 
       setSecondaryWeapon: (name: string | null) => set({ selectedSecondaryWeapon: name }),
 
-      setTraits: (traits: Record<string, number>) => set({ traits }),
+      setTraits: (traits: Record<string, number> | null) => set({ traits }),
 
       setBackgroundAnswer: (index: number, answer: string) =>
         set((state) => {
@@ -173,6 +175,27 @@ export const useDeckStore = create<DeckDraft>()(
 
       reset: () => set(initialState),
 
+      seedFromCharacter: (character: Character) =>
+        set({
+          currentStep: 0,
+          selectedClass: character.class,
+          subclass: character.subclass,
+          selectedDomainCards: character.domainCards.map((c) => c.name),
+          ancestryName: character.ancestry.name,
+          communityName: character.community.name,
+          selectedArmor: character.equipment.armor?.name ?? null,
+          selectedPrimaryWeapon: character.equipment.primaryWeapon?.name ?? null,
+          selectedSecondaryWeapon: character.equipment.secondaryWeapon?.name ?? null,
+          traits: { ...character.traits },
+          experiences: (character.experiences ?? []).map((e) => ({
+            text: e.text,
+            bonus: e.bonus ?? 2,
+          })),
+          backgroundAnswers: character.backgroundAnswers ?? [],
+          connectionAnswers: character.connectionAnswers ?? [],
+          characterName: character.name,
+        }),
+
       canProceed: () => {
         const state = get()
         switch (state.currentStep) {
@@ -193,7 +216,9 @@ export const useDeckStore = create<DeckDraft>()(
           case 5:
             return state.selectedArmor !== null && state.selectedPrimaryWeapon !== null
           case 6:
-            return state.traits !== null
+            // All 6 traits must be assigned (non-null values)
+            if (!state.traits) return false
+            return Object.values(state.traits).every((v) => v !== null && v !== undefined)
           case 7: // Experiences — need 2 non-empty
             return (state.experiences || []).filter((e) => e?.text?.trim()).length >= 2
           case 8: // Character Name

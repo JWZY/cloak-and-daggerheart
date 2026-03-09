@@ -4,10 +4,8 @@ import { tapFeedback } from '../../design-system/tokens/animations'
 import { TRAIT_NAMES, TRAIT_DESCRIPTIONS, parseSuggestedTraits, formatTraitValue, getRemainingTraitValues } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
 import { SelectableOption } from '../../ui/SelectableOption'
-import { EmberOverlay } from '../../ui/EmberOverlay'
 import { typeSubtitle, typeBody, goldDarkAlpha } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
-import { getClassAccentColor } from '../../cards/domain-colors'
 import { getClassByName } from '../../data/srd'
 
 type Variant = 'pills' | 'stepper' | 'cycle'
@@ -149,11 +147,8 @@ export function AssignTraits() {
     setVariant(VARIANTS[(idx + 1) % VARIANTS.length])
   }
 
-  const accentColor = getClassAccentColor(selectedClass)
-
   return (
     <>
-      <EmberOverlay color={accentColor} rate={6} />
       <div className="flex flex-col items-center px-4" style={{ paddingTop: 48 }}>
       <p className="max-w-[360px]" style={{
         ...typeBody,

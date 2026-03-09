@@ -103,7 +103,7 @@ async function injectCharacterAndWait(page: Page) {
   await page.goto('/')
   await page.evaluate((charData) => {
     const storeData = {
-      state: { characters: [charData] },
+      state: { characters: [charData], activeCharacterId: charData.id },
       version: 0,
     }
     localStorage.setItem('cloak-characters-v3', JSON.stringify(storeData))
@@ -193,15 +193,15 @@ test.describe('Hand View Interactions', () => {
     })
   })
 
-  test('delete character returns to deck builder', async ({ page }) => {
-    // Click the delete button
-    const deleteBtn = page.getByTestId('delete-character')
-    await expect(deleteBtn).toBeVisible({ timeout: 2000 })
-    await deleteBtn.click()
+  test('back button returns to character select', async ({ page }) => {
+    // Click the back button
+    const backBtn = page.getByTestId('back-to-select')
+    await expect(backBtn).toBeVisible({ timeout: 2000 })
+    await backBtn.click()
 
-    // After deleting, should show DeckBuilder (step 0 is now PickClass)
+    // After going back, should show CharacterSelect with the character still listed
     await expect(
-      page.locator('h2:has-text("Choose Your Class")')
+      page.locator('text=Characters').first()
     ).toBeVisible({ timeout: 10000 })
   })
 })

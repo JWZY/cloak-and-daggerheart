@@ -4,7 +4,7 @@ import { tapFeedback } from '../design-system/tokens/animations'
 import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from './domain-colors'
 import { AutoFitTitle } from '../ui/AutoFitTitle'
 import { DomainBanner } from './DomainBanner'
-import { typeTitle, typeBody } from '../ui/typography'
+import { typeTitle, typeBodyCard as typeBody } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,

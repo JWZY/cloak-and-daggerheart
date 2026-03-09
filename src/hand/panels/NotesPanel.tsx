@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { typeBody } from '../../ui/typography'
 import { GameTextarea } from '../../ui/GameTextarea'
 import { useCharacterStore } from '../../store/character-store'
 import type { Character } from '../../types/character'
@@ -42,7 +43,7 @@ export function NotesPanel({ character }: NotesPanelProps) {
         onChange={(e) => handleChange(e.target.value)}
         placeholder="Session notes, reminders, backstory details..."
         rows={5}
-        style={{ resize: 'none', fontSize: 13, lineHeight: '1.5' }}
+        style={{ resize: 'none', fontSize: typeBody.fontSize, lineHeight: '1.5' }}
       />
     </div>
   )

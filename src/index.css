@@ -39,9 +39,9 @@
   --bg-page: #03070d;
   --bg-surface: rgba(3, 7, 13, 0.6);
   --bg-overlay: rgba(3, 7, 13, 0.92);
-  --surface-faint: rgba(255, 255, 255, 0.03);
-  --surface-light: rgba(255, 255, 255, 0.06);
-  --surface-border: rgba(255, 255, 255, 0.1);
+  --surface-faint: rgba(45, 34, 22, 0.35);
+  --surface-light: rgba(231, 186, 144, 0.1);
+  --surface-border: rgba(231, 186, 144, 0.15);
   --shadow-warm: #4d381e;
 
   /* Mouse tracking for glow effect */

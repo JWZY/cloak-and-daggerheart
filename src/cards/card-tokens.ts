@@ -6,10 +6,10 @@
  * This file re-exports what card components need.
  */
 
-import { typeSubtitle } from '../ui/typography'
+import { typeSubtitleCard } from '../ui/typography'
 
 // Re-export typography tokens for card consumers
-export { typeTitle, typeSubtitle, typeBody, typeMicro, goldLight, goldDark, goldAccent, goldGradient, goldGradientH, goldGradientSubtle, goldDarkAlpha, goldLightAlpha, goldSeparatorLeft, goldSeparatorRight, goldGradientStyle } from '../ui/typography'
+export { typeTitle, typeSubtitle, typeSubtitleCard, typeBody, typeBodyCard, typeMicro, goldLight, goldDark, goldAccent, goldGradient, goldGradientH, goldGradientSubtle, goldDarkAlpha, goldLightAlpha, goldSeparatorLeft, goldSeparatorRight, goldGradientStyle } from '../ui/typography'
 // Import for local use
 import { goldGradientStyle } from '../ui/typography'
 
@@ -21,7 +21,7 @@ export const CARD_BG = '#03070d'
 
 // Shared subtitle style — used by class/domain name and footer
 export const subtitleStyle = {
-  ...typeSubtitle,
+  ...typeSubtitleCard,
   lineHeight: 'normal' as const,
   ...goldGradientStyle,
 }

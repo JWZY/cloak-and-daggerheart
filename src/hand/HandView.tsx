@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { goldAccent, typeSubtitle, typeBody } from '../ui/typography'
-import { ChevronLeft, Settings } from 'lucide-react'
+import { warmGlass, RADIUS_MENU, RADIUS_PILL } from '../design-system/tokens/surfaces'
 import { LevelUpWizard } from '../level-up/LevelUpWizard'
 import { CardZoomOverlay } from './CardZoomOverlay'
 import { DesktopLayout } from './DesktopLayout'
@@ -15,6 +15,7 @@ import type { Character } from '../types/character'
 
 export interface HandViewProps {
   character: Character
+  onEditCharacter?: () => void
 }
 
 /**
@@ -38,10 +39,14 @@ function GearMenu({
   open,
   onClose,
   onLevelUp,
+  onEditCharacter,
+  onRequestDelete,
 }: {
   open: boolean
   onClose: () => void
   onLevelUp: () => void
+  onEditCharacter: () => void
+  onRequestDelete: () => void
 }) {
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -59,28 +64,32 @@ function GearMenu({
   if (!open) return null
 
   const items = [
-    { label: 'Edit Character', action: () => console.log('Edit Character') },
-    { label: 'Export', action: () => console.log('Export') },
+    { label: 'Short Rest', action: () => {} },
+    { label: 'Long Rest', action: () => {} },
     { label: 'Level Up', action: onLevelUp },
-    { label: 'Short Rest', action: () => console.log('Short Rest') },
-    { label: 'Long Rest', action: () => console.log('Long Rest') },
+    { label: 'Edit Character', action: onEditCharacter },
   ]
 
   return (
-    <div
+    <motion.div
       ref={menuRef}
+      initial={{ opacity: 0, scale: 0.92, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.92, y: 8 }}
+      transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
       style={{
+        ...floatingPillStyle,
         position: 'absolute',
         bottom: '100%',
         right: 0,
-        marginBottom: 8,
-        minWidth: 160,
-        background: 'rgba(30, 28, 24, 0.95)',
-        backdropFilter: 'blur(20px) saturate(1.5)',
-        border: '1px solid var(--gold-muted)',
-        borderRadius: 12,
-        padding: '4px 0',
+        marginBottom: 10,
+        minWidth: 180,
+        borderRadius: RADIUS_MENU,
+        padding: '6px',
         zIndex: 60,
+        height: 'auto',
+        flexDirection: 'column' as const,
+        transformOrigin: 'bottom right',
       }}
     >
       {items.map((item) => (
@@ -93,17 +102,19 @@ function GearMenu({
           style={{
             display: 'block',
             width: '100%',
-            padding: '10px 16px',
+            padding: '12px 16px',
             background: 'transparent',
             border: 'none',
+            borderRadius: 14,
             color: 'var(--text-primary)',
             textAlign: 'left',
             cursor: 'pointer',
-            fontFamily: typeBody.fontFamily,
-            fontSize: 14,
+            ...typeSubtitle,
+            fontSize: 15,
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--bg-overlay)'
+            e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'transparent'
@@ -112,16 +123,232 @@ function GearMenu({
           {item.label}
         </button>
       ))}
-    </div>
+
+      {/* Delete Character — distinct destructive style */}
+      <button
+        onClick={() => {
+          onClose()
+          onRequestDelete()
+        }}
+        style={{
+          display: 'block',
+          width: '100%',
+          padding: '12px 16px',
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 14,
+          color: 'rgba(220, 80, 80, 0.85)',
+          textAlign: 'left',
+          cursor: 'pointer',
+          ...typeSubtitle,
+          fontSize: 15,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(220, 80, 80, 0.08)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent'
+        }}
+      >
+        Delete Character
+      </button>
+    </motion.div>
   )
 }
 
-export function HandView({ character }: HandViewProps) {
+// ---------------------------------------------------------------------------
+// Hold-to-Delete Confirmation Modal
+// ---------------------------------------------------------------------------
+
+const HOLD_DURATION_MS = 1500
+
+function DeleteConfirmModal({
+  onConfirm,
+  onCancel,
+}: {
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  const [holding, setHolding] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const holdStart = useRef<number>(0)
+  const rafRef = useRef<number>(0)
+
+  const startHold = useCallback(() => {
+    setHolding(true)
+    holdStart.current = Date.now()
+
+    const tick = () => {
+      const elapsed = Date.now() - holdStart.current
+      const pct = Math.min(elapsed / HOLD_DURATION_MS, 1)
+      setProgress(pct)
+      if (pct >= 1) {
+        onConfirm()
+      } else {
+        rafRef.current = requestAnimationFrame(tick)
+      }
+    }
+    rafRef.current = requestAnimationFrame(tick)
+  }, [onConfirm])
+
+  const cancelHold = useCallback(() => {
+    setHolding(false)
+    setProgress(0)
+    cancelAnimationFrame(rafRef.current)
+  }, [])
+
+  useEffect(() => {
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
+      onClick={onCancel}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0,0,0,0.6)',
+        zIndex: 100,
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          ...floatingPillStyle,
+          height: 'auto',
+          flexDirection: 'column' as const,
+          borderRadius: RADIUS_MENU,
+          padding: '24px',
+          width: 280,
+          gap: 16,
+          textAlign: 'center',
+        }}
+      >
+        <span
+          className="gold-text"
+          style={{ ...typeSubtitle, fontSize: 17 }}
+        >
+          Delete Character?
+        </span>
+        <span style={{ ...typeBody, color: 'var(--text-muted)', fontSize: 13 }}>
+          This cannot be undone. Hold the button below to confirm.
+        </span>
+
+        {/* Hold-to-delete button */}
+        <button
+          onMouseDown={startHold}
+          onMouseUp={cancelHold}
+          onMouseLeave={cancelHold}
+          onTouchStart={startHold}
+          onTouchEnd={cancelHold}
+          onTouchCancel={cancelHold}
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: 44,
+            borderRadius: 12,
+            border: '1px solid rgba(220, 80, 80, 0.3)',
+            background: 'transparent',
+            overflow: 'hidden',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          {/* Progress fill */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(220, 80, 80, 0.25)',
+              transformOrigin: 'left',
+              transform: `scaleX(${progress})`,
+              transition: holding ? 'none' : 'transform 0.2s ease-out',
+              borderRadius: 11,
+            }}
+          />
+          <span
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              ...typeSubtitle,
+              fontSize: 14,
+              color: 'rgba(220, 80, 80, 0.9)',
+            }}
+          >
+            {holding ? 'Deleting…' : 'Hold to Delete'}
+          </span>
+        </button>
+
+        {/* Cancel */}
+        <button
+          onClick={onCancel}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            ...typeSubtitle,
+            fontSize: 14,
+            color: 'var(--text-muted)',
+            padding: '4px 0',
+          }}
+        >
+          Cancel
+        </button>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+const floatingPillStyle = {
+  height: 52,
+  display: 'flex' as const,
+  alignItems: 'center' as const,
+  ...warmGlass,
+  borderRadius: RADIUS_PILL,
+}
+
+function pillBtnStyle(active: boolean) {
+  return {
+    position: 'relative' as const,
+    height: 40,
+    padding: '0 16px',
+    borderRadius: 9999,
+    border: 'none',
+    background: 'transparent',
+    cursor: 'pointer',
+    WebkitTapHighlightColor: 'transparent',
+    opacity: active ? 1 : 0.7,
+  }
+}
+
+function pillLabelStyle(active: boolean) {
+  return {
+    ...typeSubtitle,
+    fontSize: 15,
+    position: 'relative' as const,
+    zIndex: 1,
+    color: active ? 'var(--gold)' : 'var(--text-muted)',
+  }
+}
+
+export function HandView({ character, onEditCharacter }: HandViewProps) {
+  const setActiveCharacter = useCharacterStore((s) => s.setActiveCharacter)
   const deleteCharacter = useCharacterStore((s) => s.deleteCharacter)
   const { zoomedCard, openZoom, closeZoom } = useCardZoom()
   const [showLevelUp, setShowLevelUp] = useState(false)
   const [activeTab, setActiveTab] = useState<TabId>('cards')
   const [showGearMenu, setShowGearMenu] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const isDesktop = useIsDesktop()
 
   const accentColor = useMemo(() => getAccentColor(character), [character])
@@ -163,7 +390,7 @@ export function HandView({ character }: HandViewProps) {
         className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{
           WebkitOverflowScrolling: 'touch',
-          paddingBottom: 72,
+          paddingBottom: 88,
         }}
       >
         {activeTab === 'cards' ? (
@@ -196,104 +423,86 @@ export function HandView({ character }: HandViewProps) {
         )}
       </div>
 
-      {/* Floating bottom bar */}
+      {/* Floating bottom bar — [Back] [Cards · Actions] [Menu] */}
       <div
+        className="flex items-center justify-center"
         style={{
           position: 'fixed',
-          bottom: 0,
+          bottom: 'max(16px, env(safe-area-inset-bottom))',
           left: 0,
           right: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '8px 16px',
-          paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
-          background: 'rgba(20, 18, 15, 0.85)',
-          backdropFilter: 'blur(20px) saturate(1.5)',
-          borderTop: '1px solid var(--gold-muted)',
           zIndex: 50,
+          gap: 8,
+          pointerEvents: 'none',
         }}
       >
-        {/* Back button */}
+        {/* Back */}
         <button
-          data-testid="delete-character"
-          onClick={() => deleteCharacter(character.id)}
-          className="flex items-center justify-center"
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: '50%',
-            background: 'transparent',
-            border: '1px solid var(--gold-muted)',
-            color: 'var(--gold)',
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}
+          data-testid="back-to-select"
+          onClick={() => setActiveCharacter(null)}
+          style={{ ...floatingPillStyle, pointerEvents: 'auto', padding: '0 16px' }}
         >
-          <ChevronLeft size={18} />
+          <span style={pillLabelStyle(false)}>Back</span>
         </button>
 
         {/* Center tabs */}
         <div
-          className="flex items-center relative"
-          style={{ gap: 24 }}
+          className="flex items-center"
+          style={{ ...floatingPillStyle, pointerEvents: 'auto', padding: '0 6px', gap: 2 }}
         >
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                ...typeSubtitle,
-                color: activeTab === tab.id ? 'var(--gold)' : 'var(--text-muted)',
-                background: 'transparent',
-                border: 'none',
-                padding: '8px 4px',
-                cursor: 'pointer',
-                position: 'relative',
-              }}
-            >
-              {tab.label}
-              {activeTab === tab.id && (
-                <motion.div
-                  layoutId="tab-indicator"
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 4,
-                    right: 4,
-                    height: 2,
-                    borderRadius: 1,
-                    background: 'var(--gold)',
-                  }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
-            </button>
-          ))}
+          {TABS.map((tab) => {
+            const active = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={pillBtnStyle(active)}
+              >
+                {active && (
+                  <motion.div
+                    layoutId="pill-active-bg"
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: 9999,
+                      background: 'rgba(255,255,255,0.08)',
+                    }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span style={pillLabelStyle(active)}>{tab.label}</span>
+              </button>
+            )
+          })}
         </div>
 
-        {/* Gear button */}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <button
-            onClick={() => setShowGearMenu((prev) => !prev)}
-            className="flex items-center justify-center"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              background: 'transparent',
-              border: '1px solid var(--gold-muted)',
-              color: 'var(--gold)',
-              cursor: 'pointer',
-            }}
-          >
-            <Settings size={18} />
-          </button>
-          <GearMenu
-            open={showGearMenu}
-            onClose={() => setShowGearMenu(false)}
-            onLevelUp={handleLevelUp}
-          />
+        {/* Menu */}
+        <div style={{ position: 'relative', pointerEvents: 'auto' }}>
+          <div style={{ ...floatingPillStyle, padding: '0 16px' }}>
+            <button
+              onClick={() => setShowGearMenu((prev) => !prev)}
+              style={{
+                ...pillBtnStyle(false),
+                padding: 0,
+              }}
+            >
+              <span style={pillLabelStyle(false)}>Menu</span>
+            </button>
+          </div>
+          <AnimatePresence>
+            {showGearMenu && (
+              <GearMenu
+                open={showGearMenu}
+                onClose={() => setShowGearMenu(false)}
+                onLevelUp={handleLevelUp}
+                onEditCharacter={() => {
+                  setShowGearMenu(false)
+                  onEditCharacter?.()
+                }}
+                onRequestDelete={() => setShowDeleteConfirm(true)}
+              />
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -309,6 +518,17 @@ export function HandView({ character }: HandViewProps) {
         <LevelUpWizard
           character={character}
           onClose={() => setShowLevelUp(false)}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <DeleteConfirmModal
+          onConfirm={() => {
+            deleteCharacter(character.id)
+            setActiveCharacter(null)
+          }}
+          onCancel={() => setShowDeleteConfirm(false)}
         />
       )}
     </div>
