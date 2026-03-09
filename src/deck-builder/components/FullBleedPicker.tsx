@@ -2,8 +2,7 @@ import { useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { FatesButton } from '../../ui/FatesButton'
-import { typeBody, goldDark, goldDarkAlpha, goldLightAlpha } from '../../ui/typography'
-import { StepCarousel } from './StepCarousel'
+import { goldDark, goldDarkAlpha, goldLightAlpha } from '../../ui/typography'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -17,8 +16,6 @@ export interface PickerItem {
 }
 
 export interface FullBleedPickerProps {
-  /** Current step index (for StepCarousel) */
-  currentStep: number
   /** All items to choose from */
   items: PickerItem[]
   /** Currently focused item ID (whose illustration is shown as hero) */
@@ -44,20 +41,9 @@ export interface FullBleedPickerProps {
   heroMode?: HeroMode
 }
 
-// ─── Styles ─────────────────────────────────────────────────────────────────
-
-const badgeStyle: React.CSSProperties = {
-  ...typeBody,
-  fontSize: 12,
-  color: goldDark,
-  textAlign: 'center',
-  marginBottom: 8,
-}
-
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function FullBleedPicker({
-  currentStep,
   items,
   focusedId,
   selectedIds,
@@ -230,15 +216,6 @@ export function FullBleedPicker({
         }}
       />
 
-      {/* Step carousel navigation */}
-      <StepCarousel
-        currentStep={currentStep}
-        onBack={onBack}
-        onNext={onConfirm}
-        canGoNext={canConfirm}
-        overlay
-      />
-
       {/* Content overlay — stacks info, badge, thumbnails, buttons at bottom */}
       <div
         style={{
@@ -262,9 +239,6 @@ export function FullBleedPicker({
             {children}
           </motion.div>
         </AnimatePresence>
-
-        {/* Badge */}
-        {badge && <div style={badgeStyle}>{badge}</div>}
 
         {/* Thumbnail carousel — drum picker: focused item always centered */}
         <div
@@ -384,13 +358,24 @@ export function FullBleedPicker({
               </FatesButton>
             </div>
           )}
-          <div style={{ flex: onBack ? 1 : undefined, display: 'flex', justifyContent: 'flex-end' }}>
+          <div
+            className={canConfirm ? 'aura-v5-sm' : ''}
+            style={{
+              flex: onBack ? 1 : undefined,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              position: 'relative',
+              overflow: 'visible',
+              borderRadius: 8,
+            }}
+          >
+            {canConfirm && <div className="aura-v5-sm-inner" />}
             <FatesButton
               variant="light"
               onClick={onConfirm}
               disabled={!canConfirm}
             >
-              {confirmLabel}
+              {!canConfirm && badge ? badge : confirmLabel}
             </FatesButton>
           </div>
         </div>
