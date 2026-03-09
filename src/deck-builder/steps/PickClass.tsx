@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { FullBleedPicker, type PickerItem, type HeroMode } from '../components/FullBleedPicker'
 import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
+import { DOMAIN_COLORS } from '../../cards/domain-colors'
 import { useDeckStore } from '../../store/deck-store'
 import { classes } from '../../data/srd'
 
@@ -66,15 +67,40 @@ function Separator({ text }: { text: string }) {
   )
 }
 
-const featureBlockStyle: React.CSSProperties = {
-  marginTop: 12,
-  padding: '10px 14px',
-  borderRadius: 10,
-  background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.15) 100%)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.08), inset 0 -1px 1px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.2)',
-  border: '1px solid rgba(231,186,144,0.12)',
+/** Primary domain for each class — used for feature block tinting */
+const CLASS_DOMAIN: Record<string, string> = {
+  Guardian: 'Valor',
+  Warrior: 'Blade',
+  Sorcerer: 'Arcana',
+  Rogue: 'Midnight',
+  Bard: 'Grace',
+  Druid: 'Sage',
+  Ranger: 'Bone',
+  Seraph: 'Splendor',
+  Wizard: 'Codex',
+}
+
+/** Hex to rgba helper */
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
+
+function featureBlockStyle(className: string): React.CSSProperties {
+  const domain = CLASS_DOMAIN[className] ?? 'Valor'
+  const color = DOMAIN_COLORS[domain] ?? '#EB5B00'
+  return {
+    marginTop: 12,
+    padding: '10px 14px',
+    borderRadius: 10,
+    background: `linear-gradient(180deg, ${hexToRgba(color, 0.15)} 0%, ${hexToRgba(color, 0.06)} 100%)`,
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    boxShadow: `inset 0 1px 1px ${hexToRgba(color, 0.15)}, inset 0 -1px 1px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.2)`,
+    border: `1px solid ${hexToRgba(color, 0.2)}`,
+  }
 }
 
 interface StepProps {
@@ -158,7 +184,7 @@ export function PickClass({ onNext }: StepProps) {
               <FormatText text={showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`} />
             </div>
             {/* Hope Feature */}
-            <div style={featureBlockStyle}>
+            <div style={featureBlockStyle(focusedClass.name)}>
               <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                 {focusedClass.hope_feat_name}
               </span>
@@ -168,7 +194,7 @@ export function PickClass({ onNext }: StepProps) {
             </div>
             {/* Class Feats */}
             {focusedClass.class_feats.map((feat, i) => (
-              <div key={i} style={featureBlockStyle}>
+              <div key={i} style={featureBlockStyle(focusedClass.name)}>
                 <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                   {feat.name}
                 </span>
