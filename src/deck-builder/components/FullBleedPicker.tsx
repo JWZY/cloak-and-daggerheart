@@ -162,7 +162,7 @@ export function FullBleedPicker({
                 objectPosition:
                   heroMode === 'position' && focusedItem.objectPosition
                     ? focusedItem.objectPosition
-                    : undefined,
+                    : 'top',
                 // Mode B: scale up sharp image so it fills more area, then feather all edges
                 ...(heroMode === 'blur-fill'
                   ? {
