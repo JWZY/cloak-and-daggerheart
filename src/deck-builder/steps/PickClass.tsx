@@ -98,38 +98,6 @@ function darkenHex(hex: string, amount: number): string {
 
 type BlockVariant = 'glass' | 'glow'
 
-/**
- * Variant A (glass): Glass card with muted domain gradient, no black
- * Variant B (glow): Gradient blob behind text, no container edges
- */
-function featureBlockStyle(className: string, variant: BlockVariant): React.CSSProperties {
-  const domain = CLASS_DOMAIN[className] ?? 'Valor'
-  const muted = DOMAIN_COLORS_MUTED[domain] ?? '#8d3700'
-  const deepDark = darkenHex(muted, 0.6)
-
-  if (variant === 'glow') {
-    // Variant B: soft gradient blob — no borders, no box, just a diffuse glow behind text
-    return {
-      marginTop: 12,
-      padding: '12px 16px',
-      borderRadius: 16,
-      background: `radial-gradient(ellipse 100% 100% at 50% 50%, ${hexToRgba(muted, 0.7)} 0%, ${hexToRgba(muted, 0.3)} 50%, transparent 100%)`,
-    }
-  }
-
-  // Variant A: glass card with domain muted → deeper shade gradient
-  return {
-    marginTop: 12,
-    padding: '10px 14px',
-    borderRadius: 10,
-    background: `linear-gradient(180deg, ${hexToRgba(muted, 0.6)} 0%, ${deepDark} 100%)`,
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    boxShadow: `inset 0 1px 1px ${hexToRgba(muted, 0.3)}, inset 0 -1px 2px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)`,
-    border: `1px solid ${hexToRgba(muted, 0.35)}`,
-  }
-}
-
 interface StepProps {
   onBack?: () => void
   onNext: () => void
@@ -188,34 +156,52 @@ export function PickClass({ onNext }: StepProps) {
       canConfirm={!!selectedClass}
       heroMode={heroMode}
     >
-      {focusedClass && (
-        <div className="picker-info-column" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          gap: 4,
-          width: '100%',
-        }}>
-          <h2 style={{
-            ...typeTitle,
-            fontSize: 36,
-            fontWeight: 400,
-            ...goldGradientStyle,
-            margin: 0,
-            lineHeight: 1,
-            textAlign: 'center',
-            width: '100%',
-          }}>
-            {focusedClass.name}
-          </h2>
-          <Separator text={`${focusedClass.domain_1} · ${focusedClass.domain_2}`} />
-          <div style={{
-            maxHeight: '40vh',
-            overflowY: 'auto',
-            width: '100%',
-            maskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
-            WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
-          }}>
+      {focusedClass && (() => {
+        const domain = CLASS_DOMAIN[focusedClass.name] ?? 'Valor'
+        const muted = DOMAIN_COLORS_MUTED[domain] ?? '#8d3700'
+        const deepDark = darkenHex(muted, 0.6)
+
+        const bgStyle: React.CSSProperties = blockVariant === 'glow'
+          ? { background: `radial-gradient(ellipse 120% 100% at 50% 0%, ${hexToRgba(muted, 0.75)} 0%, ${hexToRgba(muted, 0.4)} 40%, transparent 80%)` }
+          : {
+              background: `linear-gradient(180deg, ${hexToRgba(muted, 0.65)} 0%, ${deepDark} 100%)`,
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: `inset 0 1px 1px ${hexToRgba(muted, 0.3)}, inset 0 -1px 2px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)`,
+              border: `1px solid ${hexToRgba(muted, 0.35)}`,
+            }
+
+        return (
+          <div
+            className="picker-info-column"
+            style={{
+              ...bgStyle,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+              width: '100%',
+              padding: '16px 16px 12px',
+              borderRadius: blockVariant === 'glow' ? 0 : 12,
+              maxHeight: '50vh',
+              overflowY: 'auto',
+              maskImage: 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
+            }}
+          >
+            <h2 style={{
+              ...typeTitle,
+              fontSize: 36,
+              fontWeight: 400,
+              ...goldGradientStyle,
+              margin: 0,
+              lineHeight: 1,
+              textAlign: 'center',
+              width: '100%',
+            }}>
+              {focusedClass.name}
+            </h2>
+            <Separator text={`${focusedClass.domain_1} · ${focusedClass.domain_2}`} />
+
             <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
@@ -225,8 +211,9 @@ export function PickClass({ onNext }: StepProps) {
             }}>
               <FormatText text={showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`} />
             </div>
+
             {/* Hope Feature */}
-            <div style={featureBlockStyle(focusedClass.name, blockVariant)}>
+            <div style={{ marginTop: 8, borderTop: `1px solid ${hexToRgba(muted, 0.4)}`, paddingTop: 8 }}>
               <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                 {focusedClass.hope_feat_name}
               </span>
@@ -234,9 +221,10 @@ export function PickClass({ onNext }: StepProps) {
                 <FormatText text={focusedClass.hope_feat_text} />
               </div>
             </div>
+
             {/* Class Feats */}
             {focusedClass.class_feats.map((feat, i) => (
-              <div key={i} style={featureBlockStyle(focusedClass.name, blockVariant)}>
+              <div key={i} style={{ marginTop: 8, borderTop: `1px solid ${hexToRgba(muted, 0.4)}`, paddingTop: 8 }}>
                 <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                   {feat.name}
                 </span>
@@ -246,8 +234,8 @@ export function PickClass({ onNext }: StepProps) {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )
+      })()}
     </FullBleedPicker>
 
     {/* Dev toggles */}
