@@ -257,7 +257,7 @@ export function FullBleedPicker({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            style={{ padding: '0 24px', marginBottom: 8, maxWidth: 480, alignSelf: 'center', width: '100%' }}
+            style={{ padding: '0 24px', marginBottom: 8, width: '100%' }}
           >
             {children}
           </motion.div>
