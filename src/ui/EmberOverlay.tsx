@@ -38,7 +38,7 @@ export function EmberOverlay({ color = '#e7ba90', rate = 8, active = true }: Emb
       const depth = depthRand < 0.5 ? depthRand * 0.6 : 0.3 + depthRand * 0.7
 
       const isGlow = Math.random() < 0.65
-      const size = isGlow ? 3 + depth * 4 + Math.random() * 2 : 2
+      const size = isGlow ? 5 + depth * 8 + Math.random() * 4 : 3 + Math.random() * 2
 
       el.style.position = 'absolute'
       el.style.width = `${size}px`
@@ -69,7 +69,7 @@ export function EmberOverlay({ color = '#e7ba90', rate = 8, active = true }: Emb
       const baseOpacity = 0.5 + depth * 0.4
       const driftX = (Math.random() - 0.5) * 60
       const wobble = (Math.random() - 0.5) * 25
-      const duration = 2500 + (1 - depth) * 1500 + Math.random() * 1000
+      const duration = 5000 + (1 - depth) * 3000 + Math.random() * 2000
 
       el.animate(
         [
@@ -111,16 +111,38 @@ export function EmberOverlay({ color = '#e7ba90', rate = 8, active = true }: Emb
     }
   }, [color, rate, active])
 
+  // Parse color for the glow
+  const r = parseInt(color.slice(1, 3), 16)
+  const g = parseInt(color.slice(3, 5), 16)
+  const b = parseInt(color.slice(5, 7), 16)
+
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        overflow: 'hidden',
-        pointerEvents: 'none',
-        zIndex: 0,
-      }}
-    />
+    <>
+      {/* Faint accent radial glow at bottom edge */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: -60,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '120%',
+          height: 200,
+          background: `radial-gradient(ellipse 60% 70% at 50% 100%, rgba(${r},${g},${b},0.25) 0%, rgba(${r},${g},${b},0.08) 40%, transparent 70%)`,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      {/* Particle container */}
+      <div
+        ref={containerRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          overflow: 'hidden',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+    </>
   )
 }
