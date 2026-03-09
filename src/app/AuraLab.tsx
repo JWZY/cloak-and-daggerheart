@@ -124,9 +124,11 @@ export default function AuraLab() {
     <div
       className="ios-scroll"
       style={{
-        minHeight: '100dvh',
+        height: '100dvh',
+        overflowY: 'auto',
         background: 'var(--bg-page)',
         padding: '48px 24px 80px',
+        WebkitOverflowScrolling: 'touch',
       }}
     >
       {/* Page header */}
