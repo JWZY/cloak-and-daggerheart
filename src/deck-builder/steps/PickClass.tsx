@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FullBleedPicker, type PickerItem, type HeroMode } from '../components/FullBleedPicker'
 import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
@@ -95,11 +95,11 @@ function featureBlockStyle(className: string): React.CSSProperties {
     marginTop: 12,
     padding: '10px 14px',
     borderRadius: 10,
-    background: `linear-gradient(180deg, ${hexToRgba(color, 0.15)} 0%, ${hexToRgba(color, 0.06)} 100%)`,
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-    boxShadow: `inset 0 1px 1px ${hexToRgba(color, 0.15)}, inset 0 -1px 1px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.2)`,
-    border: `1px solid ${hexToRgba(color, 0.2)}`,
+    background: `linear-gradient(180deg, ${hexToRgba(color, 0.35)} 0%, rgba(0,0,0,0.5) 100%)`,
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    boxShadow: `inset 0 1px 1px ${hexToRgba(color, 0.25)}, inset 0 -1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3)`,
+    border: `1px solid ${hexToRgba(color, 0.3)}`,
   }
 }
 
@@ -117,6 +117,11 @@ export function PickClass({ onNext }: StepProps) {
 
   const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
   const [heroMode, setHeroMode] = useState<HeroMode>('position')
+
+  // Auto-select first item on mount for faster testing
+  useEffect(() => {
+    if (!selectedClass && classes[0]) setClass(classes[0].name)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const pickerItems: PickerItem[] = classes.map((cls) => ({
     id: cls.name,
@@ -156,7 +161,16 @@ export function PickClass({ onNext }: StepProps) {
       heroMode={heroMode}
     >
       {focusedClass && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 4,
+          /* Desktop: push to right third */
+          marginLeft: 'auto',
+          maxWidth: 340,
+          width: '100%',
+        }}>
           <h2 style={{
             ...typeTitle,
             fontSize: 36,
@@ -171,6 +185,7 @@ export function PickClass({ onNext }: StepProps) {
           <div style={{
             maxHeight: '40vh',
             overflowY: 'auto',
+            width: '100%',
             maskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
           }}>
@@ -178,7 +193,7 @@ export function PickClass({ onNext }: StepProps) {
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
               textShadow: '0px 1px 1px #4d381e',
-              textAlign: 'center',
+              textAlign: 'left',
               margin: 0,
             }}>
               <FormatText text={showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`} />
@@ -188,7 +203,7 @@ export function PickClass({ onNext }: StepProps) {
               <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                 {focusedClass.hope_feat_name}
               </span>
-              <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
+              <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'left' }}>
                 <FormatText text={focusedClass.hope_feat_text} />
               </div>
             </div>
@@ -198,7 +213,7 @@ export function PickClass({ onNext }: StepProps) {
                 <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                   {feat.name}
                 </span>
-                <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
+                <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'left' }}>
                   <FormatText text={feat.text} />
                 </div>
               </div>
