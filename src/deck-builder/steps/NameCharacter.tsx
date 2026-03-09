@@ -1,16 +1,20 @@
 import { useDeckStore } from '../../store/deck-store'
 import { GameInput } from '../../ui/GameInput'
+import { EmberOverlay } from '../../ui/EmberOverlay'
 import { typeTitle } from '../../ui/typography'
+import { getClassAccentColor } from '../../cards/domain-colors'
 
 export function NameCharacter() {
   const characterName = useDeckStore((s) => s.characterName)
   const setCharacterName = useDeckStore((s) => s.setCharacterName)
   const subclass = useDeckStore((s) => s.subclass)
   const selectedClass = useDeckStore((s) => s.selectedClass)
-  const ancestry = useDeckStore((s) => s.ancestryName)
+  const accentColor = getClassAccentColor(selectedClass)
 
   return (
-    <div className="flex flex-col items-center justify-center px-4" style={{ height: '100%' }}>
+    <div style={{ position: 'relative', height: '100%' }}>
+      <EmberOverlay color={accentColor} rate={6} />
+      <div className="flex flex-col items-center justify-center px-4" style={{ position: 'relative', zIndex: 1, height: '100%' }}>
       <div className="w-full max-w-[360px]">
         <GameInput
           type="text"
@@ -52,10 +56,11 @@ export function NameCharacter() {
               textAlign: 'center',
             }}
           >
-            {ancestry} {subclass} {selectedClass}
+            {characterName.trim()}, {subclass} {selectedClass}
           </p>
         )}
       </div>
+    </div>
     </div>
   )
 }

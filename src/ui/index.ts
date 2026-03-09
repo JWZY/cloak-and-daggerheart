@@ -25,7 +25,9 @@ export type { SelectableOptionProps } from './SelectableOption'
 export { FatesButton } from './FatesButton'
 export type { FatesButtonProps } from './FatesButton'
 
+export { EmberOverlay } from './EmberOverlay'
+
 export { FormatText } from './FormatText'
 
 // Typography tokens
-export { typeTitle, typeSubtitle, typeBody, typeMicro, goldLight, goldDark, goldGradient } from './typography'
+export { typeTitle, typeSubtitle, typeSubtitleCard, typeBody, typeBodyCard, typeMicro, goldLight, goldDark, goldGradient } from './typography'

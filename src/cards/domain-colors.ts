@@ -11,6 +11,26 @@ export const DOMAIN_COLORS: Record<string, string> = {
   Valor: '#EB5B00',
 }
 
+// Map class → primary domain (first domain from SRD classes.json)
+const CLASS_DOMAIN: Record<string, string> = {
+  Guardian: 'Valor',
+  Warrior: 'Blade',
+  Sorcerer: 'Arcana',
+  Rogue: 'Midnight',
+  Bard: 'Grace',
+  Druid: 'Sage',
+  Ranger: 'Bone',
+  Seraph: 'Splendor',
+  Wizard: 'Codex',
+}
+
+/** Get the primary domain accent color for a class name, or gold fallback */
+export function getClassAccentColor(className: string | null): string {
+  if (!className) return '#e7ba90'
+  const domain = CLASS_DOMAIN[className]
+  return domain ? (DOMAIN_COLORS[domain] ?? '#e7ba90') : '#e7ba90'
+}
+
 // Muted variants — darker, still saturated (for banner outer layer)
 export const DOMAIN_COLORS_MUTED: Record<string, string> = {
   Arcana: '#47294C',

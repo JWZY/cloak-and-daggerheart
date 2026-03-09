@@ -2,8 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { typeTitle, typeSubtitle, goldDarkAlpha } from '../ui/typography'
 import { springs } from '../design-system/tokens/animations'
+import { EmberOverlay } from '../ui/EmberOverlay'
+import { getClassAccentColor } from '../cards/domain-colors'
 import { DeckBuilder } from '../deck-builder/DeckBuilder'
 import { HandView } from '../hand/HandView'
+import { CharacterSelect } from '../character-select/CharacterSelect'
 import { useCharacterStore } from '../store/character-store'
 import type { Character } from '../types/character'
 
@@ -48,20 +51,44 @@ const handVariants = {
   },
 }
 
+const selectVariants = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.3, ease: 'easeOut' },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.2, ease: 'easeIn' },
+  },
+}
+
 export default function App() {
   const characters = useCharacterStore((s) => s.characters)
+  const activeCharacterId = useCharacterStore((s) => s.activeCharacterId)
   const createCharacter = useCharacterStore((s) => s.createCharacter)
   const [splashDone, setSplashDone] = useState(false)
   const [welcomeChar, setWelcomeChar] = useState<Character | null>(null)
+  const [isCreating, setIsCreating] = useState(false)
+
+  const activeCharacter = characters.find((c) => c.id === activeCharacterId) ?? null
 
   const handleComplete = useCallback((character: Character) => {
     setWelcomeChar(character)
     createCharacter(character)
-    // After 2.5s, dismiss the welcome screen
+    setIsCreating(false)
     setTimeout(() => setWelcomeChar(null), 4500)
   }, [createCharacter])
 
-  // Splash screen: brief branded loading state
+  const handleCreateNew = useCallback(() => {
+    setIsCreating(true)
+  }, [])
+
+  const handleExitBuilder = useCallback(() => {
+    setIsCreating(false)
+  }, [])
+
+  // Splash screen
   if (!splashDone) {
     return (
       <AnimatePresence onExitComplete={() => setSplashDone(true)}>
@@ -72,15 +99,18 @@ export default function App() {
 
   // Welcome interstitial after character creation
   if (welcomeChar) {
-    return (
-      <WelcomeScreen character={welcomeChar} />
-    )
+    return <WelcomeScreen character={welcomeChar} />
   }
+
+  // Determine which view to show
+  const showBuilder = characters.length === 0 || isCreating
+  const showHand = !showBuilder && activeCharacter !== null
+  const showSelect = !showBuilder && activeCharacter === null
 
   return (
     <div style={{ height: '100dvh', background: 'var(--bg-page)', overflow: 'hidden' }}>
       <AnimatePresence mode="popLayout">
-        {characters.length === 0 ? (
+        {showBuilder && (
           <motion.div
             key="builder"
             variants={builderVariants}
@@ -88,9 +118,24 @@ export default function App() {
             animate="animate"
             exit="exit"
           >
-            <DeckBuilder onComplete={handleComplete} />
+            <DeckBuilder
+              onComplete={handleComplete}
+              onExit={characters.length > 0 ? handleExitBuilder : undefined}
+            />
           </motion.div>
-        ) : (
+        )}
+        {showSelect && (
+          <motion.div
+            key="select"
+            variants={selectVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            <CharacterSelect onCreateNew={handleCreateNew} />
+          </motion.div>
+        )}
+        {showHand && activeCharacter && (
           <motion.div
             key="hand"
             variants={handVariants}
@@ -98,7 +143,7 @@ export default function App() {
             animate="animate"
             exit="exit"
           >
-            <HandView character={characters[0]} />
+            <HandView character={activeCharacter} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -107,10 +152,12 @@ export default function App() {
 }
 
 // ---------------------------------------------------------------------------
-// Welcome Screen — 2.5s interstitial after character creation
+// Welcome Screen — 4.5s interstitial after character creation
 // ---------------------------------------------------------------------------
 
 function WelcomeScreen({ character }: { character: Character }) {
+  const accentColor = getClassAccentColor(character.class)
+
   return (
     <div
       style={{
@@ -125,6 +172,8 @@ function WelcomeScreen({ character }: { character: Character }) {
         gap: 12,
       }}
     >
+      <EmberOverlay color={accentColor} rate={10} />
+
       {/* Golden glow */}
       <motion.div
         initial={{ opacity: 0, scale: 0.6 }}
@@ -208,8 +257,6 @@ const glowPulse = {
 }
 
 function Splash({ onFinish }: { onFinish: () => void }) {
-  // Reliable timer fallback — onAnimationComplete may not fire when
-  // initial and animate are the same variant (no actual animation).
   useEffect(() => {
     const timer = setTimeout(onFinish, 1000)
     return () => clearTimeout(timer)

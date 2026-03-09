@@ -4,8 +4,10 @@ import { springs } from '../../design-system/tokens/animations'
 import { goldDarkAlpha } from '../../ui/typography'
 import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
-import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
+import { EmberOverlay } from '../../ui/EmberOverlay'
+import { typeSubtitle, typeBody } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
+import { getClassAccentColor } from '../../cards/domain-colors'
 import { tier1Armors, tier1PrimaryWeapons, tier1SecondaryWeapons, getSuggestedEquipment } from '../../data/srd'
 import { parseThresholds } from '../../core/character/armor'
 import type { Armor, Weapon } from '../../types/character'
@@ -130,8 +132,7 @@ function ArmorOption({
       <div
         className="flex gap-3 flex-wrap"
         style={{
-          fontFamily: typeBody.fontFamily,
-          fontSize: 11,
+          ...typeBody,
           color: 'var(--text-muted)',
         }}
       >
@@ -144,11 +145,9 @@ function ArmorOption({
       {armor.feat_text && (
         <p
           style={{
-            fontFamily: typeBody.fontFamily,
-            fontSize: typeBody.fontSize,
+            ...typeBody,
             color: isSelected ? 'var(--gold)' : 'var(--gold-secondary)',
             marginTop: 4,
-            lineHeight: 1.35,
           }}
         >
           {armor.feat_text}
@@ -201,8 +200,7 @@ function WeaponOption({
       <div
         className="flex gap-3 flex-wrap"
         style={{
-          fontFamily: typeBody.fontFamily,
-          fontSize: 11,
+          ...typeBody,
           color: 'var(--text-muted)',
         }}
       >
@@ -216,11 +214,9 @@ function WeaponOption({
       {weapon.feat_text && (
         <p
           style={{
-            fontFamily: typeBody.fontFamily,
-            fontSize: typeBody.fontSize,
+            ...typeBody,
             color: isSelected ? 'var(--gold)' : 'var(--gold-secondary)',
             marginTop: 4,
-            lineHeight: 1.35,
           }}
         >
           {weapon.feat_name && (
@@ -310,27 +306,17 @@ export function PickEquipment() {
   const selectedPrimaryData = tier1PrimaryWeapons.find((w) => w.name === selectedPrimaryWeapon)
   const selectedSecondaryData = tier1SecondaryWeapons.find((w) => w.name === selectedSecondaryWeapon)
 
+  const accentColor = getClassAccentColor(selectedClass)
+
   return (
-    <div className="flex flex-col items-center px-4">
-      <h2 style={{
-        ...typeTitle,
-        fontSize: 28,
-        fontWeight: 400,
-        background: goldGradient,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
+    <div style={{ position: 'relative' }}>
+      <EmberOverlay color={accentColor} rate={6} />
+      <div className="flex flex-col items-center px-4" style={{ position: 'relative', zIndex: 1 }}>
+      <p className="max-w-[360px]" style={{
+        ...typeBody,
+        color: 'var(--text-secondary)',
         textAlign: 'center',
-        margin: '0 0 8px',
-      }}>
-        Choose Your Equipment
-      </h2>
-      <p style={{
-        ...typeSubtitle,
-        fontStyle: 'italic',
-        color: 'var(--gold-secondary)',
-        textAlign: 'center',
-        marginBottom: 24,
+        marginBottom: 20,
       }}>
         {selectedClass ?? 'Class'} suggested build pre-selected
       </p>
@@ -341,19 +327,16 @@ export function PickEquipment() {
       <div className="w-full max-w-[360px] mb-6">
         <h3 style={{
           ...typeSubtitle,
-          background: goldGradient,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
+          color: 'var(--gold)',
           textAlign: 'center',
-          marginBottom: 12,
+          marginBottom: 4,
         }}>
           Armor
         </h3>
         <p
           style={{
             ...typeBody,
-            color: 'var(--text-muted)',
+            color: 'var(--text-secondary)',
             textAlign: 'center',
             marginBottom: 12,
           }}
@@ -410,10 +393,7 @@ export function PickEquipment() {
       <div className="w-full max-w-[360px] mb-6">
         <h3 style={{
           ...typeSubtitle,
-          background: goldGradient,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
+          color: 'var(--gold)',
           textAlign: 'center',
           marginBottom: 12,
         }}>
@@ -434,8 +414,11 @@ export function PickEquipment() {
               >
                 <p
                   style={{
-                    ...typeSubtitle,
-                    color: 'var(--text-muted)',
+                    ...typeBody,
+                    fontWeight: 600,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-secondary)',
                     marginBottom: 8,
                     paddingLeft: 4,
                   }}
@@ -484,44 +467,26 @@ export function PickEquipment() {
       <div className="w-full max-w-[360px] mb-6">
         <h3 style={{
           ...typeSubtitle,
-          background: goldGradient,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
+          color: 'var(--gold)',
           textAlign: 'center',
-          marginBottom: 12,
+          marginBottom: 4,
         }}>
           Secondary Weapon
         </h3>
 
-        {/* Disabled reason note */}
-        {isSecondaryDisabled && (
-          <p
-            style={{
-              ...typeBody,
-              color: 'var(--text-muted)',
-              textAlign: 'center',
-              fontStyle: 'italic',
-              marginBottom: 12,
-            }}
-          >
-            {secondaryDisabledReason}
-          </p>
-        )}
-
-        {/* Enabled helper text */}
-        {!isSecondaryDisabled && (
-          <p
-            style={{
-              ...typeBody,
-              color: 'var(--text-muted)',
-              textAlign: 'center',
-              marginBottom: 12,
-            }}
-          >
-            Optional -- your free hand allows a secondary weapon
-          </p>
-        )}
+        <p
+          style={{
+            ...typeBody,
+            color: 'var(--text-secondary)',
+            textAlign: 'center',
+            fontStyle: isSecondaryDisabled ? 'italic' : undefined,
+            marginBottom: 12,
+          }}
+        >
+          {isSecondaryDisabled
+            ? secondaryDisabledReason
+            : 'Optional — your free hand allows a secondary weapon'}
+        </p>
 
         <AnimatePresence mode="popLayout" initial={false}>
           {isSecondaryExpanded || isSecondaryDisabled ? (
@@ -538,8 +503,11 @@ export function PickEquipment() {
               >
                 <p
                   style={{
-                    ...typeSubtitle,
-                    color: 'var(--text-muted)',
+                    ...typeBody,
+                    fontWeight: 600,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-secondary)',
                     marginBottom: 8,
                     paddingLeft: 4,
                   }}
@@ -581,6 +549,7 @@ export function PickEquipment() {
           ) : null}
         </AnimatePresence>
       </div>
+    </div>
     </div>
   )
 }

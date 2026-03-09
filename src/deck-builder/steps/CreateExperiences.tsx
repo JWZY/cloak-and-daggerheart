@@ -1,7 +1,9 @@
 import { useDeckStore } from '../../store/deck-store'
 import { GameInput } from '../../ui/GameInput'
 import { GameBadge } from '../../ui/GameBadge'
+import { EmberOverlay } from '../../ui/EmberOverlay'
 import { typeSubtitle, typeBody } from '../../ui/typography'
+import { getClassAccentColor } from '../../cards/domain-colors'
 
 const EXPERIENCE_LABELS = ['Experience 1', 'Experience 2'] as const
 
@@ -13,9 +15,13 @@ const EXPERIENCE_PLACEHOLDERS = [
 export function CreateExperiences() {
   const experiences = useDeckStore((s) => s.experiences)
   const setExperience = useDeckStore((s) => s.setExperience)
+  const selectedClass = useDeckStore((s) => s.selectedClass)
+  const accentColor = getClassAccentColor(selectedClass)
 
   return (
-    <div className="flex flex-col items-center px-4">
+    <div style={{ position: 'relative' }}>
+      <EmberOverlay color={accentColor} rate={6} />
+      <div className="flex flex-col items-center px-4" style={{ position: 'relative', zIndex: 1 }}>
       <p className="max-w-[360px]" style={{
         ...typeBody,
         color: 'var(--text-secondary)',
@@ -48,6 +54,7 @@ export function CreateExperiences() {
           </div>
         ))}
       </div>
+    </div>
     </div>
   )
 }
