@@ -58,7 +58,7 @@ export default function App() {
     setWelcomeChar(character)
     createCharacter(character)
     // After 2.5s, dismiss the welcome screen
-    setTimeout(() => setWelcomeChar(null), 2500)
+    setTimeout(() => setWelcomeChar(null), 4500)
   }, [createCharacter])
 
   // Splash screen: brief branded loading state
@@ -148,7 +148,7 @@ function WelcomeScreen({ character }: { character: Character }) {
       <motion.span
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
+        transition={{ delay: 0.4, duration: 1.2, ease: 'easeOut' }}
         style={{
           ...typeSubtitle,
           color: 'rgba(212,207,199,0.7)',
@@ -162,7 +162,7 @@ function WelcomeScreen({ character }: { character: Character }) {
       <motion.span
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.6, ease: 'easeOut' }}
+        transition={{ delay: 1.0, duration: 1.2, ease: 'easeOut' }}
         className="gold-text gold-text-shadow"
         style={{
           ...typeTitle,
@@ -177,7 +177,7 @@ function WelcomeScreen({ character }: { character: Character }) {
       <motion.span
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, duration: 0.6, ease: 'easeOut' }}
+        transition={{ delay: 1.6, duration: 1.2, ease: 'easeOut' }}
         style={{
           ...typeSubtitle,
           color: 'rgba(212,207,199,0.6)',
