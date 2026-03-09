@@ -1,21 +1,46 @@
 import { useState } from 'react'
-import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
+import { FullBleedPicker, type PickerItem, type HeroMode } from '../components/FullBleedPicker'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { classes } from '../../data/srd'
 
 const BASE_URL = import.meta.env.BASE_URL
 
+const HERO_MODES: HeroMode[] = ['position', 'blur-fill', 'contain-blur']
+const HERO_MODE_LABELS: Record<HeroMode, string> = {
+  'position': 'A: Position',
+  'blur-fill': 'B: Blur Fill',
+  'contain-blur': 'C: Contain',
+}
+
+/** Per-class object-position for Mode A ("Position Map") */
+const CLASS_ART_POSITION: Record<string, string> = {
+  Guardian: 'center',
+  Sorcerer: 'top',
+  Warrior: 'center',
+  Druid: 'center 30%',
+  Bard: 'top',
+  Wizard: 'center 40%',
+  Rogue: 'top',
+  Ranger: 'center',
+  Seraph: 'center 30%',
+}
+
+/** AI content-aware filled covers (override domain card art when available) */
+const CLASS_COVER: Record<string, string> = {
+  Sorcerer: 'arcana-touched',
+}
+
 /** Hand-picked domain card artwork for each class splash image */
 const CLASS_ART: Record<string, string> = {
-  Guardian: 'unyielding-armor',
-  Sorcerer: 'eclipse',
+  Guardian: 'valor-touched',
+  Sorcerer: 'arcana-touched',
   Warrior: 'reapers-strike',
-  Druid: 'sage-touched',
+  Druid: 'conjure-swarm',
   Bard: 'grace-touched',
-  Wizard: 'codex-touched',
+  Wizard: 'book-of-vagras',
   Rogue: 'midnight-spirit',
-  Ranger: 'natural-familiar',
+  Ranger: 'cruel-precision',
   Seraph: 'hold-the-line',
 }
 
@@ -46,16 +71,22 @@ interface StepProps {
 }
 
 export function PickClass({ onNext }: StepProps) {
-  const showFullInfo = new URLSearchParams(window.location.search).has('fullinfo')
+  const params = new URLSearchParams(window.location.search)
+  const showFullInfo = params.has('fullinfo')
+  const showHeroTest = params.has('herotest') || import.meta.env.DEV
   const selectedClass = useDeckStore((s) => s.selectedClass)
   const setClass = useDeckStore((s) => s.setClass)
 
   const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
+  const [heroMode, setHeroMode] = useState<HeroMode>('position')
 
   const pickerItems: PickerItem[] = classes.map((cls) => ({
     id: cls.name,
     name: cls.name,
-    illustrationSrc: `${BASE_URL}images/cards/domains/${CLASS_ART[cls.name] ?? 'unyielding-armor'}.avif`,
+    illustrationSrc: CLASS_COVER[cls.name]
+      ? `${BASE_URL}images/cards/covers/${CLASS_COVER[cls.name]}.png`
+      : `${BASE_URL}images/cards/domains/${CLASS_ART[cls.name] ?? 'unyielding-armor'}.avif`,
+    objectPosition: CLASS_ART_POSITION[cls.name],
   }))
 
   const handleFocus = (id: string) => {
@@ -69,16 +100,22 @@ export function PickClass({ onNext }: StepProps) {
 
   const focusedClass = classes.find((c) => c.name === focusedId)
 
+  const cycleHeroMode = () => {
+    const idx = HERO_MODES.indexOf(heroMode)
+    setHeroMode(HERO_MODES[(idx + 1) % HERO_MODES.length])
+  }
+
   return (
+    <>
     <FullBleedPicker
-      title="Class"
+      currentStep={0}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={selectedClass ? [selectedClass] : []}
       onFocus={handleFocus}
       onConfirm={handleConfirm}
       canConfirm={!!selectedClass}
-      nextStepLabel="Subclass"
+      heroMode={heroMode}
     >
       {focusedClass && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -94,10 +131,10 @@ export function PickClass({ onNext }: StepProps) {
           </h2>
           <Separator text={`${focusedClass.domain_1} · ${focusedClass.domain_2}`} />
           <div style={{
-            maxHeight: showFullInfo ? '40vh' : undefined,
-            overflowY: showFullInfo ? 'auto' : undefined,
-            maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
-            WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
+            maxHeight: '40vh',
+            overflowY: 'auto',
+            maskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
           }}>
             <p style={{
               ...typeBody,
@@ -108,31 +145,55 @@ export function PickClass({ onNext }: StepProps) {
             }}>
               {showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`}
             </p>
-            {showFullInfo && (
-              <>
-                <div style={{ marginTop: 8 }}>
-                  <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
-                    {focusedClass.hope_feat_name}
-                  </span>
-                  <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
-                    {focusedClass.hope_feat_text}
-                  </p>
-                </div>
-                {focusedClass.class_feats.map((feat, i) => (
-                  <div key={i} style={{ marginTop: 8 }}>
-                    <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
-                      {feat.name}
-                    </span>
-                    <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
-                      {feat.text}
-                    </p>
-                  </div>
-                ))}
-              </>
-            )}
+            {/* Hope Feature */}
+            <div style={{ marginTop: 12 }}>
+              <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                {focusedClass.hope_feat_name}
+              </span>
+              <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
+                {focusedClass.hope_feat_text}
+              </p>
+            </div>
+            {/* Class Feats */}
+            {focusedClass.class_feats.map((feat, i) => (
+              <div key={i} style={{ marginTop: 8 }}>
+                <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                  {feat.name}
+                </span>
+                <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
+                  {feat.text}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}
     </FullBleedPicker>
+
+    {/* Dev toggle: hero image mode */}
+    {showHeroTest && (
+      <button
+        onClick={cycleHeroMode}
+        style={{
+          position: 'fixed',
+          top: 52,
+          right: 12,
+          zIndex: 9999,
+          padding: '4px 10px',
+          borderRadius: 999,
+          border: '1px solid rgba(255,255,255,0.2)',
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(8px)',
+          color: '#fff',
+          fontSize: 11,
+          fontFamily: 'system-ui, sans-serif',
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        {HERO_MODE_LABELS[heroMode]}
+      </button>
+    )}
+    </>
   )
 }
