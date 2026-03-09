@@ -71,7 +71,7 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
 
   return (
     <FullBleedPicker
-      title="Community"
+      currentStep={4}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={communityName ? [communityName] : []}
@@ -79,8 +79,6 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
       onBack={onBack}
       onConfirm={handleConfirm}
       canConfirm={!!communityName}
-      prevStepLabel="Ancestry"
-      nextStepLabel="Equipment"
     >
       {focusedCommunity && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

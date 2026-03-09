@@ -70,7 +70,7 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
 
   return (
     <FullBleedPicker
-      title="Subclass"
+      currentStep={1}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={subclass ? [subclass] : []}
@@ -78,8 +78,6 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
       onBack={onBack}
       onConfirm={handleConfirm}
       canConfirm={!!subclass}
-      prevStepLabel="Class"
-      nextStepLabel="Domain Cards"
     >
       {focusedSub && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

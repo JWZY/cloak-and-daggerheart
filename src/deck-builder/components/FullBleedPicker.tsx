@@ -2,7 +2,8 @@ import { useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { FatesButton } from '../../ui/FatesButton'
-import { typeTitle, typeBody, goldGradientStyle, goldDark, goldDarkAlpha, goldLightAlpha } from '../../ui/typography'
+import { typeBody, goldDark, goldDarkAlpha, goldLightAlpha } from '../../ui/typography'
+import { StepCarousel } from './StepCarousel'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -16,8 +17,8 @@ export interface PickerItem {
 }
 
 export interface FullBleedPickerProps {
-  /** Step title shown at top (e.g. "Class", "Subclass") */
-  title: string
+  /** Current step index (for StepCarousel) */
+  currentStep: number
   /** All items to choose from */
   items: PickerItem[]
   /** Currently focused item ID (whose illustration is shown as hero) */
@@ -37,10 +38,6 @@ export interface FullBleedPickerProps {
   backLabel?: string
   /** Badge text shown above thumbnails (e.g. "2 of 4 selected") */
   badge?: string
-  /** Label for the previous step (shown left of title) */
-  prevStepLabel?: string
-  /** Label for the next step (shown right of title) */
-  nextStepLabel?: string
   /** Info content rendered over the gradient, above thumbnails */
   children: ReactNode
   /** Hero image display mode (default: cover with center positioning) */
@@ -48,14 +45,6 @@ export interface FullBleedPickerProps {
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
-
-const titleStyle: React.CSSProperties = {
-  ...typeTitle,
-  fontSize: 36,
-  fontWeight: 400,
-  margin: 0,
-  lineHeight: 1,
-}
 
 const badgeStyle: React.CSSProperties = {
   ...typeBody,
@@ -68,7 +57,7 @@ const badgeStyle: React.CSSProperties = {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function FullBleedPicker({
-  title,
+  currentStep,
   items,
   focusedId,
   selectedIds,
@@ -79,8 +68,6 @@ export function FullBleedPicker({
   confirmLabel = 'Next',
   backLabel = 'Back',
   badge,
-  prevStepLabel,
-  nextStepLabel,
   children,
   heroMode,
 }: FullBleedPickerProps) {
@@ -214,92 +201,14 @@ export function FullBleedPicker({
         }}
       />
 
-      {/* Breadcrumb step navigation — prev · CURRENT · next */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 16,
-          width: '100%',
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'center',
-          gap: 0,
-          whiteSpace: 'nowrap',
-          filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.75))',
-          zIndex: 10,
-        }}
-      >
-        {prevStepLabel && (
-          <>
-            <motion.button
-              onClick={onBack}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                ...titleStyle,
-                fontSize: 36,
-                color: goldDarkAlpha(0.3),
-                background: 'none',
-                border: 'none',
-                padding: '8px 4px',
-                cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              {prevStepLabel}
-            </motion.button>
-            <span
-              style={{
-                ...titleStyle,
-                fontSize: 36,
-                color: goldDarkAlpha(0.3),
-                padding: '0 8px',
-              }}
-            >
-              &middot;
-            </span>
-          </>
-        )}
-        <span
-          style={{
-            ...titleStyle,
-            fontSize: 36,
-            ...goldGradientStyle,
-          }}
-        >
-          {title}
-        </span>
-        {nextStepLabel && (
-          <>
-            <span
-              style={{
-                ...titleStyle,
-                fontSize: 36,
-                color: goldDarkAlpha(0.3),
-                padding: '0 8px',
-              }}
-            >
-              &middot;
-            </span>
-            <motion.button
-              onClick={canConfirm ? onConfirm : undefined}
-              whileTap={canConfirm ? { scale: 0.95 } : undefined}
-              style={{
-                ...titleStyle,
-                fontSize: 36,
-                color: goldDarkAlpha(0.3),
-                opacity: canConfirm ? 1 : 0.5,
-                background: 'none',
-                border: 'none',
-                padding: '8px 4px',
-                cursor: canConfirm ? 'pointer' : 'default',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              {nextStepLabel}
-            </motion.button>
-          </>
-        )}
-      </div>
+      {/* Step carousel navigation */}
+      <StepCarousel
+        currentStep={currentStep}
+        onBack={onBack}
+        onNext={onConfirm}
+        canGoNext={canConfirm}
+        overlay
+      />
 
       {/* Content overlay — stacks info, badge, thumbnails, buttons at bottom */}
       <div
@@ -384,6 +293,19 @@ export function FullBleedPicker({
                     borderRadius: 8,
                   }}
                 />
+
+                {/* Feathered inner border on highlighted items */}
+                {isHighlighted && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: 8,
+                      boxShadow: `inset 0 0 4px 2px ${goldDarkAlpha(0.5)}`,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
 
                 {/* Checkmark on selected items */}
                 {isSelected && (

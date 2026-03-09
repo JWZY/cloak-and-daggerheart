@@ -81,7 +81,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
 
   return (
     <FullBleedPicker
-      title="Domain Cards"
+      currentStep={2}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={selectedDomainCards}
@@ -90,8 +90,6 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
       onConfirm={handleConfirm}
       canConfirm={canConfirm}
       badge={`${selectedDomainCards.length} of ${maxCards} selected`}
-      prevStepLabel="Subclass"
-      nextStepLabel="Ancestry"
     >
       {focusedCard && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

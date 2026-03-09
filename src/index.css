@@ -641,12 +641,12 @@ button, a {
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(231, 186, 144, 0.6) 45deg,
+    rgba(231, 186, 144, 0.85) 45deg,
     transparent 90deg,
     transparent 140deg,
-    rgba(249, 248, 243, 0.4) 180deg,
+    rgba(249, 248, 243, 0.6) 180deg,
     transparent 220deg,
-    rgba(231, 186, 144, 0.5) 290deg,
+    rgba(231, 186, 144, 0.75) 290deg,
     transparent 340deg
   );
   filter: blur(10px);
@@ -660,11 +660,11 @@ button, a {
   background: conic-gradient(
     from 60deg,
     transparent 0deg,
-    rgba(249, 248, 243, 0.5) 70deg,
+    rgba(249, 248, 243, 0.7) 70deg,
     transparent 120deg,
-    rgba(231, 186, 144, 0.35) 200deg,
+    rgba(231, 186, 144, 0.55) 200deg,
     transparent 260deg,
-    rgba(249, 248, 243, 0.45) 320deg,
+    rgba(249, 248, 243, 0.65) 320deg,
     transparent 360deg
   );
   filter: blur(8px);
