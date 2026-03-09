@@ -588,7 +588,7 @@ button, a {
 
 .type-body {
   /* maps to typeBody (with card-specific color/shadow) */
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13.5px;
   line-height: 1.4;
   color: var(--text-primary);
@@ -985,6 +985,95 @@ button, a {
     transparent 75%
   );
   filter: blur(8px);
+  animation: aura-v4-pulse 5s ease-in-out infinite alternate-reverse;
+}
+
+/* ── Aura V5 Small — halved bleed/blur/blobs for 80x120 thumbnails ────── */
+
+.aura-v5-sm {
+  position: relative;
+  z-index: 0;
+  box-shadow:
+    0 0 6px 2px rgba(218, 165, 80, 0.25),
+    0 0 14px 5px rgba(218, 165, 80, 0.1);
+}
+
+.aura-v5-sm::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 14px;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(30px 40px, rgba(218, 165, 80, 0.9) 0%, transparent 70%),
+    radial-gradient(25px 30px, rgba(241, 196, 100, 0.9) 0%, transparent 70%),
+    radial-gradient(35px 25px, rgba(218, 165, 80, 0.9) 0%, transparent 70%),
+    radial-gradient(20px 35px, rgba(241, 196, 100, 0.9) 0%, transparent 70%),
+    radial-gradient(28px 28px, rgba(218, 165, 80, 0.9) 0%, transparent 70%);
+  background-size: 30px 40px, 25px 30px, 35px 25px, 20px 35px, 28px 28px;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  animation: aura-mesh-drift 8s ease-in-out infinite alternate;
+}
+
+.aura-v5-sm::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 12px;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(22px 32px, rgba(241, 196, 100, 0.9) 0%, transparent 70%),
+    radial-gradient(28px 22px, rgba(218, 165, 80, 0.9) 0%, transparent 70%),
+    radial-gradient(25px 30px, rgba(241, 196, 100, 0.9) 0%, transparent 70%),
+    radial-gradient(30px 25px, rgba(218, 165, 80, 0.9) 0%, transparent 70%);
+  background-size: 22px 32px, 28px 22px, 25px 30px, 30px 25px;
+  background-repeat: no-repeat;
+  filter: blur(6px);
+  animation: aura-mesh-drift-alt 6s ease-in-out infinite alternate-reverse;
+}
+
+.aura-v5-sm-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.aura-v5-sm-inner::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 12px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    rgba(249, 248, 243, 0.45) 0%,
+    rgba(231, 186, 144, 0.35) 30%,
+    rgba(231, 186, 144, 0.15) 60%,
+    transparent 85%
+  );
+  filter: blur(7px) url(#aura-turbulence);
+  animation: aura-v4-pulse 6s ease-in-out infinite alternate;
+}
+
+.aura-v5-sm-inner::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 90% 90% at 50% 50%,
+    rgba(249, 248, 243, 0.3) 0%,
+    rgba(231, 186, 144, 0.2) 40%,
+    transparent 75%
+  );
+  filter: blur(4px);
   animation: aura-v4-pulse 5s ease-in-out infinite alternate-reverse;
 }
 

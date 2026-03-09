@@ -288,7 +288,7 @@ export function FullBleedPicker({
             return (
               <motion.button
                 key={item.id}
-                className={isFocused ? 'aura-v5' : ''}
+                className={isFocused ? 'aura-v5-sm' : ''}
                 animate={{
                   scale: isHighlighted ? 1 : 0.85,
                   opacity: isHighlighted ? 1 : 0.55,
@@ -309,11 +309,10 @@ export function FullBleedPicker({
                   background: 'none',
                   cursor: 'pointer',
                   touchAction: 'manipulation',
-                  '--aura-scale': 0.25,
-                } as React.CSSProperties}
+                }}
               >
-                {/* V5 turbulence inner layer — focused only */}
-                {isFocused && <div className="aura-v5-inner" />}
+                {/* V5-sm turbulence inner layer — focused only */}
+                {isFocused && <div className="aura-v5-sm-inner" />}
                 <img
                   src={item.illustrationSrc}
                   alt={item.name}
