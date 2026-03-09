@@ -226,6 +226,7 @@ export function FullBleedPicker({
           gap: 0,
           whiteSpace: 'nowrap',
           filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.75))',
+          zIndex: 10,
         }}
       >
         {prevStepLabel && (
@@ -394,7 +395,7 @@ export function FullBleedPicker({
             gap: 12,
             padding: '8px 24px',
             paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-            justifyContent: onBack ? 'space-between' : 'center',
+            justifyContent: onBack ? 'space-between' : 'flex-end',
           }}
         >
           {onBack && (
@@ -404,7 +405,7 @@ export function FullBleedPicker({
               </FatesButton>
             </div>
           )}
-          <div style={{ flex: onBack ? 1 : undefined, display: 'flex', justifyContent: onBack ? 'flex-end' : 'center' }}>
+          <div style={{ flex: onBack ? 1 : undefined, display: 'flex', justifyContent: 'flex-end' }}>
             <FatesButton
               variant="light"
               onClick={onConfirm}

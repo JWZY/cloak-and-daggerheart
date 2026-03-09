@@ -671,3 +671,217 @@ button, a {
   animation: aura-spin 3s linear infinite reverse;
 }
 
+/* ==========================================================================
+   Aura V2 — Box-shadow ambient glow + two orbiting hot spots
+   Soft diffuse base glow always present. Two blurred radial-gradient circles
+   orbit the card perimeter at different speeds for organic asymmetry.
+   ========================================================================== */
+
+.aura-v2 {
+  position: relative;
+  z-index: 0;
+  box-shadow:
+    0 0 15px 5px rgba(231, 186, 144, 0.25),
+    0 0 35px 12px rgba(231, 186, 144, 0.12),
+    0 0 60px 20px rgba(231, 186, 144, 0.06);
+}
+
+.aura-v2::before,
+.aura-v2::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Hot spot A — larger, slower, clockwise */
+.aura-v2::before {
+  width: 70px;
+  height: 70px;
+  background: radial-gradient(circle, rgba(249, 248, 243, 0.55) 0%, rgba(231, 186, 144, 0.2) 40%, transparent 70%);
+  filter: blur(18px);
+  animation: aura-orbit-cw 7s ease-in-out infinite;
+}
+
+/* Hot spot B — smaller, faster, counter-clockwise */
+.aura-v2::after {
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle, rgba(249, 248, 243, 0.45) 0%, rgba(231, 186, 144, 0.15) 40%, transparent 70%);
+  filter: blur(14px);
+  animation: aura-orbit-ccw 5.5s ease-in-out infinite;
+}
+
+@keyframes aura-orbit-cw {
+  0%   { top: -25px;  left: 15%; }
+  15%  { top: -20px;  left: 55%; }
+  30%  { top: 15%;    left: calc(100% - 10px); }
+  50%  { top: 55%;    left: calc(100% - 5px); }
+  65%  { top: calc(100% - 10px); left: 50%; }
+  80%  { top: 50%;    left: -20px; }
+  90%  { top: 15%;    left: -15px; }
+  100% { top: -25px;  left: 15%; }
+}
+
+@keyframes aura-orbit-ccw {
+  0%   { top: calc(100% - 5px); left: 60%; }
+  15%  { top: calc(100% - 10px); left: 20%; }
+  30%  { top: 50%;    left: -15px; }
+  50%  { top: 10%;    left: -10px; }
+  65%  { top: -20px;  left: 40%; }
+  80%  { top: 20%;    left: calc(100% - 15px); }
+  90%  { top: 60%;    left: calc(100% - 10px); }
+  100% { top: calc(100% - 5px); left: 60%; }
+}
+
+/* ==========================================================================
+   Aura V3 — Mesh of blurred dots
+   Five absolutely-positioned blurred circles, each drifting on a unique path
+   at different durations. Creates an organic, flickering ambient glow.
+   ========================================================================== */
+
+.aura-v3 {
+  position: relative;
+  z-index: 0;
+  box-shadow:
+    0 0 12px 4px rgba(231, 186, 144, 0.2),
+    0 0 30px 10px rgba(231, 186, 144, 0.08);
+}
+
+/* We use a wrapper approach: .aura-v3 creates a glow layer via ::before
+   that holds multiple radial-gradient backgrounds drifting independently. */
+.aura-v3::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 20px;
+  z-index: -1;
+  pointer-events: none;
+  /* Five radial gradients stacked — each positioned differently */
+  background:
+    radial-gradient(ellipse 60px 80px at 20% 0%, rgba(249, 248, 243, 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 50px 60px at 90% 30%, rgba(231, 186, 144, 0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 70px 50px at 70% 100%, rgba(249, 248, 243, 0.4) 0%, transparent 70%),
+    radial-gradient(ellipse 40px 70px at 5% 60%, rgba(231, 186, 144, 0.4) 0%, transparent 70%),
+    radial-gradient(ellipse 55px 55px at 50% 50%, rgba(249, 248, 243, 0.2) 0%, transparent 70%);
+  filter: blur(16px);
+  animation: aura-mesh-drift 8s ease-in-out infinite alternate;
+}
+
+.aura-v3::after {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: 18px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 45px 65px at 80% 10%, rgba(249, 248, 243, 0.4) 0%, transparent 70%),
+    radial-gradient(ellipse 55px 45px at 10% 80%, rgba(231, 186, 144, 0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 50px 60px at 50% 0%, rgba(231, 186, 144, 0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 60px 50px at 95% 70%, rgba(249, 248, 243, 0.35) 0%, transparent 70%);
+  filter: blur(12px);
+  animation: aura-mesh-drift-alt 6s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes aura-mesh-drift {
+  0% {
+    background-position:
+      20% 0%,
+      90% 30%,
+      70% 100%,
+      5% 60%,
+      50% 50%;
+  }
+  100% {
+    background-position:
+      35% 10%,
+      75% 15%,
+      55% 90%,
+      15% 75%,
+      45% 40%;
+  }
+}
+
+@keyframes aura-mesh-drift-alt {
+  0% {
+    background-position:
+      80% 10%,
+      10% 80%,
+      50% 0%,
+      95% 70%;
+  }
+  100% {
+    background-position:
+      65% 20%,
+      25% 70%,
+      40% 15%,
+      85% 55%;
+  }
+}
+
+/* ==========================================================================
+   Aura V4 — SVG feTurbulence distortion
+   A solid glow shape behind the card, distorted by an animated SVG turbulence
+   filter for an organic, living-flame appearance.
+   ========================================================================== */
+
+.aura-v4 {
+  position: relative;
+  z-index: 0;
+  box-shadow:
+    0 0 10px 3px rgba(231, 186, 144, 0.15),
+    0 0 25px 8px rgba(231, 186, 144, 0.06);
+}
+
+.aura-v4::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 18px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    rgba(249, 248, 243, 0.45) 0%,
+    rgba(231, 186, 144, 0.35) 30%,
+    rgba(231, 186, 144, 0.15) 60%,
+    transparent 85%
+  );
+  filter: blur(14px) url(#aura-turbulence);
+  animation: aura-v4-pulse 6s ease-in-out infinite alternate;
+}
+
+.aura-v4::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 14px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 90% 90% at 50% 50%,
+    rgba(249, 248, 243, 0.3) 0%,
+    rgba(231, 186, 144, 0.2) 40%,
+    transparent 75%
+  );
+  filter: blur(8px);
+  animation: aura-v4-pulse 5s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes aura-v4-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
