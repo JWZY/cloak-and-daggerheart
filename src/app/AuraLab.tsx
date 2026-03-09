@@ -9,12 +9,14 @@ function AuraCard({
   height,
   radius,
   children,
+  style: extraStyle,
 }: {
   className: string
   width: number
   height: number
   radius: number
   children?: React.ReactNode
+  style?: React.CSSProperties
 }) {
   return (
     <div
@@ -25,6 +27,7 @@ function AuraCard({
         height,
         borderRadius: radius,
         flexShrink: 0,
+        ...extraStyle,
       }}
     >
       <img
@@ -219,7 +222,7 @@ export default function AuraLab() {
         </p>
         <div style={{ display: 'flex', gap: 40, alignItems: 'flex-end' }}>
           <div style={{ textAlign: 'center' }}>
-            <AuraCard className="aura-v5" width={80} height={120} radius={10}>
+            <AuraCard className="aura-v5" width={80} height={120} radius={10} style={{ '--aura-scale': 0.5 } as React.CSSProperties}>
               <div className="aura-v5-inner" />
             </AuraCard>
             <span style={{ display: 'block', marginTop: 12, fontFamily: "'Source Sans 3', sans-serif", fontSize: 11, color: 'var(--text-muted)' }}>
