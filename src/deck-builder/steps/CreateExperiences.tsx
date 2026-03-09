@@ -1,9 +1,14 @@
 import { useDeckStore } from '../../store/deck-store'
 import { GameInput } from '../../ui/GameInput'
 import { GameBadge } from '../../ui/GameBadge'
-import { typeTitle, typeSubtitle, goldGradient } from '../../ui/typography'
+import { typeSubtitle, typeBody } from '../../ui/typography'
 
 const EXPERIENCE_LABELS = ['Experience 1', 'Experience 2'] as const
+
+const EXPERIENCE_PLACEHOLDERS = [
+  'e.g. Exiled Prince of a Kingdom, Arcane Scholar',
+  'e.g. Honourable Bounty Hunter, Drunk Sailor',
+]
 
 export function CreateExperiences() {
   const experiences = useDeckStore((s) => s.experiences)
@@ -11,25 +16,11 @@ export function CreateExperiences() {
 
   return (
     <div className="flex flex-col items-center px-4">
-      <h2 style={{
-        ...typeTitle,
-        fontSize: 28,
-        fontWeight: 400,
-        background: goldGradient,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
+      <p className="max-w-[360px]" style={{
+        ...typeBody,
+        color: 'var(--text-secondary)',
         textAlign: 'center',
-        margin: '0 0 8px',
-      }}>
-        Create Experiences
-      </h2>
-      <p style={{
-        ...typeSubtitle,
-        fontStyle: 'italic',
-        color: 'var(--gold-secondary)',
-        textAlign: 'center',
-        marginBottom: 24,
+        marginBottom: 20,
       }}>
         Words or phrases that describe your character's skills and history. Each adds +2 to relevant action rolls.
       </p>
@@ -52,7 +43,7 @@ export function CreateExperiences() {
               type="text"
               value={experiences[index]?.text ?? ''}
               onChange={(e) => setExperience(index, e.target.value)}
-              placeholder="e.g. Arcane Scholar, Survivor of the War"
+              placeholder={EXPERIENCE_PLACEHOLDERS[index % EXPERIENCE_PLACEHOLDERS.length]}
             />
           </div>
         ))}
