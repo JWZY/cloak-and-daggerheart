@@ -274,7 +274,7 @@ export function FullBleedPicker({
             gap: 12,
             overflowX: 'auto',
             /* 50% - half thumb width so first/last items can center */
-            padding: '12px calc(50% - 40px)',
+            padding: '24px calc(50% - 40px)',
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
@@ -288,7 +288,7 @@ export function FullBleedPicker({
             return (
               <motion.button
                 key={item.id}
-                className={isHighlighted ? 'aura-v5' : ''}
+                className={isFocused ? 'aura-v5' : ''}
                 animate={{
                   scale: isHighlighted ? 1 : 0.85,
                   opacity: isHighlighted ? 1 : 0.55,
@@ -304,7 +304,7 @@ export function FullBleedPicker({
                   overflow: 'visible',
                   flexShrink: 0,
                   scrollSnapAlign: 'center',
-                  border: isHighlighted ? 'none' : `2px solid ${goldLightAlpha(0.3)}`,
+                  border: isFocused ? 'none' : `2px solid ${goldLightAlpha(0.3)}`,
                   padding: 0,
                   background: 'none',
                   cursor: 'pointer',
@@ -312,8 +312,8 @@ export function FullBleedPicker({
                   '--aura-scale': 0.5,
                 } as React.CSSProperties}
               >
-                {/* V5 turbulence inner layer */}
-                {isHighlighted && <div className="aura-v5-inner" />}
+                {/* V5 turbulence inner layer — focused only */}
+                {isFocused && <div className="aura-v5-inner" />}
                 <img
                   src={item.illustrationSrc}
                   alt={item.name}
@@ -328,8 +328,8 @@ export function FullBleedPicker({
                   }}
                 />
 
-                {/* Feathered inner border on highlighted items */}
-                {isHighlighted && (
+                {/* Feathered inner border on focused item */}
+                {isFocused && (
                   <div
                     style={{
                       position: 'absolute',
