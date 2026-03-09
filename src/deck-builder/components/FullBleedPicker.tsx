@@ -257,7 +257,7 @@ export function FullBleedPicker({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            style={{ padding: '0 24px', marginBottom: 8 }}
+            style={{ padding: '0 24px', marginBottom: 8, maxWidth: 480, alignSelf: 'center', width: '100%' }}
           >
             {children}
           </motion.div>
@@ -337,6 +337,7 @@ export function FullBleedPicker({
                       borderRadius: 8,
                       boxShadow: `inset 0 0 4px 2px ${goldDarkAlpha(0.5)}`,
                       pointerEvents: 'none',
+                      zIndex: 2,
                     }}
                   />
                 )}
@@ -356,6 +357,7 @@ export function FullBleedPicker({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      zIndex: 3,
                     }}
                   >
                     <Check size={12} color={goldDark} strokeWidth={3} />
