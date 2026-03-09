@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FullBleedPicker, type PickerItem, type HeroMode } from '../components/FullBleedPicker'
+import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
 import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { DOMAIN_COLORS_MUTED } from '../../cards/domain-colors'
@@ -8,14 +8,7 @@ import { classes } from '../../data/srd'
 
 const BASE_URL = import.meta.env.BASE_URL
 
-const HERO_MODES: HeroMode[] = ['position', 'blur-fill', 'contain-blur']
-const HERO_MODE_LABELS: Record<HeroMode, string> = {
-  'position': 'A: Position',
-  'blur-fill': 'B: Blur Fill',
-  'contain-blur': 'C: Contain',
-}
-
-/** Per-class object-position for Mode A ("Position Map") */
+/** Per-class object-position for hero image */
 const CLASS_ART_POSITION: Record<string, string> = {
   Guardian: 'center',
   Sorcerer: 'top',
@@ -30,6 +23,7 @@ const CLASS_ART_POSITION: Record<string, string> = {
 
 /** AI content-aware filled covers (override domain card art when available) */
 const CLASS_COVER: Record<string, string> = {
+  Guardian: 'valor-touched',
   Sorcerer: 'arcana-touched',
   Warrior: 'reapers-strike',
 }
@@ -95,14 +89,11 @@ interface StepProps {
 }
 
 export function PickClass({ onNext }: StepProps) {
-  const params = new URLSearchParams(window.location.search)
-  const showFullInfo = params.has('fullinfo')
-  const showHeroTest = params.has('herotest') || import.meta.env.DEV
+  const showFullInfo = new URLSearchParams(window.location.search).has('fullinfo')
   const selectedClass = useDeckStore((s) => s.selectedClass)
   const setClass = useDeckStore((s) => s.setClass)
 
   const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
-  const [heroMode, setHeroMode] = useState<HeroMode>('position')
 
   // Auto-select first item on mount for faster testing
   useEffect(() => {
@@ -129,13 +120,7 @@ export function PickClass({ onNext }: StepProps) {
 
   const focusedClass = classes.find((c) => c.name === focusedId)
 
-  const cycleHeroMode = () => {
-    const idx = HERO_MODES.indexOf(heroMode)
-    setHeroMode(HERO_MODES[(idx + 1) % HERO_MODES.length])
-  }
-
   return (
-    <>
     <FullBleedPicker
       currentStep={0}
       items={pickerItems}
@@ -144,7 +129,7 @@ export function PickClass({ onNext }: StepProps) {
       onFocus={handleFocus}
       onConfirm={handleConfirm}
       canConfirm={!!selectedClass}
-      heroMode={heroMode}
+      heroMode="position"
     >
       {focusedClass && (() => {
         const domain = CLASS_DOMAIN[focusedClass.name] ?? 'Valor'
@@ -164,7 +149,6 @@ export function PickClass({ onNext }: StepProps) {
               flexDirection: 'column',
               gap: 4,
               width: '100%',
-              /* Extend up past the info area with negative margin + extra top padding */
               marginTop: -40,
               padding: '56px 24px 12px',
               maxHeight: '55vh',
@@ -224,29 +208,5 @@ export function PickClass({ onNext }: StepProps) {
         )
       })()}
     </FullBleedPicker>
-
-    {/* Dev toggles */}
-    {showHeroTest && (
-      <div style={{ position: 'fixed', top: 52, right: 12, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <button
-          onClick={cycleHeroMode}
-          style={{
-            padding: '4px 10px',
-            borderRadius: 999,
-            border: '1px solid rgba(255,255,255,0.2)',
-            background: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(8px)',
-            color: '#fff',
-            fontSize: 11,
-            fontFamily: 'system-ui, sans-serif',
-            cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          {HERO_MODE_LABELS[heroMode]}
-        </button>
-      </div>
-    )}
-    </>
   )
 }
