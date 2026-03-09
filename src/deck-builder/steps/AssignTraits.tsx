@@ -154,7 +154,7 @@ export function AssignTraits() {
   return (
     <>
       <EmberOverlay color={accentColor} rate={6} />
-      <div className="flex flex-col items-center px-4" style={{ paddingTop: '20%' }}>
+      <div className="flex flex-col items-center px-4" style={{ paddingTop: 48 }}>
       <p className="max-w-[360px]" style={{
         ...typeBody,
         color: 'var(--text-secondary)',
