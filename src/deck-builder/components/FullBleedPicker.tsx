@@ -358,18 +358,7 @@ export function FullBleedPicker({
               </FatesButton>
             </div>
           )}
-          <div
-            className={canConfirm ? 'aura-v5-sm' : ''}
-            style={{
-              flex: onBack ? 1 : undefined,
-              display: 'flex',
-              justifyContent: 'flex-end',
-              position: 'relative',
-              overflow: 'visible',
-              borderRadius: 8,
-            }}
-          >
-            {canConfirm && <div className="aura-v5-sm-inner" />}
+          <div style={{ flex: onBack ? 1 : undefined, display: 'flex', justifyContent: 'flex-end' }}>
             <FatesButton
               variant="light"
               onClick={onConfirm}
