@@ -622,7 +622,7 @@ button, a {
 
 .aura-glow {
   position: relative;
-  border-color: rgba(0, 224, 208, 0.6) !important;
+  border-color: transparent !important;
   z-index: 0;
 }
 
@@ -631,7 +631,6 @@ button, a {
 .aura-glow::after {
   content: '';
   position: absolute;
-  /* Bleed out beyond the card edges */
   inset: -10px;
   border-radius: 14px;
   z-index: -1;
@@ -642,12 +641,12 @@ button, a {
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(0, 224, 208, 0.6) 45deg,
+    rgba(231, 186, 144, 0.6) 45deg,
     transparent 90deg,
     transparent 140deg,
-    rgba(0, 200, 220, 0.4) 180deg,
+    rgba(249, 248, 243, 0.4) 180deg,
     transparent 220deg,
-    rgba(0, 224, 208, 0.5) 290deg,
+    rgba(231, 186, 144, 0.5) 290deg,
     transparent 340deg
   );
   filter: blur(10px);
@@ -661,11 +660,11 @@ button, a {
   background: conic-gradient(
     from 60deg,
     transparent 0deg,
-    rgba(0, 240, 220, 0.5) 70deg,
+    rgba(249, 248, 243, 0.5) 70deg,
     transparent 120deg,
-    rgba(0, 210, 200, 0.35) 200deg,
+    rgba(231, 186, 144, 0.35) 200deg,
     transparent 260deg,
-    rgba(0, 230, 215, 0.45) 320deg,
+    rgba(249, 248, 243, 0.45) 320deg,
     transparent 360deg
   );
   filter: blur(8px);

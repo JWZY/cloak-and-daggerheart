@@ -154,22 +154,29 @@ export function FullBleedPicker({
                 width: '100%',
                 height: '100%',
                 objectFit:
-                  heroMode === 'contain-blur'
+                  heroMode === 'contain-blur' || heroMode === 'blur-fill'
                     ? 'contain'
-                    : heroMode === 'blur-fill'
-                      ? 'contain'
-                      : 'cover',
+                    : 'cover',
                 objectPosition:
                   heroMode === 'position' && focusedItem.objectPosition
                     ? focusedItem.objectPosition
                     : undefined,
-                // Mode B: feather edges so contained image blends into blurred backdrop
+                // Mode B: scale up sharp image so it fills more area, then feather all edges
                 ...(heroMode === 'blur-fill'
                   ? {
-                      maskImage:
-                        'radial-gradient(ellipse 80% 70% at center, black 50%, transparent 100%)',
-                      WebkitMaskImage:
-                        'radial-gradient(ellipse 80% 70% at center, black 50%, transparent 100%)',
+                      // Scale up so the art covers ~120% — less empty space to feather across
+                      transform: 'scale(1.15)',
+                      // Composite mask: fade each edge independently with generous 25% fade zones
+                      maskImage: [
+                        'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+                        'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+                      ].join(', '),
+                      WebkitMaskImage: [
+                        'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+                        'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
+                      ].join(', '),
+                      maskComposite: 'intersect' as const,
+                      WebkitMaskComposite: 'source-in',
                     }
                   : {}),
               }}
@@ -356,7 +363,7 @@ export function FullBleedPicker({
                   overflow: 'visible',
                   flexShrink: 0,
                   scrollSnapAlign: 'center',
-                  border: `2px solid ${isFocused ? 'rgba(0, 224, 208, 0.6)' : goldLightAlpha(0.3)}`,
+                  border: isFocused ? 'none' : `2px solid ${goldLightAlpha(0.3)}`,
                   padding: 0,
                   background: 'none',
                   cursor: 'pointer',
