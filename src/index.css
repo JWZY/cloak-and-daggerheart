@@ -614,3 +614,36 @@ button, a {
   color: var(--text-secondary);
 }
 
+/* ─── Aura glow — animated teal flame effect for selected thumbnails ────── */
+@keyframes aura-flicker {
+  0%, 100% {
+    box-shadow:
+      0 0 6px 2px rgba(0, 224, 208, 0.5),
+      0 0 14px 4px rgba(0, 224, 208, 0.25),
+      0 0 24px 8px rgba(0, 180, 200, 0.12);
+  }
+  25% {
+    box-shadow:
+      0 0 8px 3px rgba(0, 224, 208, 0.6),
+      0 0 18px 6px rgba(0, 224, 208, 0.3),
+      0 0 28px 10px rgba(0, 180, 200, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 5px 1px rgba(0, 224, 208, 0.45),
+      0 0 12px 3px rgba(0, 224, 208, 0.2),
+      0 0 20px 6px rgba(0, 180, 200, 0.1);
+  }
+  75% {
+    box-shadow:
+      0 0 9px 3px rgba(0, 224, 208, 0.55),
+      0 0 16px 5px rgba(0, 224, 208, 0.28),
+      0 0 26px 9px rgba(0, 180, 200, 0.13);
+  }
+}
+
+.aura-glow {
+  animation: aura-flicker 2.5s ease-in-out infinite;
+  border-color: rgba(0, 224, 208, 0.7) !important;
+}
+

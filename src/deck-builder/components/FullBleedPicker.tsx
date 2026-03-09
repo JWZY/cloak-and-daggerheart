@@ -5,10 +5,13 @@ import { typeTitle, typeBody, goldGradientStyle, goldDark, goldDarkAlpha, goldLi
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+export type HeroMode = 'position' | 'blur-fill' | 'contain-blur'
+
 export interface PickerItem {
   id: string
   name: string
   illustrationSrc: string
+  objectPosition?: string
 }
 
 export interface FullBleedPickerProps {
@@ -39,6 +42,8 @@ export interface FullBleedPickerProps {
   nextStepLabel?: string
   /** Info content rendered over the gradient, above thumbnails */
   children: ReactNode
+  /** Hero image display mode (default: cover with center positioning) */
+  heroMode?: HeroMode
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
@@ -65,8 +70,7 @@ export function FullBleedPicker({
   title,
   items,
   focusedId,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  selectedIds,
+  selectedIds: _selectedIds,
   onFocus,
   onBack,
   onConfirm,
@@ -77,6 +81,7 @@ export function FullBleedPicker({
   prevStepLabel,
   nextStepLabel,
   children,
+  heroMode,
 }: FullBleedPickerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -110,10 +115,8 @@ export function FullBleedPicker({
       {/* Hero illustration — crossfades on focus change */}
       <AnimatePresence mode="wait">
         {focusedItem && (
-          <motion.img
+          <motion.div
             key={focusedId}
-            src={focusedItem.illustrationSrc}
-            alt=""
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -121,12 +124,42 @@ export function FullBleedPicker({
             style={{
               position: 'absolute',
               inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
               pointerEvents: 'none',
             }}
-          />
+          >
+            {/* Blurred backdrop — Mode B & C */}
+            {(heroMode === 'blur-fill' || heroMode === 'contain-blur') && (
+              <img
+                src={focusedItem.illustrationSrc}
+                alt=""
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  filter: 'blur(40px) saturate(1.5)',
+                  transform: 'scale(1.3)',
+                }}
+              />
+            )}
+            {/* Sharp image */}
+            <img
+              src={focusedItem.illustrationSrc}
+              alt=""
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: heroMode === 'contain-blur' ? 'contain' : 'cover',
+                objectPosition:
+                  heroMode === 'position' && focusedItem.objectPosition
+                    ? focusedItem.objectPosition
+                    : undefined,
+              }}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -292,6 +325,7 @@ export function FullBleedPicker({
             return (
               <motion.button
                 key={item.id}
+                className={isFocused ? 'aura-glow' : ''}
                 animate={{
                   scale: isFocused ? 1 : 0.85,
                   opacity: isFocused ? 1 : 0.55,
@@ -307,12 +341,7 @@ export function FullBleedPicker({
                   overflow: 'hidden',
                   flexShrink: 0,
                   scrollSnapAlign: 'center',
-                  border: isFocused
-                    ? `3px solid ${goldLightAlpha(0.9)}`
-                    : `2px solid ${goldLightAlpha(0.3)}`,
-                  boxShadow: isFocused
-                    ? `0 0 12px ${goldDarkAlpha(0.4)}`
-                    : 'none',
+                  border: `2px solid ${isFocused ? 'rgba(0, 224, 208, 0.7)' : goldLightAlpha(0.3)}`,
                   padding: 0,
                   background: 'none',
                   cursor: 'pointer',
