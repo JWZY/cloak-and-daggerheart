@@ -113,6 +113,7 @@ export function PickClass({ onNext }: StepProps) {
   const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
   const [heroMode, setHeroMode] = useState<HeroMode>('position')
   const [blockVariant, setBlockVariant] = useState<BlockVariant>('glass')
+  const [glowOpacity, setGlowOpacity] = useState(0.75)
 
   // Auto-select first item on mount for faster testing
   useEffect(() => {
@@ -161,8 +162,14 @@ export function PickClass({ onNext }: StepProps) {
         const muted = DOMAIN_COLORS_MUTED[domain] ?? '#8d3700'
         const deepDark = darkenHex(muted, 0.6)
 
+        // Feather mask: fade all edges for soft glow, only bottom for glass
+        const glowMask = [
+          'linear-gradient(to bottom, transparent, black 12%, black 88%, transparent)',
+          'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+        ].join(', ')
+
         const bgStyle: React.CSSProperties = blockVariant === 'glow'
-          ? { background: `radial-gradient(ellipse 120% 100% at 50% 0%, ${hexToRgba(muted, 0.75)} 0%, ${hexToRgba(muted, 0.4)} 40%, transparent 80%)` }
+          ? { background: `radial-gradient(ellipse 130% 110% at 50% 0%, ${hexToRgba(muted, glowOpacity)} 0%, ${hexToRgba(muted, glowOpacity * 0.5)} 45%, transparent 85%)` }
           : {
               background: `linear-gradient(180deg, ${hexToRgba(muted, 0.65)} 0%, ${deepDark} 100%)`,
               backdropFilter: 'blur(12px)',
@@ -180,13 +187,15 @@ export function PickClass({ onNext }: StepProps) {
               flexDirection: 'column',
               gap: 4,
               width: '100%',
-              padding: '16px 16px 12px',
+              padding: '16px 24px 12px',
               borderRadius: blockVariant === 'glow' ? 0 : 12,
               maxHeight: '50vh',
               overflowY: 'auto',
-              maskImage: 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
-            }}
+              maskImage: blockVariant === 'glow' ? glowMask : 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
+              WebkitMaskImage: blockVariant === 'glow' ? glowMask : 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
+              maskComposite: blockVariant === 'glow' ? 'intersect' : undefined,
+              WebkitMaskComposite: blockVariant === 'glow' ? 'source-in' : undefined,
+            } as React.CSSProperties}
           >
             <h2 style={{
               ...typeTitle,
@@ -275,6 +284,29 @@ export function PickClass({ onNext }: StepProps) {
         >
           Block: {blockVariant === 'glass' ? 'A: Glass' : 'B: Glow'}
         </button>
+        <div style={{
+          padding: '4px 10px',
+          borderRadius: 999,
+          border: '1px solid rgba(255,255,255,0.2)',
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(8px)',
+          color: '#fff',
+          fontSize: 11,
+          fontFamily: 'system-ui, sans-serif',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}>
+          <span>Glow: {Math.round(glowOpacity * 100)}%</span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round(glowOpacity * 100)}
+            onChange={(e) => setGlowOpacity(Number(e.target.value) / 100)}
+            style={{ width: 80, accentColor: 'var(--gold)' }}
+          />
+        </div>
       </div>
     )}
     </>
