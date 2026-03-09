@@ -100,6 +100,35 @@ export function FullBleedPicker({
         background: 'black',
       }}
     >
+      {/* SVG filter for aura-v5 turbulence */}
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <filter id="aura-turbulence" x="-50%" y="-50%" width="200%" height="200%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.012"
+              numOctaves="4"
+              result="noise"
+            >
+              <animate
+                attributeName="seed"
+                from="0"
+                to="5"
+                dur="12s"
+                repeatCount="indefinite"
+              />
+            </feTurbulence>
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale="8"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
+
       {/* Hero illustration — crossfades on focus change */}
       <AnimatePresence mode="wait">
         {focusedItem && (
@@ -259,7 +288,7 @@ export function FullBleedPicker({
             return (
               <motion.button
                 key={item.id}
-                className={isHighlighted ? 'aura-glow' : ''}
+                className={isHighlighted ? 'aura-v5' : ''}
                 animate={{
                   scale: isHighlighted ? 1 : 0.85,
                   opacity: isHighlighted ? 1 : 0.55,
@@ -275,13 +304,16 @@ export function FullBleedPicker({
                   overflow: 'visible',
                   flexShrink: 0,
                   scrollSnapAlign: 'center',
-                  border: isFocused ? 'none' : `2px solid ${goldLightAlpha(0.3)}`,
+                  border: isHighlighted ? 'none' : `2px solid ${goldLightAlpha(0.3)}`,
                   padding: 0,
                   background: 'none',
                   cursor: 'pointer',
                   touchAction: 'manipulation',
-                }}
+                  '--aura-scale': 0.5,
+                } as React.CSSProperties}
               >
+                {/* V5 turbulence inner layer */}
+                {isHighlighted && <div className="aura-v5-inner" />}
                 <img
                   src={item.illustrationSrc}
                   alt={item.name}
@@ -291,6 +323,8 @@ export function FullBleedPicker({
                     objectFit: 'cover',
                     pointerEvents: 'none',
                     borderRadius: 8,
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 />
 
