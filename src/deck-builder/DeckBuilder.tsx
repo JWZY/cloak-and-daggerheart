@@ -210,6 +210,14 @@ export function DeckBuilder({ onComplete, onExit }: DeckBuilderProps) {
             onGoToStep={handleGoToStep}
             maxReachableStep={maxReachableStep}
           />
+          {/* Gradient fade below carousel — masks scrolling content */}
+          {!isFullBleed && (
+            <div style={{
+              height: 32,
+              background: 'linear-gradient(180deg, var(--bg-page) 0%, transparent 100%)',
+              pointerEvents: 'none',
+            }} />
+          )}
         </div>
 
         {/* Step content — always fills available space */}
