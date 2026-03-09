@@ -9,6 +9,11 @@ interface EmberOverlayProps {
   active?: boolean
 }
 
+/**
+ * Fixed-position ember particle overlay that covers the full viewport.
+ * Uses position:fixed so it never scrolls or gets clipped by parent containers.
+ * Place anywhere in the component tree — it renders at viewport level.
+ */
 export function EmberOverlay({ color = '#e7ba90', rate = 8, active = true }: EmberOverlayProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -29,8 +34,9 @@ export function EmberOverlay({ color = '#e7ba90', rate = 8, active = true }: Emb
 
     function createEmber() {
       const el = document.createElement('div')
-      const width = container.clientWidth
-      const height = container.clientHeight
+      // Use viewport dimensions directly — container is fixed to viewport
+      const width = window.innerWidth
+      const height = window.innerHeight
       if (width === 0 || height === 0) return
 
       // Depth: 0 = far, 1 = close
@@ -59,7 +65,7 @@ export function EmberOverlay({ color = '#e7ba90', rate = 8, active = true }: Emb
       const blur = depth < 0.4 ? (0.4 - depth) * 3 : 0
       if (blur > 0.5) el.style.filter = `blur(${blur}px)`
 
-      // Start position: random X, bottom of container
+      // Start position: random X, bottom of viewport
       el.style.left = `${Math.random() * width}px`
       el.style.top = `${height + 5}px`
 
@@ -118,25 +124,24 @@ export function EmberOverlay({ color = '#e7ba90', rate = 8, active = true }: Emb
 
   return (
     <>
-      {/* Faint accent radial glow at bottom edge */}
+      {/* Faint accent radial glow at bottom edge — fixed to viewport */}
       <div
         style={{
-          position: 'absolute',
-          bottom: -60,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '120%',
+          position: 'fixed',
+          bottom: -40,
+          left: 0,
+          right: 0,
           height: 200,
-          background: `radial-gradient(ellipse 60% 70% at 50% 100%, rgba(${r},${g},${b},0.25) 0%, rgba(${r},${g},${b},0.08) 40%, transparent 70%)`,
+          background: `radial-gradient(ellipse 60% 80% at 50% 100%, rgba(${r},${g},${b},0.25) 0%, rgba(${r},${g},${b},0.08) 40%, transparent 70%)`,
           pointerEvents: 'none',
           zIndex: 0,
         }}
       />
-      {/* Particle container */}
+      {/* Particle container — fixed to viewport, never scrolls */}
       <div
         ref={containerRef}
         style={{
-          position: 'absolute',
+          position: 'fixed',
           inset: 0,
           overflow: 'hidden',
           pointerEvents: 'none',

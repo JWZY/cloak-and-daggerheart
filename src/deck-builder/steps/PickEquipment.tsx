@@ -309,9 +309,9 @@ export function PickEquipment() {
   const accentColor = getClassAccentColor(selectedClass)
 
   return (
-    <div style={{ position: 'relative', minHeight: '100%' }}>
+    <>
       <EmberOverlay color={accentColor} rate={6} />
-      <div className="flex flex-col items-center px-4" style={{ position: 'relative', zIndex: 1, paddingTop: '20%' }}>
+      <div className="flex flex-col items-center px-4" style={{ paddingTop: '20%' }}>
       <p className="max-w-[360px]" style={{
         ...typeBody,
         color: 'var(--text-secondary)',
@@ -550,6 +550,6 @@ export function PickEquipment() {
         </AnimatePresence>
       </div>
     </div>
-    </div>
+    </>
   )
 }

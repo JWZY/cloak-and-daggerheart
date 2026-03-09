@@ -91,6 +91,56 @@ style={{
 
 ---
 
+## Full-Viewport Background Overlays (EmberOverlay, glow, etc.)
+
+**The bug:** Background effects (particles, gradients) that should cover the full viewport instead only cover the content height, scroll with the content, or get clipped by scroll containers.
+
+**The root cause:** The DeckBuilder layout chain is deeply nested:
+```
+DeckBuilder (100dvh, flex)
+  └─ flex-1 column (overflow-hidden, relative)
+      └─ motion.div (absolute inset-0)
+          └─ scrollable div (overflow-y-auto, paddingTop/Bottom)
+              └─ step component
+                  └─ background overlay (position:absolute) ← WRONG
+```
+Using `position: absolute` inside this chain means the overlay inherits the step component's height (which is only as tall as its content), not the viewport. It also scrolls with the content.
+
+**The fix — use `position: fixed` for viewport-level overlays:**
+```tsx
+// EmberOverlay, accent glows, etc.
+style={{
+  position: 'fixed',
+  inset: 0,
+  overflow: 'hidden',
+  pointerEvents: 'none',
+  zIndex: 0,
+}}
+```
+
+**Why this works:** `position: fixed` is relative to the viewport, not any parent. It ignores all scroll containers, overflow clipping, and nesting depth. The overlay always covers the full screen.
+
+**Corollary — step components don't need wrapper divs for overlays:**
+```tsx
+// WRONG — adds unnecessary nesting and height problems
+return (
+  <div style={{ position: 'relative', minHeight: '100%' }}>
+    <EmberOverlay />
+    <div style={{ position: 'relative', zIndex: 1 }}>...</div>
+  </div>
+)
+
+// RIGHT — EmberOverlay is fixed, just render it alongside content
+return (
+  <>
+    <EmberOverlay />
+    <div>...</div>
+  </>
+)
+```
+
+---
+
 ## Layout & Positioning
 
 ### Safe Area Insets (Notch / Dynamic Island)
