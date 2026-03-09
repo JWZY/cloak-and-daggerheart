@@ -313,7 +313,7 @@ export function FullBleedPicker({
             gap: 12,
             overflowX: 'auto',
             /* 50% - half thumb width so first/last items can center */
-            padding: '0 calc(50% - 40px) 12px',
+            padding: '12px calc(50% - 40px)',
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
