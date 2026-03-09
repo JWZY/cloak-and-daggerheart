@@ -12,9 +12,9 @@ export function NameCharacter() {
   const accentColor = getClassAccentColor(selectedClass)
 
   return (
-    <div style={{ position: 'relative', height: '100%' }}>
+    <div style={{ position: 'relative', minHeight: '100%', height: '100%' }}>
       <EmberOverlay color={accentColor} rate={6} />
-      <div className="flex flex-col items-center justify-center px-4" style={{ position: 'relative', zIndex: 1, height: '100%' }}>
+      <div className="flex flex-col items-center justify-center px-4" style={{ position: 'relative', zIndex: 1, minHeight: '100%' }}>
       <div className="w-full max-w-[360px]">
         <GameInput
           type="text"
