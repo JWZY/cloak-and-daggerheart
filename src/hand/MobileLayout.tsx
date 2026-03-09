@@ -9,7 +9,6 @@ import { EquipmentPanel } from './panels/EquipmentPanel'
 import { NotesPanel } from './panels/NotesPanel'
 import { InlineSection } from './InlineSection'
 import { CharacterHeader } from './CharacterHeader'
-import { LevelUpButton } from './LevelUpButton'
 import { ScaledCard } from '../cards/ScaledCard'
 import { cardScale } from '../cards/card-tokens'
 import { getClassForSubclass } from '../data/srd'
@@ -24,7 +23,7 @@ interface MobileLayoutProps {
   onLevelUp: () => void
 }
 
-export function MobileLayout({ character, accentColor, onHeroTap, onCardTap, onLevelUp }: MobileLayoutProps) {
+export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: MobileLayoutProps) {
   const classData = getClassForSubclass(character.subclass)
   const updateBackground = useCharacterStore((s) => s.updateBackground)
   const updateConnections = useCharacterStore((s) => s.updateConnections)
@@ -33,9 +32,6 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap, onL
     <div className="flex flex-col">
       <CharacterHeader character={character} variant="mobile" />
 
-      {character.level < 2 && (
-        <LevelUpButton onClick={onLevelUp} variant="mobile" />
-      )}
 
       {/* Hero Card — natural height, centered */}
       <div className="flex items-center justify-center px-4 py-3">
@@ -127,8 +123,7 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap, onL
                       border: '1px solid var(--surface-border)',
                       borderRadius: 8,
                       color: 'var(--text-primary)',
-                      fontFamily: typeBody.fontFamily,
-                      fontSize: typeBody.fontSize,
+                      ...typeBody,
                       outline: 'none',
                       caretColor: 'var(--gold)',
                     }}
@@ -158,8 +153,7 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap, onL
                       border: '1px solid var(--surface-border)',
                       borderRadius: 8,
                       color: 'var(--text-primary)',
-                      fontFamily: typeBody.fontFamily,
-                      fontSize: typeBody.fontSize,
+                      ...typeBody,
                       outline: 'none',
                       caretColor: 'var(--gold)',
                     }}

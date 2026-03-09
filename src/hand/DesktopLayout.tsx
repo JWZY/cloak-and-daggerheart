@@ -8,7 +8,6 @@ import { EquipmentPanel } from './panels/EquipmentPanel'
 import { NotesPanel } from './panels/NotesPanel'
 import { InlineSection } from './InlineSection'
 import { CharacterHeader } from './CharacterHeader'
-import { LevelUpButton } from './LevelUpButton'
 import { DomainCardBody } from './DomainCardBody'
 import { ScaledCard } from '../cards/ScaledCard'
 import { DomainCard } from '../cards/DomainCard'
@@ -28,7 +27,7 @@ interface DesktopLayoutProps {
   onLevelUp: () => void
 }
 
-export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap, onLevelUp }: DesktopLayoutProps) {
+export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: DesktopLayoutProps) {
   const classData = getClassForSubclass(character.subclass)
   const updateBackground = useCharacterStore((s) => s.updateBackground)
   const updateConnections = useCharacterStore((s) => s.updateConnections)
@@ -43,9 +42,6 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap, on
         <div className="sticky top-0 self-start flex flex-col items-center justify-center pt-8" style={{ minHeight: '100dvh' }}>
           <CharacterHeader character={character} variant="desktop" />
 
-          {character.level < 2 && (
-            <LevelUpButton onClick={onLevelUp} variant="desktop" />
-          )}
 
           {/* Hero card at 0.85 scale */}
           <ScaledCard scale={cardScale.hero} style={{ flexShrink: 0 }}>
@@ -169,8 +165,7 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap, on
                           border: '1px solid var(--surface-border)',
                           borderRadius: 8,
                           color: 'var(--text-primary)',
-                          fontFamily: typeBody.fontFamily,
-                          fontSize: typeBody.fontSize,
+                          ...typeBody,
                           outline: 'none',
                           caretColor: 'var(--gold)',
                         }}
@@ -200,8 +195,7 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap, on
                           border: '1px solid var(--surface-border)',
                           borderRadius: 8,
                           color: 'var(--text-primary)',
-                          fontFamily: typeBody.fontFamily,
-                          fontSize: typeBody.fontSize,
+                          ...typeBody,
                           outline: 'none',
                           caretColor: 'var(--gold)',
                         }}
