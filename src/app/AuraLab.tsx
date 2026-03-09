@@ -8,11 +8,13 @@ function AuraCard({
   width,
   height,
   radius,
+  children,
 }: {
   className: string
   width: number
   height: number
   radius: number
+  children?: React.ReactNode
 }) {
   return (
     <div
@@ -38,6 +40,7 @@ function AuraCard({
           zIndex: 1,
         }}
       />
+      {children}
     </div>
   )
 }
@@ -188,7 +191,53 @@ export default function AuraLab() {
         className="aura-v4"
       />
 
-      {/* Hidden SVG filter definitions for v4 */}
+      {/* V5 — Combined V3 mesh + V4 turbulence */}
+      <div style={{ marginBottom: 48 }}>
+        <h2
+          style={{
+            fontFamily: "'EB Garamond', serif",
+            fontSize: 20,
+            fontWeight: 500,
+            fontVariant: 'small-caps',
+            letterSpacing: '0.04em',
+            color: 'var(--gold-light)',
+            marginBottom: 4,
+          }}
+        >
+          v5 — Saturated mesh blobs + turbulence distortion
+        </h2>
+        <p
+          style={{
+            fontFamily: "'Source Sans 3', sans-serif",
+            fontSize: 13,
+            color: 'var(--text-muted)',
+            marginBottom: 16,
+            lineHeight: 1.4,
+          }}
+        >
+          Combines V3 saturated gold drifting blobs (0.9 opacity) with V4 SVG turbulence distortion layered on top. Two independent animation systems creating a rich organic flame.
+        </p>
+        <div style={{ display: 'flex', gap: 40, alignItems: 'flex-end' }}>
+          <div style={{ textAlign: 'center' }}>
+            <AuraCard className="aura-v5" width={80} height={120} radius={10}>
+              <div className="aura-v5-inner" />
+            </AuraCard>
+            <span style={{ display: 'block', marginTop: 12, fontFamily: "'Source Sans 3', sans-serif", fontSize: 11, color: 'var(--text-muted)' }}>
+              80 × 120
+            </span>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <AuraCard className="aura-v5" width={160} height={240} radius={14}>
+              <div className="aura-v5-inner" />
+            </AuraCard>
+            <span style={{ display: 'block', marginTop: 12, fontFamily: "'Source Sans 3', sans-serif", fontSize: 11, color: 'var(--text-muted)' }}>
+              160 × 240
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Hidden SVG filter definitions for v4 + v5 */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           <filter id="aura-turbulence" x="-50%" y="-50%" width="200%" height="200%">
