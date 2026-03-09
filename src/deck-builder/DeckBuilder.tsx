@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { springs } from '../design-system/tokens/animations'
-import { StepIndicator } from './components/StepIndicator'
+import { StepCarousel } from './components/StepCarousel'
 import { PickClass } from './steps/PickClass'
 import { PickSubclass } from './steps/PickSubclass'
 import { PickDomainCards } from './steps/PickDomainCards'
@@ -12,6 +11,8 @@ import { AssignTraits } from './steps/AssignTraits'
 import { CreateExperiences } from './steps/CreateExperiences'
 import { NameCharacter } from './steps/NameCharacter'
 import { FatesButton } from '../ui/FatesButton'
+import { EmberOverlay } from '../ui/EmberOverlay'
+import { getClassAccentColor } from '../cards/domain-colors'
 import { useDeckStore } from '../store/deck-store'
 import { calculateMaxHP } from '../core/character/hp'
 import { getArmorScore } from '../core/character/armor'
@@ -27,30 +28,9 @@ import {
 import type { Character, Traits, TraitName } from '../types/character'
 import { TRAIT_NAMES } from '../core/rules/traits'
 
-const TOTAL_STEPS = 9
 const BASE_PATH = import.meta.env.BASE_URL ?? '/'
 
-const slideVariants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? '100%' : '-100%',
-    opacity: 0,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-  },
-  exit: (direction: number) => ({
-    x: direction < 0 ? '100%' : '-100%',
-    opacity: 0,
-  }),
-}
-
-const slideTransition = {
-  type: 'spring' as const,
-  ...springs.smooth,
-}
-
-/** Full-bleed steps crossfade instead of sliding — less jarring */
+/** All steps crossfade — stable layout, no sliding */
 const fadeVariants = {
   enter: () => ({ opacity: 0 }),
   center: { opacity: 1 },
@@ -61,9 +41,10 @@ const fadeTransition = { duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }
 
 interface DeckBuilderProps {
   onComplete: (character: Character) => void
+  onExit?: () => void
 }
 
-export function DeckBuilder({ onComplete }: DeckBuilderProps) {
+export function DeckBuilder({ onComplete, onExit }: DeckBuilderProps) {
   const store = useDeckStore()
   const [direction, setDirection] = useState(0)
 
@@ -98,6 +79,57 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
     store.prevStep()
   }, [store])
 
+  // Track the highest step reached so carousel knows what's clickable
+  const [maxReached, setMaxReached] = useState(store.currentStep)
+  useEffect(() => {
+    setMaxReached((prev) => Math.max(prev, store.currentStep))
+  }, [store.currentStep])
+
+  // The next step is reachable if canProceed is true
+  const maxReachableStep = canProceed ? Math.max(maxReached, store.currentStep + 1) : maxReached
+
+  const handleGoToStep = useCallback((step: number) => {
+    setDirection(step > store.currentStep ? 1 : -1)
+    store.goToStep(step)
+  }, [store])
+
+  const handleExit = useCallback(() => {
+    store.reset()
+    onExit?.()
+  }, [store, onExit])
+
+  const handleSkip = useCallback(() => {
+    const dummy: Character = {
+      id: crypto.randomUUID(),
+      name: 'Theron Ashvale',
+      level: 1,
+      ancestry: { name: 'Elf', description: 'Graceful and long-lived.', feats: [] },
+      community: { name: 'Highborne', description: 'Noble and refined.', feats: [] },
+      class: 'Warrior',
+      subclass: 'Call of the Brave',
+      traits: { agility: 1, strength: 2, finesse: 0, instinct: -1, presence: 1, knowledge: 0 },
+      hp: { current: 18, max: 18 },
+      armorSlots: { current: 3, max: 3 },
+      hope: 2,
+      stress: { current: 0, max: 6 },
+      evasion: 8,
+      proficiency: 1,
+      domainCards: [],
+      equipment: { primaryWeapon: null, secondaryWeapon: null, armor: null, items: [], consumables: [] },
+      gold: 10,
+      notes: '',
+      advancements: [],
+      markedTraits: [],
+      subclassTier: 'foundation',
+      backgroundAnswers: [],
+      experiences: [{ text: 'Survived the Siege of Ashvale', bonus: 0 }],
+      connectionAnswers: [],
+      createdAt: Date.now(),
+    }
+    store.reset()
+    onComplete(dummy)
+  }, [store, onComplete])
+
   // Steps that use FullBleedPicker and provide their own nav chrome.
   // Add step indices here as they are converted: 0, 1, 2, 3, 4
   const FULL_BLEED_STEPS = new Set<number>([0, 1, 2, 3, 4])
@@ -116,7 +148,23 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
   ]
 
   const isReview = store.currentStep === 8
-  const buttonLabel = isReview ? 'Begin Adventure' : 'Continue'
+
+  // Progress badge for traits step (step 6) — show "3 / 6" when incomplete
+  const getButtonLabel = () => {
+    if (isReview) return 'Begin Adventure'
+    if (store.currentStep === 6 && !canProceed) {
+      const assigned = store.traits
+        ? Object.values(store.traits).filter((v) => v !== null && v !== undefined).length
+        : 0
+      return `${assigned} / 6`
+    }
+    if (store.currentStep === 7 && !canProceed) {
+      const filled = (store.experiences || []).filter((e) => e?.text?.trim()).length
+      return `${filled} / 2`
+    }
+    return 'Next'
+  }
+  const buttonLabel = getButtonLabel()
 
   return (
     <div
@@ -127,6 +175,11 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
         background: 'var(--bg-page)',
       }}
     >
+      {/* Persistent ember particles — outside AnimatePresence so they survive step transitions */}
+      {!isFullBleed && store.selectedClass && (
+        <EmberOverlay color={getClassAccentColor(store.selectedClass)} rate={6} />
+      )}
+
       {/* Atmosphere texture overlay */}
       <div
         style={{
@@ -142,71 +195,123 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
         }}
       />
 
-      {/* Main content column */}
+      {/* Main content column — stable layout, no shifts between modes */}
       <div className="flex flex-col flex-1 min-w-0 relative z-10">
-        {/* Header — hidden for full-bleed picker steps */}
-        {!isFullBleed && (
-          <div className="shrink-0">
-            <StepIndicator
-              currentStep={store.currentStep}
-              totalSteps={TOTAL_STEPS}
-            />
-          </div>
-        )}
+        {/* Persistent step carousel — always absolute so it never shifts layout */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+          zIndex: 20,
+          filter: isFullBleed ? 'drop-shadow(0px 4px 4px rgba(0,0,0,0.75))' : undefined,
+        }}>
+          <StepCarousel
+            currentStep={store.currentStep}
+            onGoToStep={handleGoToStep}
+            maxReachableStep={maxReachableStep}
+          />
+        </div>
 
-        {/* Step content */}
-        <div className={`flex-1 ${isFullBleed ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
+        {/* Step content — always fills available space */}
+        <div className="flex-1 overflow-hidden relative">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={store.currentStep}
               custom={direction}
-              variants={isFullBleed ? fadeVariants : slideVariants}
+              variants={fadeVariants}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={isFullBleed ? fadeTransition : slideTransition}
-              className={`w-full ${isFullBleed ? 'h-full' : 'py-4'}`}
+              transition={fadeTransition}
+              className="w-full h-full absolute inset-0"
             >
-              {stepComponents[store.currentStep]}
+              {isFullBleed ? (
+                stepComponents[store.currentStep]
+              ) : (
+                <div className={`h-full overflow-x-hidden ${store.currentStep === 8 ? 'overflow-hidden' : 'overflow-y-auto'}`}
+                  style={{ paddingTop: 64, paddingBottom: 80, overscrollBehavior: 'none' }}
+                >
+                  <div className="py-4">
+                    {stepComponents[store.currentStep]}
+                  </div>
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Bottom nav — hidden for full-bleed picker steps */}
-        {!isFullBleed && (
-          <div
-            className="shrink-0 flex items-center justify-between px-6 py-4"
-            style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
-          >
-            {store.currentStep > 0 ? (
-              <FatesButton variant="dark" onClick={handleBack}>
-                Back
-              </FatesButton>
-            ) : (
-              <div />
-            )}
+        {/* Bottom nav — always rendered, fades based on mode */}
+        <motion.div
+          className="shrink-0 flex items-center justify-between px-6 py-4"
+          style={{
+            paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 20,
+            pointerEvents: isFullBleed ? 'none' : 'auto',
+          }}
+          animate={{ opacity: isFullBleed ? 0 : 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          {store.currentStep > 0 ? (
+            <FatesButton variant="dark" onClick={handleBack}>
+              Back
+            </FatesButton>
+          ) : onExit ? (
+            <FatesButton variant="dark" onClick={handleExit}>
+              Exit
+            </FatesButton>
+          ) : (
+            <div />
+          )}
 
-            <motion.div
-              animate={
-                showPulse
-                  ? {
-                      scale: [1, 1.06, 1],
-                      transition: { duration: 0.4, ease: 'easeOut' },
-                    }
-                  : { scale: 1 }
-              }
+          <motion.div
+            animate={
+              showPulse
+                ? {
+                    scale: [1, 1.06, 1],
+                    transition: { duration: 0.4, ease: 'easeOut' },
+                  }
+                : { scale: 1 }
+            }
+          >
+            <FatesButton
+              variant="light"
+              disabled={!canProceed}
+              onClick={handleNext}
             >
-              <FatesButton
-                variant="light"
-                disabled={!canProceed}
-                onClick={handleNext}
-              >
-                {buttonLabel}
-              </FatesButton>
-            </motion.div>
-          </div>
-        )}
+              {buttonLabel}
+            </FatesButton>
+          </motion.div>
+        </motion.div>
       </div>
+
+      {/* Dev skip button */}
+      {import.meta.env.DEV && (
+        <button
+          onClick={handleSkip}
+          style={{
+            position: 'fixed',
+            bottom: 12,
+            left: 12,
+            zIndex: 9999,
+            padding: '4px 10px',
+            borderRadius: 999,
+            border: '1px solid rgba(255,255,255,0.2)',
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            color: '#fff',
+            fontSize: 11,
+            fontFamily: 'system-ui, sans-serif',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          Skip →
+        </button>
+      )}
     </div>
   )
 }
