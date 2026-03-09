@@ -100,29 +100,11 @@ test.describe('Character Creation Flow (v2)', () => {
     ).toBeEnabled({ timeout: 2000 })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 8: Create Background (optional — just continue)
-    await expect(
-      page.locator('text=Create Your Background')
-    ).toBeVisible({ timeout: 3000 })
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 9: Create Connections (optional — just continue)
-    await expect(
-      page.locator('text=Create Connections')
-    ).toBeVisible({ timeout: 3000 })
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 10: Name Character
+    // Step 8: Name Character (final step)
     await expect(
       page.locator('h2:has-text("Name Your Character")')
     ).toBeVisible({ timeout: 3000 })
     await page.fill('input[placeholder*="name"]', 'Test Wizard')
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 11: Review
-    await expect(page.locator('text=Test Wizard').first()).toBeVisible({
-      timeout: 3000,
-    })
     await page.locator('button:has-text("Begin Adventure")').click()
 
     // Verify HandView loaded with character
@@ -215,29 +197,11 @@ test.describe('Character Creation Flow (v2)', () => {
     ).toBeEnabled({ timeout: 2000 })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 8: Create Background (optional — just continue)
-    await expect(
-      page.locator('text=Create Your Background')
-    ).toBeVisible({ timeout: 3000 })
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 9: Create Connections (optional — just continue)
-    await expect(
-      page.locator('text=Create Connections')
-    ).toBeVisible({ timeout: 3000 })
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 10: Name Character
+    // Step 8: Name Character (final step) — School of War gives +1 HP (5 base + 1 = 6)
     await expect(
       page.locator('h2:has-text("Name Your Character")')
     ).toBeVisible({ timeout: 3000 })
     await page.fill('input[placeholder*="name"]', 'War Wizard')
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 11: Review — School of War gives +1 HP (5 base + 1 = 6)
-    await expect(page.locator('text=War Wizard').first()).toBeVisible({
-      timeout: 3000,
-    })
     await page.locator('button:has-text("Begin Adventure")').click()
 
     // Verify HandView loaded

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
+import { goldAccent } from '../ui/typography'
 import { DomainCard } from '../cards/DomainCard'
 import { AncestryCard } from '../cards/AncestryCard'
 import { CommunityCard } from '../cards/CommunityCard'
@@ -128,7 +129,7 @@ function DotIndicators({
               height: 5,
               background:
                 i === selectedIndex
-                  ? '#d4af37'
+                  ? goldAccent
                   : 'var(--text-muted)',
               borderRadius: i === selectedIndex ? 3 : '50%',
             }}

@@ -9,11 +9,8 @@ import { PickAncestry } from './steps/PickAncestry'
 import { PickCommunity } from './steps/PickCommunity'
 import { PickEquipment } from './steps/PickEquipment'
 import { AssignTraits } from './steps/AssignTraits'
-import { CreateBackground } from './steps/CreateBackground'
 import { CreateExperiences } from './steps/CreateExperiences'
 import { NameCharacter } from './steps/NameCharacter'
-import { CreateConnections } from './steps/CreateConnections'
-import { ReviewDeck } from './steps/ReviewDeck'
 import { FatesButton } from '../ui/FatesButton'
 import { useDeckStore } from '../store/deck-store'
 import { calculateMaxHP } from '../core/character/hp'
@@ -30,7 +27,7 @@ import {
 import type { Character, Traits, TraitName } from '../types/character'
 import { TRAIT_NAMES } from '../core/rules/traits'
 
-const TOTAL_STEPS = 12
+const TOTAL_STEPS = 9
 const BASE_PATH = import.meta.env.BASE_URL ?? '/'
 
 const slideVariants = {
@@ -85,7 +82,7 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
   }, [canProceed])
 
   const handleNext = useCallback(() => {
-    if (store.currentStep === 11) {
+    if (store.currentStep === 8) {
       // Finalize character
       const character = assembleCharacter(store)
       store.reset()
@@ -115,13 +112,10 @@ export function DeckBuilder({ onComplete }: DeckBuilderProps) {
     <PickEquipment key="step-5" />,
     <AssignTraits key="step-6" />,
     <CreateExperiences key="step-7" />,
-    <CreateBackground key="step-8" />,
-    <CreateConnections key="step-9" />,
-    <NameCharacter key="step-10" />,
-    <ReviewDeck key="step-11" />,
+    <NameCharacter key="step-8" />,
   ]
 
-  const isReview = store.currentStep === 11
+  const isReview = store.currentStep === 8
   const buttonLabel = isReview ? 'Begin Adventure' : 'Continue'
 
   return (

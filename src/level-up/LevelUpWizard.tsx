@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradient } from '../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradient, goldGradientStyle, goldGradientH } from '../ui/typography'
 import { SelectableOption } from '../ui/SelectableOption'
 import { X, ChevronRight, ChevronLeft, Check, Sparkles } from 'lucide-react'
 import { useLevelUpStore } from '../store/level-up-store'
@@ -110,10 +110,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
   // Shared styles
   const goldText = {
     ...typeTitle,
-    background: goldGradient,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
+    ...goldGradientStyle,
   }
 
   return (
@@ -150,7 +147,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
               width: i === store.currentStep ? 24 : 8,
               height: 8,
               background: i <= store.currentStep
-                ? 'linear-gradient(90deg, #f9f8f3, #e7ba90)'
+                ? goldGradientH
                 : 'var(--gold-muted)',
             }}
           />
@@ -236,7 +233,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
               ...typeSubtitle,
               color: '#1a1207',
               background: canProceedFromStep()
-                ? 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)'
+                ? goldGradient
                 : 'var(--gold-muted)',
               opacity: canProceedFromStep() ? 1 : 0.5,
             }}
@@ -251,7 +248,7 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
             style={{
               ...typeSubtitle,
               color: '#1a1207',
-              background: 'linear-gradient(180deg, #f9f8f3 0%, #e7ba90 100%)',
+              background: goldGradient,
             }}
           >
             <Check size={16} />
@@ -529,7 +526,7 @@ function StepAdvancements({
               className="w-5 h-5 rounded-full border transition-all"
               style={{
                 background: i < slotsUsed
-                  ? 'linear-gradient(180deg, #f9f8f3, #e7ba90)'
+                  ? goldGradient
                   : 'transparent',
                 borderColor: i < slotsUsed ? 'var(--gold)' : 'var(--gold-muted)',
               }}
@@ -579,7 +576,7 @@ function StepAdvancements({
                           width: 12,
                           height: 12,
                           background: isFilled
-                            ? 'linear-gradient(180deg, #f9f8f3, #e7ba90)'
+                            ? goldGradient
                             : 'transparent',
                           border: isFilled
                             ? '1px solid var(--gold)'
@@ -844,10 +841,7 @@ function StepReview({
         <span style={{
           ...typeTitle,
           fontSize: 20,
-          background: goldGradient,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
+          ...goldGradientStyle,
         }}>
           Level {character.level + 1}
         </span>

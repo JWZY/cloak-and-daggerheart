@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
-import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { getSubclassCardCount } from '../../core/rules/class-rules'
@@ -20,17 +20,14 @@ function Separator({ text }: { text: string }) {
       width: '100%',
       justifyContent: 'center',
     }}>
-      <div style={{ flex: 1, maxWidth: 60, height: 2, background: 'linear-gradient(90deg, transparent, rgba(231,186,144,0.4))' }} />
+      <div style={{ flex: 1, maxWidth: 60, height: 2, background: goldSeparatorLeft }} />
       <span style={{
         ...typeSubtitle,
-        background: goldGradient,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
+        ...goldGradientStyle,
       }}>
         {text}
       </span>
-      <div style={{ flex: 1, maxWidth: 60, height: 2, background: 'linear-gradient(270deg, transparent, rgba(231,186,144,0.4))' }} />
+      <div style={{ flex: 1, maxWidth: 60, height: 2, background: goldSeparatorRight }} />
     </div>
   )
 }
@@ -77,10 +74,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
     ...typeTitle,
     fontSize: 36,
     fontWeight: 400,
-    background: goldGradient,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
+    ...goldGradientStyle,
     margin: 0,
     lineHeight: 1,
   }

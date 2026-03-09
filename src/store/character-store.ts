@@ -16,6 +16,8 @@ interface CharacterStore {
   updateHope: (id: string, delta: number) => void
   updateStress: (id: string, delta: number) => void
   updateNotes: (id: string, notes: string) => void
+  updateBackground: (id: string, index: number, answer: string) => void
+  updateConnections: (id: string, index: number, answer: string) => void
   levelUp: (id: string, choices: LevelUpChoices) => void
 }
 
@@ -102,6 +104,26 @@ export const useCharacterStore = create<CharacterStore>()(
           characters: state.characters.map((c) =>
             c.id === id ? { ...c, notes } : c
           ),
+        })),
+
+      updateBackground: (id: string, index: number, answer: string) =>
+        set((state) => ({
+          characters: state.characters.map((c) => {
+            if (c.id !== id) return c
+            const answers = [...(c.backgroundAnswers || [])]
+            answers[index] = answer
+            return { ...c, backgroundAnswers: answers }
+          }),
+        })),
+
+      updateConnections: (id: string, index: number, answer: string) =>
+        set((state) => ({
+          characters: state.characters.map((c) => {
+            if (c.id !== id) return c
+            const answers = [...(c.connectionAnswers || [])]
+            answers[index] = answer
+            return { ...c, connectionAnswers: answers }
+          }),
         })),
 
       levelUp: (id: string, choices: LevelUpChoices) =>

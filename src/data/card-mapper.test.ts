@@ -150,7 +150,7 @@ describe('domainCardToProps', () => {
     expect(mapped.props.type).toBe(codexCard.type)
     expect(mapped.props.level).toBe(codexCard.level)
     expect(mapped.props.recall).toBe(codexCard.recall)
-    expect(mapped.props.artworkSrc).toContain('.webp')
+    expect(mapped.props.artworkSrc).toMatch(/\.(webp|avif)$/)
     expect(mapped.bodyText).toBe(codexCard.text)
   })
 

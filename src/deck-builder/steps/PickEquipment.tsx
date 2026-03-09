@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springs } from '../../design-system/tokens/animations'
+import { goldDarkAlpha } from '../../ui/typography'
 import { SelectableOption } from '../../ui/SelectableOption'
 import { GameBadge } from '../../ui/GameBadge'
 import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
@@ -46,7 +47,7 @@ function DiamondPip() {
           transform: 'rotate(45deg)',
           borderRadius: 1,
           boxShadow:
-            '0 0 3px rgba(200,192,180,0.4), 0 0 8px rgba(231,186,144,0.4)',
+            `0 0 3px rgba(200,192,180,0.4), 0 0 8px ${goldDarkAlpha(0.4)}`,
         }}
       />
     </div>

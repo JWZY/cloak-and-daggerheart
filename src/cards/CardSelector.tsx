@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { springs } from '../design-system/tokens/animations'
+import { goldAccent } from '../ui/typography'
 
 export interface CardSelectorProps {
   selected: boolean
@@ -13,7 +14,7 @@ export interface CardSelectorProps {
 export function CardSelector({
   selected,
   onSelect,
-  color = '#d4af37',
+  color = goldAccent,
   dimmed = false,
   children,
 }: CardSelectorProps) {

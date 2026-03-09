@@ -105,34 +105,13 @@ test.describe('Deck Builder Flow (v2)', () => {
     })
     await page.locator('button:has-text("Continue")').click()
 
-    // Step 8: Create Background (optional — just continue)
-    await expect(
-      page.locator('text=Create Your Background')
-    ).toBeVisible({ timeout: 3000 })
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 9: Create Connections (optional — just continue)
-    await expect(
-      page.locator('text=Create Connections')
-    ).toBeVisible({ timeout: 3000 })
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 10: Name Character
+    // Step 8: Name Character (final step)
     await expect(
       page.locator('h2:has-text("Name Your Character")')
     ).toBeVisible({ timeout: 3000 })
-    await expect(page.locator('button:has-text("Continue")')).toBeDisabled()
+    await expect(page.locator('button:has-text("Begin Adventure")')).toBeDisabled()
     await page.fill('input[placeholder*="name"]', 'Merlin the Wise')
-    await expect(page.locator('button:has-text("Continue")')).toBeEnabled()
-    await page.locator('button:has-text("Continue")').click()
-
-    // Step 11: Review — character name visible, "Begin Adventure" button
-    await expect(page.locator('text=Merlin the Wise').first()).toBeVisible({
-      timeout: 3000,
-    })
-    await expect(
-      page.locator('button:has-text("Begin Adventure")')
-    ).toBeVisible()
+    await expect(page.locator('button:has-text("Begin Adventure")')).toBeEnabled()
     await page.locator('button:has-text("Begin Adventure")').click()
 
     // HandView appears with character name and stat bar

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { tapFeedback } from '../design-system/tokens/animations'
+import { goldAccent } from '../ui/typography'
 
 export interface CardBackProps {
   variant: 'subclass' | 'domain'
@@ -24,7 +25,7 @@ export function CardBack({ variant, onClick }: CardBackProps) {
         height,
         borderRadius,
         background: '#1e201f',
-        border: '2px solid #d4af37',
+        border: `2px solid ${goldAccent}`,
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
         overflow: 'hidden',
@@ -55,22 +56,22 @@ export function CardBack({ variant, onClick }: CardBackProps) {
         {/* Outer diamond */}
         <path
           d="M40 4 L76 40 L40 76 L4 40 Z"
-          stroke="#d4af37"
+          stroke={goldAccent}
           strokeWidth="1.5"
           fill="none"
         />
         {/* Inner diamond */}
         <path
           d="M40 16 L64 40 L40 64 L16 40 Z"
-          stroke="#d4af37"
+          stroke={goldAccent}
           strokeWidth="1"
           fill="none"
         />
         {/* Cross lines */}
-        <line x1="40" y1="4" x2="40" y2="76" stroke="#d4af37" strokeWidth="0.75" />
-        <line x1="4" y1="40" x2="76" y2="40" stroke="#d4af37" strokeWidth="0.75" />
+        <line x1="40" y1="4" x2="40" y2="76" stroke={goldAccent} strokeWidth="0.75" />
+        <line x1="4" y1="40" x2="76" y2="40" stroke={goldAccent} strokeWidth="0.75" />
         {/* Center dot */}
-        <circle cx="40" cy="40" r="2" fill="#d4af37" />
+        <circle cx="40" cy="40" r="2" fill={goldAccent} />
       </svg>
     </motion.div>
   )

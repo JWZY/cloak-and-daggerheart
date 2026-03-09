@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
-import { typeMicro, typeBody } from '../ui/typography'
+import { typeMicro, typeBody, goldAccent } from '../ui/typography'
 import { springs } from '../design-system/tokens/animations'
 import { GameBadge } from '../ui/GameBadge'
 import { GlassPanel } from '../ui/GlassPanel'
@@ -149,7 +149,7 @@ function StatRow({
   )
 }
 
-export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
+export function StatBar({ character, accentColor = goldAccent }: StatBarProps) {
   const updateHP = useCharacterStore((s) => s.updateHP)
   const updateArmor = useCharacterStore((s) => s.updateArmor)
   const updateHope = useCharacterStore((s) => s.updateHope)
@@ -164,15 +164,7 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
         border: '1px solid var(--surface-light)',
       }}
     >
-      <StatRow
-        label="HP"
-        icon={Heart}
-        current={character.hp.current}
-        max={character.hp.max}
-        color="#A61118"
-        onDecrease={() => updateHP(character.id, -1)}
-        onIncrease={() => updateHP(character.id, 1)}
-      />
+      {/* Armor with Evasion & Thresholds inline */}
       <StatRow
         label="Armor"
         icon={Shield}
@@ -182,27 +174,7 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
         onDecrease={() => updateArmor(character.id, -1)}
         onIncrease={() => updateArmor(character.id, 1)}
       />
-      <StatRow
-        label="Hope"
-        icon={Star}
-        current={character.hope}
-        color="#BEA228"
-        onDecrease={() => updateHope(character.id, -1)}
-        onIncrease={() => updateHope(character.id, 1)}
-        showMax={false}
-      />
-      <StatRow
-        label="Stress"
-        icon={Circle}
-        current={character.stress.current}
-        max={character.stress.max}
-        color="#1E1E1E"
-        onDecrease={() => updateStress(character.id, -1)}
-        onIncrease={() => updateStress(character.id, 1)}
-      />
-
-      {/* Evasion & Thresholds */}
-      <div className="flex items-center justify-center gap-2 pt-1">
+      <div className="flex items-center gap-2 pl-[54px]">
         <GameBadge color={accentColor}>Evasion {character.evasion}</GameBadge>
         {character.equipment?.armor && (() => {
           const thresholds = parseThresholds(character.equipment.armor.base_thresholds)
@@ -214,6 +186,34 @@ export function StatBar({ character, accentColor = '#d4af37' }: StatBarProps) {
           )
         })()}
       </div>
+
+      <StatRow
+        label="HP"
+        icon={Heart}
+        current={character.hp.current}
+        max={character.hp.max}
+        color="#A61118"
+        onDecrease={() => updateHP(character.id, -1)}
+        onIncrease={() => updateHP(character.id, 1)}
+      />
+      <StatRow
+        label="Stress"
+        icon={Circle}
+        current={character.stress.current}
+        max={character.stress.max}
+        color="#1E1E1E"
+        onDecrease={() => updateStress(character.id, -1)}
+        onIncrease={() => updateStress(character.id, 1)}
+      />
+      <StatRow
+        label="Hope"
+        icon={Star}
+        current={character.hope}
+        color="#BEA228"
+        onDecrease={() => updateHope(character.id, -1)}
+        onIncrease={() => updateHope(character.id, 1)}
+        showMax={false}
+      />
     </GlassPanel>
   )
 }

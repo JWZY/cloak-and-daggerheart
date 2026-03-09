@@ -7,7 +7,7 @@
  * Usage:
  *   import { typeTitle, typeSubtitle, typeBody, typeMicro } from '../ui/typography'
  *   <h1 style={{ ...typeTitle, fontSize: 36 }}>Title</h1>
- *   <span style={{ ...typeSubtitle, color: '#e7ba90' }}>Label</span>
+ *   <span style={{ ...typeSubtitle, color: goldDark }}>Label</span>
  */
 
 // ─── Typography Tiers ────────────────────────────────────────────────────────
@@ -63,4 +63,37 @@ export const typeMicro = {
 
 export const goldLight = '#f9f8f3'
 export const goldDark = '#e7ba90'
+export const goldAccent = '#d4af37'
 export const goldGradient = `linear-gradient(180deg, ${goldLight}, ${goldDark})`
+/** Horizontal gold gradient (left to right) — used for step indicators, progress bars */
+export const goldGradientH = `linear-gradient(90deg, ${goldLight}, ${goldDark})`
+
+// ─── Gold with Opacity Helpers ──────────────────────────────────────────────
+// goldDark (#e7ba90) = rgb(231, 186, 144)
+
+/** Gold-dark at given opacity — returns rgba string */
+export function goldDarkAlpha(alpha: number): string {
+  return `rgba(231,186,144,${alpha})`
+}
+
+/** Gold-light at given opacity — returns rgba string */
+export function goldLightAlpha(alpha: number): string {
+  return `rgba(249,248,243,${alpha})`
+}
+
+/** Subtle gold background gradient at low opacity — used for buttons, overlays */
+export const goldGradientSubtle = `linear-gradient(180deg, ${goldLightAlpha(0.12)} 0%, ${goldDarkAlpha(0.12)} 100%)`
+
+/** Separator line: left-to-right fade from transparent to gold */
+export const goldSeparatorLeft = `linear-gradient(90deg, transparent, ${goldDarkAlpha(0.4)})`
+/** Separator line: right-to-left fade from transparent to gold */
+export const goldSeparatorRight = `linear-gradient(270deg, transparent, ${goldDarkAlpha(0.4)})`
+
+/** Gold gradient text style — background-clip text pattern for shiny gold text */
+export const goldGradientStyle = {
+  background: `linear-gradient(180deg, ${goldLight} 0%, ${goldDark} 100%)`,
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  textShadow: 'none',
+} as const

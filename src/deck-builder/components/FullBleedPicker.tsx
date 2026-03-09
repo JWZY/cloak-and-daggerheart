@@ -1,7 +1,7 @@
 import { useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FatesButton } from '../../ui/FatesButton'
-import { typeTitle, typeBody, goldGradient, goldDark } from '../../ui/typography'
+import { typeTitle, typeBody, goldGradientStyle, goldDark, goldDarkAlpha, goldLightAlpha } from '../../ui/typography'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -180,7 +180,7 @@ export function FullBleedPicker({
               style={{
                 ...titleStyle,
                 fontSize: 36,
-                color: 'rgba(231,186,144,0.3)',
+                color: goldDarkAlpha(0.3),
                 background: 'none',
                 border: 'none',
                 padding: '8px 4px',
@@ -194,7 +194,7 @@ export function FullBleedPicker({
               style={{
                 ...titleStyle,
                 fontSize: 36,
-                color: 'rgba(231,186,144,0.3)',
+                color: goldDarkAlpha(0.3),
                 padding: '0 8px',
               }}
             >
@@ -206,10 +206,7 @@ export function FullBleedPicker({
           style={{
             ...titleStyle,
             fontSize: 36,
-            background: goldGradient,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            ...goldGradientStyle,
           }}
         >
           {title}
@@ -220,7 +217,7 @@ export function FullBleedPicker({
               style={{
                 ...titleStyle,
                 fontSize: 36,
-                color: 'rgba(231,186,144,0.3)',
+                color: goldDarkAlpha(0.3),
                 padding: '0 8px',
               }}
             >
@@ -232,7 +229,7 @@ export function FullBleedPicker({
               style={{
                 ...titleStyle,
                 fontSize: 36,
-                color: 'rgba(231,186,144,0.3)',
+                color: goldDarkAlpha(0.3),
                 opacity: canConfirm ? 1 : 0.5,
                 background: 'none',
                 border: 'none',
@@ -311,10 +308,10 @@ export function FullBleedPicker({
                   flexShrink: 0,
                   scrollSnapAlign: 'center',
                   border: isFocused
-                    ? '3px solid rgba(249,248,243,0.9)'
-                    : '2px solid rgba(249,248,243,0.3)',
+                    ? `3px solid ${goldLightAlpha(0.9)}`
+                    : `2px solid ${goldLightAlpha(0.3)}`,
                   boxShadow: isFocused
-                    ? '0 0 12px rgba(231,186,144,0.4)'
+                    ? `0 0 12px ${goldDarkAlpha(0.4)}`
                     : 'none',
                   padding: 0,
                   background: 'none',
@@ -344,8 +341,8 @@ export function FullBleedPicker({
                       height: 10,
                       borderRadius: '50%',
                       background: goldDark,
-                      border: '1.5px solid rgba(249,248,243,0.9)',
-                      boxShadow: '0 0 6px rgba(231,186,144,0.6)',
+                      border: `1.5px solid ${goldLightAlpha(0.9)}`,
+                      boxShadow: `0 0 6px ${goldDarkAlpha(0.6)}`,
                     }}
                   />
                 )}

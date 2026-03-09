@@ -6,25 +6,18 @@
  * This file re-exports what card components need.
  */
 
-import { typeSubtitle, goldLight, goldDark } from '../ui/typography'
+import { typeSubtitle } from '../ui/typography'
 
 // Re-export typography tokens for card consumers
-export { typeTitle, typeSubtitle, typeBody, typeMicro, goldLight, goldDark, goldGradient } from '../ui/typography'
+export { typeTitle, typeSubtitle, typeBody, typeMicro, goldLight, goldDark, goldAccent, goldGradient, goldGradientH, goldGradientSubtle, goldDarkAlpha, goldLightAlpha, goldSeparatorLeft, goldSeparatorRight, goldGradientStyle } from '../ui/typography'
+// Import for local use
+import { goldGradientStyle } from '../ui/typography'
 
 // Card dimensions
 export const CARD_WIDTH = 360
 export const CARD_HEIGHT = 508
 export const CARD_BORDER_RADIUS = 12
 export const CARD_BG = '#03070d'
-
-// Gold gradient style for title elements (background-clip text)
-export const goldGradientStyle = {
-  background: `linear-gradient(180deg, ${goldLight} 0%, ${goldDark} 100%)`,
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  textShadow: 'none', // text-shadow doesn't work with background-clip: text
-} as const
 
 // Shared subtitle style — used by class/domain name and footer
 export const subtitleStyle = {

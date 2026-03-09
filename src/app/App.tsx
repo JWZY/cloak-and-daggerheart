@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { typeTitle } from '../ui/typography'
+import { typeTitle, goldDarkAlpha } from '../ui/typography'
 import { springs } from '../design-system/tokens/animations'
 import { DeckBuilder } from '../deck-builder/DeckBuilder'
 import { HandView } from '../hand/HandView'
@@ -141,7 +141,7 @@ function Splash({ onFinish }: { onFinish: () => void }) {
           width: 120,
           height: 120,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(231, 186, 144, 0.3) 0%, transparent 70%)',
+          background: `radial-gradient(circle, ${goldDarkAlpha(0.3)} 0%, transparent 70%)`,
           filter: 'blur(20px)',
           pointerEvents: 'none',
         }}

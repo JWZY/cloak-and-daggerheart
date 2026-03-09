@@ -5,7 +5,7 @@ import { getSuggestedEquipment } from '../data/srd'
 
 interface DeckDraft {
   // Step completion tracking
-  currentStep: number // 0-11
+  currentStep: number // 0-8
 
   // Step 0: Class
   selectedClass: string | null
@@ -160,7 +160,7 @@ export const useDeckStore = create<DeckDraft>()(
 
       nextStep: () =>
         set((state) => ({
-          currentStep: Math.min(state.currentStep + 1, 11),
+          currentStep: Math.min(state.currentStep + 1, 8),
         })),
 
       prevStep: () =>
@@ -169,7 +169,7 @@ export const useDeckStore = create<DeckDraft>()(
         })),
 
       goToStep: (step: number) =>
-        set({ currentStep: Math.max(0, Math.min(step, 11)) }),
+        set({ currentStep: Math.max(0, Math.min(step, 8)) }),
 
       reset: () => set(initialState),
 
@@ -196,14 +196,8 @@ export const useDeckStore = create<DeckDraft>()(
             return state.traits !== null
           case 7: // Experiences — need 2 non-empty
             return (state.experiences || []).filter((e) => e?.text?.trim()).length >= 2
-          case 8: // Background — optional per SRD
-            return true
-          case 9: // Connections — skippable per SRD
-            return true
-          case 10: // Character Name
+          case 8: // Character Name
             return state.characterName.trim() !== ''
-          case 11: // Review
-            return true
           default:
             return false
         }
