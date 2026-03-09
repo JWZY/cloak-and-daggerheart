@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FormatText } from '../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradient, goldGradientStyle, goldGradientH } from '../ui/typography'
 import { SelectableOption } from '../ui/SelectableOption'
 import { X, ChevronRight, ChevronLeft, Check, Sparkles } from 'lucide-react'
@@ -806,9 +807,9 @@ function StepDomainCard({
                   {card.domain} &middot; L{card.level}
                 </span>
               </div>
-              <span style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>
-                {card.text.length > 120 ? card.text.slice(0, 120) + '\u2026' : card.text}
-              </span>
+              <div style={{ fontFamily: typeBody.fontFamily, fontSize: 12, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>
+                <FormatText text={card.text.length > 120 ? card.text.slice(0, 120) + '\u2026' : card.text} />
+              </div>
             </button>
           )
         })}

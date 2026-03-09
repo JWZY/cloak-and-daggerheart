@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
+import { CardPreviewButton } from '../components/CardPreviewButton'
+import { CardZoom } from '../../cards/CardZoom'
+import { AncestryCard } from '../../cards/AncestryCard'
+import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradientStyle, goldDark, goldDarkAlpha, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { ancestries } from '../../data/srd'
@@ -42,6 +46,7 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
   const setAncestry = useDeckStore((s) => s.setAncestry)
 
   const [focusedId, setFocusedId] = useState<string | null>(ancestryName ?? ancestries[0]?.name ?? null)
+  const [showCard, setShowCard] = useState(false)
 
   const pickerItems: PickerItem[] = ancestries.map((ancestry) => ({
     id: ancestry.name,
@@ -70,6 +75,7 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
   }
 
   return (
+    <>
     <FullBleedPicker
       currentStep={3}
       items={pickerItems}
@@ -82,9 +88,12 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
     >
       {focusedAncestry && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <h2 style={goldTitleStyle}>
-            {focusedAncestry.name}
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h2 style={goldTitleStyle}>
+              {focusedAncestry.name}
+            </h2>
+            <CardPreviewButton onClick={() => setShowCard(true)} />
+          </div>
           <Separator text="Ancestry" />
           <div style={{
             maxHeight: showFullInfo ? '40vh' : undefined,
@@ -92,24 +101,24 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
             maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
             WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            <p style={{
+            <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
               textShadow: '0px 1px 1px #4d381e',
               textAlign: 'center',
               margin: 0,
             }}>
-              {showFullInfo ? focusedAncestry.description : `${focusedAncestry.description.split('. ')[0]}.`}
-            </p>
+              <FormatText text={showFullInfo ? focusedAncestry.description : `${focusedAncestry.description.split('. ')[0]}.`} />
+            </div>
             {showFullInfo ? (
               focusedAncestry.feats.map((f) => (
                 <div key={f.name} style={{ marginTop: 8 }}>
                   <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                     {f.name}
                   </span>
-                  <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
-                    {f.text}
-                  </p>
+                  <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                    <FormatText text={f.text} />
+                  </div>
                 </div>
               ))
             ) : (
@@ -131,5 +140,12 @@ export function PickAncestry({ onBack, onNext }: StepProps) {
         </div>
       )}
     </FullBleedPicker>
+
+    {showCard && focusedAncestry && (
+      <CardZoom layoutId={`preview-${focusedAncestry.name}`} onClose={() => setShowCard(false)}>
+        <AncestryCard ancestry={focusedAncestry} />
+      </CardZoom>
+    )}
+    </>
   )
 }

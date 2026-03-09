@@ -1,4 +1,5 @@
 import { BarChart3, Sword, StickyNote, Star, Sparkles, BookOpen, Users, Award } from 'lucide-react'
+import { FormatText } from '../ui/FormatText'
 import { typeSubtitle, typeBody, typeMicro } from '../ui/typography'
 import { HeroCard } from './HeroCard'
 import { StatBar } from './StatBar'
@@ -114,9 +115,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap, on
                     <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                       {classData.hope_feat_name}
                     </span>
-                    <p style={{ ...typeBody, color: 'var(--text-secondary)', marginTop: 4 }}>
-                      {classData.hope_feat_text}
-                    </p>
+                    <div style={{ ...typeBody, color: 'var(--text-secondary)', marginTop: 4 }}>
+                      <FormatText text={classData.hope_feat_text} />
+                    </div>
                   </div>
                 </InlineSection>
               )}
@@ -124,9 +125,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap, on
               {/* Class Features */}
               {classData?.class_feats?.map((feat, i) => (
                 <InlineSection key={i} title={feat.name} icon={Sparkles}>
-                  <p style={{ ...typeBody, color: 'var(--text-secondary)' }}>
-                    {feat.text}
-                  </p>
+                  <div style={{ ...typeBody, color: 'var(--text-secondary)' }}>
+                    <FormatText text={feat.text} />
+                  </div>
                 </InlineSection>
               ))}
 

@@ -1,5 +1,10 @@
 import { useState } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
+import { CardPreviewButton } from '../components/CardPreviewButton'
+import { CardZoom } from '../../cards/CardZoom'
+import { DomainCard } from '../../cards/DomainCard'
+import { DomainCardBody } from '../../hand/DomainCardBody'
+import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { getDomainCards, parseAbilityText } from '../../data/card-mapper'
@@ -50,6 +55,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
   const [focusedId, setFocusedId] = useState<string | null>(
     selectedDomainCards[0] ?? domainCards[0]?.props.title ?? null
   )
+  const [showCard, setShowCard] = useState(false)
 
   const pickerItems: PickerItem[] = domainCards.map((card) => ({
     id: card.props.title,
@@ -80,6 +86,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
   }
 
   return (
+    <>
     <FullBleedPicker
       currentStep={2}
       items={pickerItems}
@@ -93,9 +100,12 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
     >
       {focusedCard && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <h2 style={goldTitleStyle}>
-            {focusedCard.props.title}
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h2 style={goldTitleStyle}>
+              {focusedCard.props.title}
+            </h2>
+            <CardPreviewButton onClick={() => setShowCard(true)} />
+          </div>
           <Separator text={`${focusedCard.props.domain} · ${focusedCard.props.type} · L${focusedCard.props.level}`} />
           <div style={{
             maxHeight: showFullInfo ? '40vh' : undefined,
@@ -105,7 +115,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
           }}>
             {showFullInfo ? (
               parseAbilityText(focusedCard.bodyText).map((ability, i) => (
-                <p key={i} style={{
+                <div key={i} style={{
                   ...typeBody,
                   color: 'rgba(212,207,199,0.9)',
                   textShadow: '0px 1px 1px #4d381e',
@@ -114,8 +124,8 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
                   marginTop: i > 0 ? 8 : 0,
                 }}>
                   {ability.name && <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>{ability.name}: </span>}
-                  {ability.text}
-                </p>
+                  <FormatText text={ability.text} />
+                </div>
               ))
             ) : (
               <p style={{
@@ -135,5 +145,14 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
         </div>
       )}
     </FullBleedPicker>
+
+    {showCard && focusedCard && (
+      <CardZoom layoutId={`preview-${focusedCard.props.title}`} onClose={() => setShowCard(false)}>
+        <DomainCard {...focusedCard.props}>
+          <DomainCardBody bodyText={focusedCard.bodyText} />
+        </DomainCard>
+      </CardZoom>
+    )}
+    </>
   )
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FullBleedPicker, type PickerItem, type HeroMode } from '../components/FullBleedPicker'
+import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { classes } from '../../data/srd'
@@ -136,23 +137,23 @@ export function PickClass({ onNext }: StepProps) {
             maskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)',
           }}>
-            <p style={{
+            <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
               textShadow: '0px 1px 1px #4d381e',
               textAlign: 'center',
               margin: 0,
             }}>
-              {showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`}
-            </p>
+              <FormatText text={showFullInfo ? focusedClass.description : `${focusedClass.description.split('. ')[0]}.`} />
+            </div>
             {/* Hope Feature */}
             <div style={{ marginTop: 12 }}>
               <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                 {focusedClass.hope_feat_name}
               </span>
-              <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
-                {focusedClass.hope_feat_text}
-              </p>
+              <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
+                <FormatText text={focusedClass.hope_feat_text} />
+              </div>
             </div>
             {/* Class Feats */}
             {focusedClass.class_feats.map((feat, i) => (
@@ -160,9 +161,9 @@ export function PickClass({ onNext }: StepProps) {
                 <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                   {feat.name}
                 </span>
-                <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
-                  {feat.text}
-                </p>
+                <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'center' }}>
+                  <FormatText text={feat.text} />
+                </div>
               </div>
             ))}
           </div>

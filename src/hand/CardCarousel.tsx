@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
+import { FormatText } from '../ui/FormatText'
 import { goldAccent } from '../ui/typography'
 import { DomainCard } from '../cards/DomainCard'
 import { AncestryCard } from '../cards/AncestryCard'
@@ -47,14 +48,14 @@ export function CardCarousel({ character, onCardTap }: CardCarouselProps) {
                     onClick={() => onCardTap(card.name)}
                   >
                     {bodyParts.map((part, i) => (
-                      <p key={i} className={i > 0 ? 'mt-2' : ''}>
+                      <div key={i} className={i > 0 ? 'mt-2' : ''}>
                         {part.name && (
                           <>
                             <span className="font-bold">{part.name}:</span>{' '}
                           </>
                         )}
-                        {part.text}
-                      </p>
+                        <FormatText text={part.text} />
+                      </div>
                     ))}
                   </DomainCard>
                 </ScaledCard>

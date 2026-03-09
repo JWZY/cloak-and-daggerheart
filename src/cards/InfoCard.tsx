@@ -6,7 +6,8 @@
 
 import { motion } from 'framer-motion'
 import { tapFeedback } from '../design-system/tokens/animations'
-import { typeTitle, typeBody } from '../ui/typography'
+import { FormatText } from '../ui/FormatText'
+import { typeTitle, typeBodyCard as typeBody } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
@@ -194,7 +195,7 @@ export function InfoCard({
         </div>
 
         {/* Description */}
-        <p
+        <div
           style={{
             ...typeBody,
             color: 'var(--text-secondary)',
@@ -202,8 +203,8 @@ export function InfoCard({
             fontStyle: 'italic',
           }}
         >
-          {description}
-        </p>
+          <FormatText text={description} />
+        </div>
 
         {/* Thin separator before feats */}
         <div className="flex items-center gap-2">
@@ -215,7 +216,7 @@ export function InfoCard({
         {/* Feats */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {feats.map((feat, i) => (
-            <p
+            <div
               key={i}
               style={{
                 ...typeBody,
@@ -223,8 +224,9 @@ export function InfoCard({
                 textShadow: '0px 1px 1px #4d381e',
               }}
             >
-              <span style={{ fontWeight: 700 }}>{feat.name}:</span> {feat.text}
-            </p>
+              <span style={{ fontWeight: 700 }}>{feat.name}:</span>{' '}
+              <FormatText text={feat.text} />
+            </div>
           ))}
         </div>
 

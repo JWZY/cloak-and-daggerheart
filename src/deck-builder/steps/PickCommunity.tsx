@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
+import { CardPreviewButton } from '../components/CardPreviewButton'
+import { CardZoom } from '../../cards/CardZoom'
+import { CommunityCard } from '../../cards/CommunityCard'
+import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradientStyle, goldDark, goldDarkAlpha, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { communities } from '../../data/srd'
@@ -42,6 +46,7 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
   const setCommunity = useDeckStore((s) => s.setCommunity)
 
   const [focusedId, setFocusedId] = useState<string | null>(communityName ?? communities[0]?.name ?? null)
+  const [showCard, setShowCard] = useState(false)
 
   const pickerItems: PickerItem[] = communities.map((community) => ({
     id: community.name,
@@ -70,6 +75,7 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
   }
 
   return (
+    <>
     <FullBleedPicker
       currentStep={4}
       items={pickerItems}
@@ -82,9 +88,12 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
     >
       {focusedCommunity && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <h2 style={goldTitleStyle}>
-            {focusedCommunity.name}
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h2 style={goldTitleStyle}>
+              {focusedCommunity.name}
+            </h2>
+            <CardPreviewButton onClick={() => setShowCard(true)} />
+          </div>
           <Separator text="Community" />
           <div style={{
             maxHeight: showFullInfo ? '40vh' : undefined,
@@ -92,24 +101,24 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
             maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
             WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            <p style={{
+            <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
               textShadow: '0px 1px 1px #4d381e',
               textAlign: 'center',
               margin: 0,
             }}>
-              {showFullInfo ? focusedCommunity.description : `${focusedCommunity.description.split('. ')[0]}.`}
-            </p>
+              <FormatText text={showFullInfo ? focusedCommunity.description : `${focusedCommunity.description.split('. ')[0]}.`} />
+            </div>
             {showFullInfo ? (
               focusedCommunity.feats.map((f) => (
                 <div key={f.name} style={{ marginTop: 8 }}>
                   <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                     {f.name}
                   </span>
-                  <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
-                    {f.text}
-                  </p>
+                  <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                    <FormatText text={f.text} />
+                  </div>
                 </div>
               ))
             ) : (
@@ -131,5 +140,12 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
         </div>
       )}
     </FullBleedPicker>
+
+    {showCard && focusedCommunity && (
+      <CardZoom layoutId={`preview-${focusedCommunity.name}`} onClose={() => setShowCard(false)}>
+        <CommunityCard community={focusedCommunity} />
+      </CardZoom>
+    )}
+    </>
   )
 }

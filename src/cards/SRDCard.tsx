@@ -1,7 +1,8 @@
 import { useId, useRef, useEffect, useState } from 'react'
 import { type DomainIconName, getDomainIconPath } from './domain-icons'
 import { AutoFitTitle } from '../ui/AutoFitTitle'
-import { typeTitle, typeBody } from '../ui/typography'
+import { FormatText } from '../ui/FormatText'
+import { typeTitle, typeBodyCard as typeBody } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
@@ -325,10 +326,10 @@ export function SRDCard({
           }}
         >
           {feats.map((feat, i) => (
-            <p key={i} className={contentLayout === 'figma' ? '' : (i > 0 ? 'mt-2' : '')}>
+            <div key={i} className={contentLayout === 'figma' ? '' : (i > 0 ? 'mt-2' : '')}>
               {feat.name && <><span style={{ fontWeight: 700 }}>{feat.name}:</span>{' '}</>}
-              {feat.text}
-            </p>
+              <FormatText text={feat.text} />
+            </div>
           ))}
 
           {featList && featList.length > 0 && (
@@ -341,7 +342,7 @@ export function SRDCard({
             >
               {featList.map((item, i) => (
                 <li key={i} className={contentLayout === 'figma' ? '' : 'mb-0.5'}>
-                  {item}
+                  <FormatText text={item} />
                 </li>
               ))}
             </ul>

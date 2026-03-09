@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradient } from '../../ui/typography'
 import { getSubclassCards, getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { SRDCard } from '../../cards/SRDCard'
@@ -88,10 +89,10 @@ export function ReviewDeck() {
             {selectedDomains.map(({ props, bodyText }) => (
               <DomainCard key={props.title} {...props} scale={0.4}>
                 {parseAbilityText(bodyText).map((ability, i) => (
-                  <p key={i} className="mb-1 text-xs">
+                  <div key={i} className="mb-1 text-xs">
                     {ability.name && <strong>{ability.name}: </strong>}
-                    {ability.text}
-                  </p>
+                    <FormatText text={ability.text} />
+                  </div>
                 ))}
               </DomainCard>
             ))}

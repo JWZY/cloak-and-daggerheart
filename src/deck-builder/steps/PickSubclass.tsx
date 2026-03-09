@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
+import { CardPreviewButton } from '../components/CardPreviewButton'
+import { CardZoom } from '../../cards/CardZoom'
+import { SRDCard } from '../../cards/SRDCard'
+import { FormatText } from '../../ui/FormatText'
 import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
-import { getSubclassesForClass } from '../../data/srd'
+import { getSubclassesForClass, getSubclassByName, getClassByName } from '../../data/srd'
+import { subclassToCardProps } from '../../data/card-mapper'
 
 const BASE_URL = import.meta.env.BASE_URL
 
@@ -45,6 +50,7 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
   const subclassData = getSubclassesForClass(selectedClass ?? 'Wizard')
 
   const [focusedId, setFocusedId] = useState<string | null>(subclass ?? subclassData[0]?.name ?? null)
+  const [showCard, setShowCard] = useState(false)
 
   const pickerItems: PickerItem[] = subclassData.map((sub) => ({
     id: sub.name,
@@ -69,6 +75,7 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
     : ''
 
   return (
+    <>
     <FullBleedPicker
       currentStep={1}
       items={pickerItems}
@@ -81,16 +88,19 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
     >
       {focusedSub && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <h2 style={{
-            ...typeTitle,
-            fontSize: 36,
-            fontWeight: 400,
-            ...goldGradientStyle,
-            margin: 0,
-            lineHeight: 1,
-          }}>
-            {focusedSub.name}
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h2 style={{
+              ...typeTitle,
+              fontSize: 36,
+              fontWeight: 400,
+              ...goldGradientStyle,
+              margin: 0,
+              lineHeight: 1,
+            }}>
+              {focusedSub.name}
+            </h2>
+            <CardPreviewButton onClick={() => setShowCard(true)} />
+          </div>
           <Separator text={selectedClass ?? ''} />
           <div style={{
             maxHeight: showFullInfo ? '40vh' : undefined,
@@ -98,15 +108,15 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
             maskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
             WebkitMaskImage: showFullInfo ? 'linear-gradient(to bottom, transparent, black 8px, black calc(100% - 8px), transparent)' : undefined,
           }}>
-            <p style={{
+            <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
               textShadow: '0px 1px 1px #4d381e',
               textAlign: 'center',
               margin: 0,
             }}>
-              {showFullInfo ? (focusedSub.description || descriptionText) : descriptionText}
-            </p>
+              <FormatText text={showFullInfo ? (focusedSub.description || descriptionText) : descriptionText} />
+            </div>
             {showFullInfo && (
               <>
                 {focusedSub.spellcast_trait && (
@@ -124,9 +134,9 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
                     <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                       {foundation.name}
                     </span>
-                    <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
-                      {foundation.text}
-                    </p>
+                    <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                      <FormatText text={foundation.text} />
+                    </div>
                   </div>
                 ))}
               </>
@@ -135,5 +145,17 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
         </div>
       )}
     </FullBleedPicker>
+
+    {showCard && focusedSub && selectedClass && (
+      <CardZoom layoutId={`preview-${focusedSub.name}`} onClose={() => setShowCard(false)}>
+        <SRDCard
+          {...subclassToCardProps(
+            getSubclassByName(focusedSub.name),
+            getClassByName(selectedClass)
+          )}
+        />
+      </CardZoom>
+    )}
+    </>
   )
 }

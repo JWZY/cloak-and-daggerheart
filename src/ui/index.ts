@@ -25,5 +25,7 @@ export type { SelectableOptionProps } from './SelectableOption'
 export { FatesButton } from './FatesButton'
 export type { FatesButtonProps } from './FatesButton'
 
+export { FormatText } from './FormatText'
+
 // Typography tokens
 export { typeTitle, typeSubtitle, typeBody, typeMicro, goldLight, goldDark, goldGradient } from './typography'
