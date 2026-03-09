@@ -1,5 +1,6 @@
 import { useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Check } from 'lucide-react'
 import { FatesButton } from '../../ui/FatesButton'
 import { typeTitle, typeBody, goldGradientStyle, goldDark, goldDarkAlpha, goldLightAlpha } from '../../ui/typography'
 
@@ -70,8 +71,7 @@ export function FullBleedPicker({
   title,
   items,
   focusedId,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  selectedIds: _selectedIds,
+  selectedIds,
   onFocus,
   onBack,
   onConfirm,
@@ -344,14 +344,16 @@ export function FullBleedPicker({
         >
           {items.map((item) => {
             const isFocused = item.id === focusedId
+            const isSelected = selectedIds.includes(item.id)
+            const isHighlighted = isFocused || isSelected
 
             return (
               <motion.button
                 key={item.id}
-                className={isFocused ? 'aura-glow' : ''}
+                className={isHighlighted ? 'aura-glow' : ''}
                 animate={{
-                  scale: isFocused ? 1 : 0.85,
-                  opacity: isFocused ? 1 : 0.55,
+                  scale: isHighlighted ? 1 : 0.85,
+                  opacity: isHighlighted ? 1 : 0.55,
                 }}
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -383,6 +385,26 @@ export function FullBleedPicker({
                   }}
                 />
 
+                {/* Checkmark on selected items */}
+                {isSelected && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 6,
+                      right: 6,
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.6)',
+                      border: `1.5px solid ${goldDark}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Check size={12} color={goldDark} strokeWidth={3} />
+                  </div>
+                )}
               </motion.button>
             )
           })}
