@@ -61,6 +61,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
     id: card.props.title,
     name: card.props.title,
     illustrationSrc: `${BASE_URL}images/cards/domains/${kebabCase(card.props.title)}.avif`,
+    objectPosition: 'center',
   }))
 
   const handleFocus = (id: string) => {

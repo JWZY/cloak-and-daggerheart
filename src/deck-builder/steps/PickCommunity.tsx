@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
 import { CardPreviewButton } from '../components/CardPreviewButton'
 import { CardZoom } from '../../cards/CardZoom'
@@ -48,10 +48,16 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
   const [focusedId, setFocusedId] = useState<string | null>(communityName ?? communities[0]?.name ?? null)
   const [showCard, setShowCard] = useState(false)
 
+  // Auto-select first item on mount for faster testing
+  useEffect(() => {
+    if (!communityName && communities[0]) setCommunity(communities[0].name)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const pickerItems: PickerItem[] = communities.map((community) => ({
     id: community.name,
     name: community.name,
     illustrationSrc: `${BASE_URL}images/cards/communities/${kebabCase(community.name)}.avif`,
+    objectPosition: 'center',
   }))
 
   const handleFocus = (id: string) => {
@@ -77,7 +83,6 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
   return (
     <>
     <FullBleedPicker
-      currentStep={4}
       items={pickerItems}
       focusedId={focusedId}
       selectedIds={communityName ? [communityName] : []}
