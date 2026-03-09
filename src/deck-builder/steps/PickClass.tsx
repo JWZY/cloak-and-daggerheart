@@ -31,6 +31,7 @@ const CLASS_ART_POSITION: Record<string, string> = {
 /** AI content-aware filled covers (override domain card art when available) */
 const CLASS_COVER: Record<string, string> = {
   Sorcerer: 'arcana-touched',
+  Warrior: 'reapers-strike',
 }
 
 /** Hand-picked domain card artwork for each class splash image */
@@ -88,16 +89,6 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-/** Darken a hex color by mixing toward black */
-function darkenHex(hex: string, amount: number): string {
-  const r = Math.round(parseInt(hex.slice(1, 3), 16) * (1 - amount))
-  const g = Math.round(parseInt(hex.slice(3, 5), 16) * (1 - amount))
-  const b = Math.round(parseInt(hex.slice(5, 7), 16) * (1 - amount))
-  return `rgb(${r},${g},${b})`
-}
-
-type BlockVariant = 'glass' | 'glow'
-
 interface StepProps {
   onBack?: () => void
   onNext: () => void
@@ -112,8 +103,6 @@ export function PickClass({ onNext }: StepProps) {
 
   const [focusedId, setFocusedId] = useState<string | null>(selectedClass ?? classes[0]?.name ?? null)
   const [heroMode, setHeroMode] = useState<HeroMode>('position')
-  const [blockVariant, setBlockVariant] = useState<BlockVariant>('glass')
-  const [glowOpacity, setGlowOpacity] = useState(0.75)
 
   // Auto-select first item on mount for faster testing
   useEffect(() => {
@@ -160,41 +149,30 @@ export function PickClass({ onNext }: StepProps) {
       {focusedClass && (() => {
         const domain = CLASS_DOMAIN[focusedClass.name] ?? 'Valor'
         const muted = DOMAIN_COLORS_MUTED[domain] ?? '#8d3700'
-        const deepDark = darkenHex(muted, 0.6)
 
-        // Feather mask: fade all edges for soft glow, only bottom for glass
         const glowMask = [
-          'linear-gradient(to bottom, transparent, black 12%, black 88%, transparent)',
+          'linear-gradient(to bottom, transparent, black 8%, black 88%, transparent)',
           'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
         ].join(', ')
-
-        const bgStyle: React.CSSProperties = blockVariant === 'glow'
-          ? { background: `radial-gradient(ellipse 130% 110% at 50% 0%, ${hexToRgba(muted, glowOpacity)} 0%, ${hexToRgba(muted, glowOpacity * 0.5)} 45%, transparent 85%)` }
-          : {
-              background: `linear-gradient(180deg, ${hexToRgba(muted, 0.65)} 0%, ${deepDark} 100%)`,
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              boxShadow: `inset 0 1px 1px ${hexToRgba(muted, 0.3)}, inset 0 -1px 2px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3)`,
-              border: `1px solid ${hexToRgba(muted, 0.35)}`,
-            }
 
         return (
           <div
             className="picker-info-column"
             style={{
-              ...bgStyle,
+              background: `radial-gradient(ellipse 140% 120% at 50% 20%, ${hexToRgba(muted, 1)} 0%, ${hexToRgba(muted, 0.5)} 45%, transparent 85%)`,
               display: 'flex',
               flexDirection: 'column',
               gap: 4,
               width: '100%',
-              padding: '16px 24px 12px',
-              borderRadius: blockVariant === 'glow' ? 0 : 12,
-              maxHeight: '50vh',
+              /* Extend up past the info area with negative margin + extra top padding */
+              marginTop: -40,
+              padding: '56px 24px 12px',
+              maxHeight: '55vh',
               overflowY: 'auto',
-              maskImage: blockVariant === 'glow' ? glowMask : 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
-              WebkitMaskImage: blockVariant === 'glow' ? glowMask : 'linear-gradient(to bottom, black 0%, black 90%, transparent 100%)',
-              maskComposite: blockVariant === 'glow' ? 'intersect' : undefined,
-              WebkitMaskComposite: blockVariant === 'glow' ? 'source-in' : undefined,
+              maskImage: glowMask,
+              WebkitMaskImage: glowMask,
+              maskComposite: 'intersect',
+              WebkitMaskComposite: 'source-in',
             } as React.CSSProperties}
           >
             <h2 style={{
@@ -267,46 +245,6 @@ export function PickClass({ onNext }: StepProps) {
         >
           {HERO_MODE_LABELS[heroMode]}
         </button>
-        <button
-          onClick={() => setBlockVariant(v => v === 'glass' ? 'glow' : 'glass')}
-          style={{
-            padding: '4px 10px',
-            borderRadius: 999,
-            border: '1px solid rgba(255,255,255,0.2)',
-            background: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(8px)',
-            color: '#fff',
-            fontSize: 11,
-            fontFamily: 'system-ui, sans-serif',
-            cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          Block: {blockVariant === 'glass' ? 'A: Glass' : 'B: Glow'}
-        </button>
-        <div style={{
-          padding: '4px 10px',
-          borderRadius: 999,
-          border: '1px solid rgba(255,255,255,0.2)',
-          background: 'rgba(0,0,0,0.6)',
-          backdropFilter: 'blur(8px)',
-          color: '#fff',
-          fontSize: 11,
-          fontFamily: 'system-ui, sans-serif',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}>
-          <span>Glow: {Math.round(glowOpacity * 100)}%</span>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={Math.round(glowOpacity * 100)}
-            onChange={(e) => setGlowOpacity(Number(e.target.value) / 100)}
-            style={{ width: 80, accentColor: 'var(--gold)' }}
-          />
-        </div>
       </div>
     )}
     </>
