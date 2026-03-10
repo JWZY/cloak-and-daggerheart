@@ -14,7 +14,7 @@ import { getClassByName, getSubclassesForClass, getLevel1DomainCards, getDomainC
 // ---------------------------------------------------------------------------
 
 /** Convert a name to kebab-case for file paths */
-function kebabCase(str: string): string {
+export function kebabCase(str: string): string {
   return str
     .toLowerCase()
     .replace(/['']/g, '')
@@ -36,13 +36,17 @@ export function parseAbilityText(text: string): { name: string; text: string }[]
   const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(Boolean)
 
   return paragraphs.map(paragraph => {
+    // Preserve newlines in bullet lists so FormatText can render them
+    const hasBullets = /^- /m.test(paragraph)
+    const collapse = (s: string) => hasBullets ? s.trim() : s.replace(/\n/g, ' ').trim()
+
     // Check for **Name:** pattern at the start
     const match = paragraph.match(/^\*\*(.+?):\*\*\s*(.*)$/s)
     if (match) {
-      return { name: match[1], text: match[2].replace(/\n/g, ' ').trim() }
+      return { name: match[1], text: collapse(match[2]) }
     }
     // No bold header — plain text paragraph
-    return { name: '', text: paragraph.replace(/\n/g, ' ').trim() }
+    return { name: '', text: collapse(paragraph) }
   })
 }
 
@@ -179,7 +183,7 @@ export function ancestryToInfoCardProps(ancestry: Ancestry): InfoCardProps {
     description: desc,
     feats: ancestry.feats.map(f => ({ name: f.name, text: f.text })),
     footerLeft: 'Ancestry',
-    footerRight: `${ancestry.feats.length} feat${ancestry.feats.length > 1 ? 's' : ''}`,
+    footerRight: '',
     illustrationSrc: `${BASE_URL}images/cards/ancestries/${kebabCase(ancestry.name)}.avif`,
   }
 }
@@ -203,7 +207,7 @@ export function communityToInfoCardProps(community: Community): InfoCardProps {
     description: desc,
     feats: community.feats.map(f => ({ name: f.name, text: f.text })),
     footerLeft: 'Community',
-    footerRight: `${community.feats.length} feat${community.feats.length > 1 ? 's' : ''}`,
+    footerRight: '',
     illustrationSrc: `${BASE_URL}images/cards/communities/${kebabCase(community.name)}.avif`,
   }
 }

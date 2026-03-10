@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect, useId } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { goldAccent, typeSubtitle, typeBody } from '../ui/typography'
 import { warmGlass, RADIUS_MENU, RADIUS_PILL } from '../design-system/tokens/surfaces'
@@ -57,8 +57,15 @@ function GearMenu({
         onClose()
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
     document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [open, onClose])
 
   if (!open) return null
@@ -73,6 +80,8 @@ function GearMenu({
   return (
     <motion.div
       ref={menuRef}
+      role="menu"
+      aria-label="Character actions"
       initial={{ opacity: 0, scale: 0.92, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.92, y: 8 }}
@@ -95,6 +104,7 @@ function GearMenu({
       {items.map((item) => (
         <button
           key={item.label}
+          role="menuitem"
           onClick={() => {
             item.action()
             onClose()
@@ -126,6 +136,7 @@ function GearMenu({
 
       {/* Delete Character — distinct destructive style */}
       <button
+        role="menuitem"
         onClick={() => {
           onClose()
           onRequestDelete()
@@ -173,6 +184,24 @@ function DeleteConfirmModal({
   const [progress, setProgress] = useState(0)
   const holdStart = useRef<number>(0)
   const rafRef = useRef<number>(0)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const titleId = useId()
+
+  // Escape key dismissal + focus management
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+
+    const prev = document.activeElement as HTMLElement | null
+    dialogRef.current?.focus()
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      prev?.focus()
+    }
+  }, [onCancel])
 
   const startHold = useCallback(() => {
     setHolding(true)
@@ -203,6 +232,11 @@ function DeleteConfirmModal({
 
   return (
     <motion.div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      tabIndex={-1}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -216,6 +250,7 @@ function DeleteConfirmModal({
         justifyContent: 'center',
         background: 'rgba(0,0,0,0.6)',
         zIndex: 100,
+        outline: 'none',
       }}
     >
       <motion.div
@@ -235,6 +270,7 @@ function DeleteConfirmModal({
         }}
       >
         <span
+          id={titleId}
           className="gold-text"
           style={{ ...typeSubtitle, fontSize: 17 }}
         >
@@ -359,7 +395,7 @@ export function HandView({ character, onEditCharacter }: HandViewProps) {
 
   const handleCardTap = useCallback(
     (cardName: string) => {
-      if (cardName === 'ancestry' || cardName === 'community') {
+      if (cardName === 'ancestry' || cardName === 'community' || cardName === 'hero-card') {
         openZoom(cardName)
       } else {
         openZoom(`domain-${cardName}`)

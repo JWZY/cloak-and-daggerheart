@@ -131,7 +131,7 @@ test.describe('Hand View Interactions', () => {
 
   test('stat bar shows HP, Armor, Hope, Stress labels', async ({ page }) => {
     await expect(page.getByText('HP', { exact: true })).toBeVisible()
-    await expect(page.getByText('Armor', { exact: true })).toBeVisible()
+    await expect(page.getByText('Armor', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('Hope', { exact: true })).toBeVisible()
     await expect(page.getByText('Stress', { exact: true })).toBeVisible()
   })
@@ -163,31 +163,34 @@ test.describe('Hand View Interactions', () => {
   })
 
   test('collapsible panels open and close', async ({ page }) => {
-    // Click Traits panel header to open it
-    await page.locator('button:has-text("Traits")').click()
+    // Hope Feature section starts expanded (collapsible but not defaultCollapsed)
+    // Its content should be visible
+    await expect(page.locator('text=Not This Time').first()).toBeVisible({
+      timeout: 3000,
+    })
+
+    // Click Hope Feature header to collapse it
+    const hopeFeatHeader = page.locator('text=Hope Feature').first()
+    await hopeFeatHeader.click()
     await page.waitForTimeout(400)
 
-    // Trait names should be visible
-    await expect(page.locator('text=knowledge').first()).toBeVisible({
+    // Content should be hidden after collapse
+    await expect(page.locator('text=Not This Time').first()).not.toBeVisible({
       timeout: 2000,
     })
 
-    // Click again to close
-    await page.locator('button:has-text("Traits")').click()
+    // Click again to expand
+    await hopeFeatHeader.click()
     await page.waitForTimeout(400)
 
-    // Open Equipment panel
-    await page.locator('button:has-text("Equipment")').click()
-    await page.waitForTimeout(400)
-
-    // Weapon info should be visible
-    await expect(page.locator('text=Greatstaff').first()).toBeVisible({
+    // Content should be visible again
+    await expect(page.locator('text=Not This Time').first()).toBeVisible({
       timeout: 2000,
     })
   })
 
-  test('domain cards carousel is present', async ({ page }) => {
-    // At least one domain card name should be visible in the carousel
+  test('domain ability panels are present', async ({ page }) => {
+    // At least one domain card name should be visible as a panel
     await expect(page.locator('text=Book of Ava').first()).toBeVisible({
       timeout: 3000,
     })

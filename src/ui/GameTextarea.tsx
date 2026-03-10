@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useId } from 'react'
 import { typeSubtitle, typeBody, goldDarkAlpha } from './typography'
 import { RADIUS_OPTION } from '../design-system/tokens/surfaces'
 
@@ -9,10 +9,14 @@ export interface GameTextareaProps
 
 export const GameTextarea = forwardRef<HTMLTextAreaElement, GameTextareaProps>(
   function GameTextarea({ label, style, ...props }, ref) {
+    const autoId = useId()
+    const textareaId = props.id ?? autoId
+
     return (
       <div style={{ width: '100%' }}>
         {label && (
           <label
+            htmlFor={textareaId}
             style={{
               display: 'block',
               ...typeSubtitle,
@@ -25,11 +29,12 @@ export const GameTextarea = forwardRef<HTMLTextAreaElement, GameTextareaProps>(
         )}
         <textarea
           ref={ref}
+          id={textareaId}
           {...props}
           style={{
             width: '100%',
             padding: '12px 16px',
-            background: 'linear-gradient(180deg, rgba(45,34,22,0.55), rgba(30,22,14,0.4))',
+            background: 'rgba(30, 22, 14, 0.35)',
             border: `1px solid ${goldDarkAlpha(0.15)}`,
             borderRadius: RADIUS_OPTION,
             color: 'var(--text-primary)',

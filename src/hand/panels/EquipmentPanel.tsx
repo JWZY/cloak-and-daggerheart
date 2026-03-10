@@ -1,5 +1,5 @@
-import { Sword, Shield, Scroll } from 'lucide-react'
-import { typeMicro, typeSubtitle, typeBody } from '../../ui/typography'
+import { Sword, Shield } from 'lucide-react'
+import { typeSubtitle, typeBody } from '../../ui/typography'
 import type { Character } from '../../types/character'
 
 export interface EquipmentPanelProps {
@@ -36,7 +36,8 @@ function EquipmentRow({
         <div className="flex items-baseline gap-2">
           <span
             style={{
-              ...typeMicro,
+              ...typeBody,
+              fontWeight: 600,
               color: 'var(--gold-secondary)',
               flexShrink: 0,
             }}
@@ -58,8 +59,7 @@ function EquipmentRow({
         {details && (
           <span
             style={{
-              ...typeMicro,
-              fontFamily: typeBody.fontFamily,
+              ...typeBody,
               display: 'block',
               marginTop: 2,
               color: 'var(--text-muted)',
@@ -129,30 +129,6 @@ export function EquipmentPanel({ character }: EquipmentPanelProps) {
         details={armorDetails}
       />
 
-      {/* Gold */}
-      <div
-        className="flex items-center gap-2 pt-2 mt-1"
-        style={{ borderTop: '1px solid var(--gold-muted)' }}
-      >
-        <Scroll size={12} color="var(--gold-secondary)" />
-        <span
-          style={{
-            ...typeMicro,
-            color: 'var(--gold-secondary)',
-          }}
-        >
-          Gold
-        </span>
-        <span
-          style={{
-            ...typeBody,
-            fontWeight: 700,
-            color: 'var(--gold)',
-          }}
-        >
-          {character.gold}
-        </span>
-      </div>
     </div>
   )
 }

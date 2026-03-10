@@ -17,6 +17,7 @@ interface CharacterStore {
   updateArmor: (id: string, delta: number) => void
   updateHope: (id: string, delta: number) => void
   updateStress: (id: string, delta: number) => void
+  updateGold: (id: string, delta: number) => void
   updateNotes: (id: string, notes: string) => void
   updateBackground: (id: string, index: number, answer: string) => void
   updateConnections: (id: string, index: number, answer: string) => void
@@ -104,6 +105,15 @@ export const useCharacterStore = create<CharacterStore>()(
                     ),
                   },
                 }
+              : c
+          ),
+        })),
+
+      updateGold: (id: string, delta: number) =>
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === id
+              ? { ...c, gold: Math.max(0, c.gold + delta) }
               : c
           ),
         })),
