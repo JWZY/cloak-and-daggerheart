@@ -1,6 +1,7 @@
 import { TRAIT_NAMES, formatTraitValue } from '../../core/rules/traits'
 import { getSubclassByName } from '../../data/srd'
 import { typeSubtitle, typeMicro, typeBody } from '../../ui/typography'
+import { STAT_COLORS } from '../../cards/domain-colors'
 import { GameBadge } from '../../ui/GameBadge'
 import type { Character } from '../../types/character'
 
@@ -70,7 +71,7 @@ export function StatsPanel({ character }: StatsPanelProps) {
                   color: value > 0
                     ? 'var(--gold)'
                     : value < 0
-                      ? '#A61118'
+                      ? STAT_COLORS.negative
                       : 'var(--text-muted)',
                 }}
               >

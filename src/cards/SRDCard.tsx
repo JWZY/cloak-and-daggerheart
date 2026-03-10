@@ -2,7 +2,7 @@ import { useId, useRef, useEffect, useState } from 'react'
 import { type DomainIconName, getDomainIconPath } from './domain-icons'
 import { AutoFitTitle } from '../ui/AutoFitTitle'
 import { FormatText } from '../ui/FormatText'
-import { typeTitle, typeBodyCard as typeBody } from '../ui/typography'
+import { typeTitle, typeBodyCard as typeBody, dropShadowWarm, textShadowWarm } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
@@ -210,6 +210,8 @@ export function SRDCard({
               objectPosition: `center calc(50% - ${illustrationOffset}px)`,
             }}
             draggable={false}
+            loading="lazy"
+            decoding="async"
           />
         )}
 
@@ -235,6 +237,8 @@ export function SRDCard({
         className="absolute w-full pointer-events-none"
         style={{ top: 188, height: 319, objectFit: 'cover', transform: 'scaleY(-1)', zIndex: 1 }}
         draggable={false}
+        loading="lazy"
+        decoding="async"
       />
 
       {/* Content area — min 297px, pinned to bottom, grows upward */}
@@ -251,7 +255,7 @@ export function SRDCard({
         {/* Title section */}
         <div className={contentLayout === 'figma' ? 'flex flex-col items-center text-center' : 'flex flex-col items-center text-center pt-2'}>
           {/* Subclass name */}
-          <div style={{ filter: titleShadowStyle === 'subtle' ? 'drop-shadow(0px 1px 1px #4d381e)' : GOLD_DROP_SHADOW, width: '100%' }}>
+          <div style={{ filter: titleShadowStyle === 'subtle' ? dropShadowWarm : GOLD_DROP_SHADOW, width: '100%' }}>
             <AutoFitTitle
               maxFontSize={titleFontSize ?? 36}
               style={{
@@ -321,7 +325,7 @@ export function SRDCard({
             fontFamily: bodyFontFamily ?? typeBody.fontFamily,
             lineHeight: bodyLineHeight ?? '1.4',
             color: 'var(--text-primary)',
-            ...(bodyTextShadow ? { textShadow: '0px 1px 1px #4d381e' } : {}),
+            ...(bodyTextShadow ? { textShadow: textShadowWarm } : {}),
             ...(contentLayout === 'figma' ? { display: 'flex', flexDirection: 'column' as const, gap: 12 } : {}),
           }}
         >
@@ -374,6 +378,8 @@ export function SRDCard({
           className="absolute inset-0 w-full h-full pointer-events-none z-20"
           style={{ opacity: CARD_FRAME_OPACITY }}
           draggable={false}
+          loading="lazy"
+          decoding="async"
         />
       )}
     </div>

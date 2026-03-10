@@ -4,7 +4,7 @@ import { CardPreviewButton } from '../components/CardPreviewButton'
 import { CardZoom } from '../../cards/CardZoom'
 import { CommunityCard } from '../../cards/CommunityCard'
 import { FormatText } from '../../ui/FormatText'
-import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradientStyle, goldDark, goldDarkAlpha, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradientStyle, goldDark, goldDarkAlpha, goldSeparatorLeft, goldSeparatorRight, textShadowWarm } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { communities } from '../../data/srd'
 
@@ -109,7 +109,7 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
             <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
-              textShadow: '0px 1px 1px #4d381e',
+              textShadow: textShadowWarm,
               textAlign: 'center',
               margin: 0,
             }}>
@@ -121,7 +121,7 @@ export function PickCommunity({ onBack, onNext }: StepProps) {
                   <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                     {f.name}
                   </span>
-                  <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                  <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: textShadowWarm, margin: '4px 0 0' }}>
                     <FormatText text={f.text} />
                   </div>
                 </div>

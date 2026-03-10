@@ -1,11 +1,13 @@
 import { type DomainIconName, getDomainIconPath } from './domain-icons'
-import { typeTitle, goldLight, goldDark } from '../ui/typography'
+import { typeTitle, goldLight, goldDark, textShadowWarm } from '../ui/typography'
 
 // Single-domain masked banner — shared between DomainCard and FlatDomainCard
-export function DomainBanner({ outerColor, innerColor, uid, domain, basePath, level, scale = 1.2 }: {
-  outerColor: string; innerColor: string; uid: string; domain: string; basePath: string; level?: string | number; scale?: number
+// Optional domain2: when provided, shows two domain icons stacked (no level number)
+export function DomainBanner({ outerColor, innerColor, uid, domain, basePath, level, domain2, scale = 1.2 }: {
+  outerColor: string; innerColor: string; uid: string; domain: string; basePath: string; level?: string | number; domain2?: string; scale?: number
 }) {
   const iconName = domain.toLowerCase() as DomainIconName
+  const icon2Name = domain2?.toLowerCase() as DomainIconName | undefined
 
   const maskStyle = {
     WebkitMaskImage: `url('${basePath}images/cards/banners/mask.svg')`,
@@ -48,23 +50,34 @@ export function DomainBanner({ outerColor, innerColor, uid, domain, basePath, le
           </defs>
         </svg>
       </div>
-      {/* Layer 3: Level number + domain icon — stacked vertically in pennant */}
-      <div className="absolute flex flex-col items-center justify-center" style={{ top: 4, left: 10, width: 24, height: 60, gap: 0, ...maskAt(-10, -4) }}>
-        {level != null && (
-          <span style={{
-            fontFamily: typeTitle.fontFamily,
-            fontSize: 27,
-            fontWeight: 400,
-            lineHeight: 0,
-            letterSpacing: '-1.62px',
-            fontVariantNumeric: 'lining-nums proportional-nums',
-            textShadow: '0 1px 1px #4d381e',
-            color: 'var(--gold)',
-          }}>
-            {level}
-          </span>
+      {/* Layer 3: Content — either level+icon, or two domain icons */}
+      <div className="absolute flex flex-col items-center justify-center" style={{ top: 4, left: 10, width: 24, height: 60, gap: icon2Name ? 4 : 2, ...maskAt(-10, -4) }}>
+        {icon2Name ? (
+          <>
+            <img src={getDomainIconPath(iconName, basePath)} alt="" width={20} height={20} draggable={false} />
+            <img src={getDomainIconPath(icon2Name, basePath)} alt="" width={20} height={20} draggable={false} />
+          </>
+        ) : (
+          <>
+            {level != null && (
+              <div style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{
+                  fontFamily: typeTitle.fontFamily,
+                  fontSize: 24,
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  letterSpacing: '-1.62px',
+                  fontVariantNumeric: 'lining-nums proportional-nums',
+                  textShadow: textShadowWarm,
+                  color: 'var(--gold)',
+                }}>
+                  {level}
+                </span>
+              </div>
+            )}
+            <img src={getDomainIconPath(iconName, basePath)} alt="" width={24} height={24} draggable={false} />
+          </>
         )}
-        <img src={getDomainIconPath(iconName, basePath)} alt="" width={level != null ? 18 : 24} height={level != null ? 18 : 24} draggable={false} />
       </div>
       {/* Layer 4: Texture overlay */}
       <img

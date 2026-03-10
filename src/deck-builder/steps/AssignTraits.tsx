@@ -4,7 +4,7 @@ import { tapFeedback } from '../../design-system/tokens/animations'
 import { TRAIT_NAMES, TRAIT_DESCRIPTIONS, parseSuggestedTraits, formatTraitValue, getRemainingTraitValues } from '../../core/rules/traits'
 import type { TraitName } from '../../types/character'
 import { SelectableOption } from '../../ui/SelectableOption'
-import { typeSubtitle, typeBody, goldDarkAlpha } from '../../ui/typography'
+import { typeSubtitle, typeBody, goldDarkAlpha, textShadowWarm } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { getClassByName } from '../../data/srd'
 
@@ -175,7 +175,7 @@ export function AssignTraits() {
                   background: 'var(--bg-overlay)',
                   border: '1px solid var(--gold)',
                   color: 'var(--gold)',
-                  textShadow: '0px 1px 1px #4d381e',
+                  textShadow: textShadowWarm,
                   borderRadius: 9999,
                   padding: '6px 16px',
                   cursor: 'pointer',

@@ -4,7 +4,7 @@ import { tapFeedback } from '../design-system/tokens/animations'
 import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from './domain-colors'
 import { AutoFitTitle } from '../ui/AutoFitTitle'
 import { DomainBanner } from './DomainBanner'
-import { typeTitle, typeBodyCard as typeBody } from '../ui/typography'
+import { typeTitle, typeBodyCard as typeBody, textShadowWarm, selectionGreen, selectionGlow } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
@@ -52,12 +52,7 @@ export function DomainCard({
   const domainColor = DOMAIN_COLORS[domain] || '#77457E'
   const domainColorMuted = DOMAIN_COLORS_MUTED[domain] || '#47294C'
 
-  // Build subtitle line: "Grimoire · Level 1 · Recall 2"
-  const subtitleParts: string[] = []
-  if (type) subtitleParts.push(type)
-  if (level !== undefined) subtitleParts.push(`Level ${level}`)
-  if (recall && parseInt(String(recall)) > 0) subtitleParts.push(`Recall ${recall}`)
-  const subtitleLine = subtitleParts.join(' \u00B7 ')
+  const separatorLabel = type || domain
 
   // Measure content area to dynamically center illustration in visible space
   const contentRef = useRef<HTMLDivElement>(null)
@@ -88,9 +83,9 @@ export function DomainCard({
         cursor: onClick ? 'pointer' : 'default',
         // Selection ring
         ...(selected ? {
-          outline: '3px solid #22c55e',
+          outline: `3px solid ${selectionGreen}`,
           outlineOffset: -3,
-          boxShadow: '0 0 20px rgba(34, 197, 94, 0.4)',
+          boxShadow: `0 0 20px ${selectionGlow}`,
         } : {}),
       }}
     >
@@ -114,11 +109,41 @@ export function DomainCard({
               objectPosition: `center calc(50% - ${illustrationOffset}px)`,
             }}
             draggable={false}
+            loading="lazy"
+            decoding="async"
           />
         )}
 
         {/* Domain banner (top-left) — single icon */}
         <DomainBanner outerColor={domainColorMuted} innerColor={domainColor} uid={uid} domain={domain} basePath={basePath} level={level} />
+
+        {/* Recall cost badge (top-right) */}
+        {recall && parseInt(String(recall)) > 0 && (
+          <div
+            className="absolute flex items-center justify-center"
+            style={{
+              top: 12,
+              right: 12,
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(4px)',
+              border: '1.5px solid var(--gold)',
+              zIndex: 10,
+            }}
+          >
+            <span style={{
+              fontFamily: typeTitle.fontFamily,
+              fontSize: 14,
+              fontWeight: 600,
+              color: 'var(--gold)',
+              lineHeight: 1,
+            }}>
+              {recall}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Background atmosphere layer */}
@@ -128,6 +153,8 @@ export function DomainCard({
         className="absolute w-full pointer-events-none"
         style={{ top: 188, height: 319, objectFit: 'cover', transform: 'scaleY(-1)', zIndex: 1 }}
         draggable={false}
+        loading="lazy"
+        decoding="async"
       />
 
       {/* Content area — pinned to bottom, grows upward */}
@@ -179,10 +206,10 @@ export function DomainCard({
               />
             </div>
 
-            {/* Domain name */}
+            {/* Type label */}
             <div style={{ filter: GOLD_DROP_SHADOW }}>
               <span style={subtitleStyle}>
-                {domain}
+                {separatorLabel}
               </span>
             </div>
 
@@ -205,28 +232,13 @@ export function DomainCard({
           </div>
         </div>
 
-        {/* Subtitle metadata line */}
-        {subtitleLine && (
-          <div className="text-center" style={{ marginTop: -4 }}>
-            <span style={{
-              fontFamily: typeBody.fontFamily,
-              fontSize: 13,
-              fontWeight: typeBody.fontWeight,
-              letterSpacing: '0.06em',
-              color: 'var(--text-secondary)',
-            }}>
-              {subtitleLine}
-            </span>
-          </div>
-        )}
-
         {/* Body text */}
         <div
           style={{
             flex: 1,
             ...typeBody,
             color: 'var(--text-primary)',
-            textShadow: '0px 1px 1px #4d381e',
+            textShadow: textShadowWarm,
             display: 'flex',
             flexDirection: 'column' as const,
             gap: 12,
@@ -243,9 +255,6 @@ export function DomainCard({
           <span style={subtitleStyle}>
             {domain}
           </span>
-          <span style={subtitleStyle}>
-            Daggerheart Compatible
-          </span>
         </div>
       </div>
 
@@ -256,6 +265,8 @@ export function DomainCard({
         className="absolute inset-0 w-full h-full pointer-events-none z-20"
         style={{ opacity: CARD_FRAME_OPACITY }}
         draggable={false}
+        loading="lazy"
+        decoding="async"
       />
     </div>
   )

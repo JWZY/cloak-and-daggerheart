@@ -4,7 +4,7 @@ import { CardPreviewButton } from '../components/CardPreviewButton'
 import { CardZoom } from '../../cards/CardZoom'
 import { SRDCard } from '../../cards/SRDCard'
 import { FormatText } from '../../ui/FormatText'
-import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight, textShadowWarm } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { getSubclassesForClass, getSubclassByName, getClassByName } from '../../data/srd'
 import { subclassToCardProps } from '../../data/card-mapper'
@@ -115,7 +115,7 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
             <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
-              textShadow: '0px 1px 1px #4d381e',
+              textShadow: textShadowWarm,
               textAlign: 'center',
               margin: 0,
             }}>
@@ -128,7 +128,7 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
                     <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                       Spellcast Trait
                     </span>
-                    <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                    <p style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: textShadowWarm, margin: '4px 0 0' }}>
                       {focusedSub.spellcast_trait}
                     </p>
                   </div>
@@ -138,7 +138,7 @@ export function PickSubclass({ onBack, onNext }: StepProps) {
                     <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                       {foundation.name}
                     </span>
-                    <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0' }}>
+                    <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: textShadowWarm, margin: '4px 0 0' }}>
                       <FormatText text={foundation.text} />
                     </div>
                   </div>

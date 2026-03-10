@@ -5,7 +5,7 @@ import { CardZoom } from '../../cards/CardZoom'
 import { DomainCard } from '../../cards/DomainCard'
 import { DomainCardBody } from '../../hand/DomainCardBody'
 import { FormatText } from '../../ui/FormatText'
-import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight, textShadowWarm } from '../../ui/typography'
 import { useDeckStore } from '../../store/deck-store'
 import { getDomainCards, parseAbilityText } from '../../data/card-mapper'
 import { getSubclassCardCount } from '../../core/rules/class-rules'
@@ -118,7 +118,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
                 <div key={i} style={{
                   ...typeBody,
                   color: 'rgba(212,207,199,0.9)',
-                  textShadow: '0px 1px 1px #4d381e',
+                  textShadow: textShadowWarm,
                   textAlign: 'center',
                   margin: 0,
                   marginTop: i > 0 ? 8 : 0,
@@ -131,7 +131,7 @@ export function PickDomainCards({ onBack, onNext }: StepProps) {
               <p style={{
                 ...typeBody,
                 color: 'rgba(212,207,199,0.9)',
-                textShadow: '0px 1px 1px #4d381e',
+                textShadow: textShadowWarm,
                 textAlign: 'center',
                 margin: 0,
                 maxHeight: 60,

@@ -1,3 +1,5 @@
+import { goldDark } from '../ui/typography'
+
 // Domain colors — single source of truth (Figma banner = canonical, code fallback for Arcana/Sage)
 export const DOMAIN_COLORS: Record<string, string> = {
   Arcana: '#77457E',
@@ -26,10 +28,23 @@ const CLASS_DOMAIN: Record<string, string> = {
 
 /** Get the primary domain accent color for a class name, or gold fallback */
 export function getClassAccentColor(className: string | null): string {
-  if (!className) return '#e7ba90'
+  if (!className) return goldDark
   const domain = CLASS_DOMAIN[className]
-  return domain ? (DOMAIN_COLORS[domain] ?? '#e7ba90') : '#e7ba90'
+  return domain ? (DOMAIN_COLORS[domain] ?? goldDark) : goldDark
 }
+
+/**
+ * Semantic stat colors — map game mechanics to their thematic domain colors.
+ * Armor = Bone gray, HP = Blade red, Stress = Midnight dark, Hope = Splendor gold.
+ */
+export const STAT_COLORS = {
+  armor: DOMAIN_COLORS.Bone,
+  hp: DOMAIN_COLORS.Blade,
+  stress: DOMAIN_COLORS.Midnight,
+  hope: DOMAIN_COLORS.Splendor,
+  /** Red for negative trait values, danger states */
+  negative: DOMAIN_COLORS.Blade,
+} as const
 
 // Muted variants — darker, still saturated (for banner outer layer)
 export const DOMAIN_COLORS_MUTED: Record<string, string> = {

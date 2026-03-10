@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FullBleedPicker, type PickerItem } from '../components/FullBleedPicker'
 import { FormatText } from '../../ui/FormatText'
-import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight } from '../../ui/typography'
+import { typeTitle, typeSubtitle, typeBody, goldGradientStyle, goldSeparatorLeft, goldSeparatorRight, textShadowWarm } from '../../ui/typography'
 import { DOMAIN_COLORS_MUTED } from '../../cards/domain-colors'
 import { useDeckStore } from '../../store/deck-store'
 import { classes } from '../../data/srd'
@@ -176,7 +176,7 @@ export function PickClass({ onNext }: StepProps) {
             <div style={{
               ...typeBody,
               color: 'rgba(212,207,199,0.9)',
-              textShadow: '0px 1px 1px #4d381e',
+              textShadow: textShadowWarm,
               textAlign: 'left',
               margin: 0,
             }}>
@@ -188,7 +188,7 @@ export function PickClass({ onNext }: StepProps) {
               <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                 {focusedClass.hope_feat_name}
               </span>
-              <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'left' }}>
+              <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: textShadowWarm, margin: '4px 0 0', textAlign: 'left' }}>
                 <FormatText text={focusedClass.hope_feat_text} />
               </div>
             </div>
@@ -199,7 +199,7 @@ export function PickClass({ onNext }: StepProps) {
                 <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
                   {feat.name}
                 </span>
-                <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: '0px 1px 1px #4d381e', margin: '4px 0 0', textAlign: 'left' }}>
+                <div style={{ ...typeBody, color: 'rgba(212,207,199,0.9)', textShadow: textShadowWarm, margin: '4px 0 0', textAlign: 'left' }}>
                   <FormatText text={feat.text} />
                 </div>
               </div>

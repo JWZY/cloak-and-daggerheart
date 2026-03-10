@@ -112,6 +112,23 @@ export const goldSeparatorLeft = `linear-gradient(90deg, transparent, ${goldDark
 /** Separator line: right-to-left fade from transparent to gold */
 export const goldSeparatorRight = `linear-gradient(270deg, transparent, ${goldDarkAlpha(0.4)})`
 
+// ─── Shadows ────────────────────────────────────────────────────────────────
+
+const SHADOW_WARM = '#4d381e'
+/** Pre-composed text-shadow for body text on card/panel surfaces */
+export const textShadowWarm = `0px 1px 1px ${SHADOW_WARM}`
+/** Pre-composed drop-shadow filter for gold title text */
+export const dropShadowWarm = `drop-shadow(0px 1px 1px ${SHADOW_WARM})`
+
+// ─── Selection ──────────────────────────────────────────────────────────────
+
+/** Selection ring color for selected cards/items */
+export const selectionGreen = '#22c55e'
+/** Selection glow for box-shadow on selected cards */
+export const selectionGlow = 'rgba(34, 197, 94, 0.4)'
+
+// ─── Gold Gradient Text ─────────────────────────────────────────────────────
+
 /** Gold gradient text style — background-clip text pattern for shiny gold text */
 export const goldGradientStyle = {
   background: `linear-gradient(180deg, ${goldLight} 0%, ${goldDark} 100%)`,

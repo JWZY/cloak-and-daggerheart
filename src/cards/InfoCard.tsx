@@ -7,7 +7,7 @@
 import { motion } from 'framer-motion'
 import { tapFeedback } from '../design-system/tokens/animations'
 import { FormatText } from '../ui/FormatText'
-import { typeTitle, typeBodyCard as typeBody } from '../ui/typography'
+import { typeTitle, typeBodyCard as typeBody, textShadowWarm } from '../ui/typography'
 import {
   goldGradientStyle,
   subtitleStyle,
@@ -100,6 +100,8 @@ export function InfoCard({
               className="absolute inset-0 w-full h-full pointer-events-none"
               style={{ objectFit: 'cover', objectPosition: 'top', userSelect: 'none' }}
               draggable={false}
+              loading="lazy"
+              decoding="async"
             />
             {/* Atmosphere overlay for texture */}
             <img
@@ -108,6 +110,8 @@ export function InfoCard({
               className="absolute w-full h-full pointer-events-none"
               style={{ objectFit: 'cover', opacity: 0.15, mixBlendMode: 'overlay' }}
               draggable={false}
+              loading="lazy"
+              decoding="async"
             />
           </>
         ) : (
@@ -119,6 +123,8 @@ export function InfoCard({
               className="absolute w-full h-full pointer-events-none"
               style={{ objectFit: 'cover', opacity: 0.3, transform: 'scaleY(-1) scaleX(-1)' }}
               draggable={false}
+              loading="lazy"
+              decoding="async"
             />
             {/* Large decorative title — faint, centered */}
             <div
@@ -147,6 +153,8 @@ export function InfoCard({
         className="absolute w-full pointer-events-none"
         style={{ top: 160, height: 348, objectFit: 'cover', transform: 'scaleY(-1)', zIndex: 1, opacity: 0.8 }}
         draggable={false}
+        loading="lazy"
+        decoding="async"
       />
 
       {/* Content area — pinned to bottom, same structure as SRDCard */}
@@ -199,7 +207,7 @@ export function InfoCard({
           style={{
             ...typeBody,
             color: 'var(--text-secondary)',
-            textShadow: '0px 1px 1px #4d381e',
+            textShadow: textShadowWarm,
             fontStyle: 'italic',
           }}
         >
@@ -221,7 +229,7 @@ export function InfoCard({
               style={{
                 ...typeBody,
                 color: 'var(--text-primary)',
-                textShadow: '0px 1px 1px #4d381e',
+                textShadow: textShadowWarm,
               }}
             >
               <span style={{ fontWeight: 700 }}>{feat.name}:</span>{' '}
@@ -248,6 +256,8 @@ export function InfoCard({
         className="absolute inset-0 w-full h-full pointer-events-none z-20"
         style={{ opacity: CARD_FRAME_OPACITY }}
         draggable={false}
+        loading="lazy"
+        decoding="async"
       />
     </div>
   )

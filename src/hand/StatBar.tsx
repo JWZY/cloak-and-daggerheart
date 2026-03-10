@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
-import { typeMicro, typeBody, goldAccent } from '../ui/typography'
+import { typeBody, goldAccent } from '../ui/typography'
 import { springs } from '../design-system/tokens/animations'
+import { STAT_COLORS } from '../cards/domain-colors'
 import { GameBadge } from '../ui/GameBadge'
 import { GlassPanel } from '../ui/GlassPanel'
 import { useCharacterStore } from '../store/character-store'
@@ -86,9 +87,10 @@ function StatRow({
       {/* Label */}
       <span
         style={{
-          ...typeMicro,
+          ...typeBody,
+          fontWeight: 600,
           color: 'var(--gold-secondary)',
-          width: 46,
+          width: 52,
           flexShrink: 0,
         }}
       >
@@ -169,7 +171,7 @@ export function StatBar({ character, accentColor = goldAccent }: StatBarProps) {
         icon={Shield}
         current={character.armorSlots.current}
         max={character.armorSlots.max}
-        color="#A3A9A8"
+        color={STAT_COLORS.armor}
         onDecrease={() => updateArmor(character.id, -1)}
         onIncrease={() => updateArmor(character.id, 1)}
       />
@@ -191,7 +193,7 @@ export function StatBar({ character, accentColor = goldAccent }: StatBarProps) {
         icon={Heart}
         current={character.hp.current}
         max={character.hp.max}
-        color="#A61118"
+        color={STAT_COLORS.hp}
         onDecrease={() => updateHP(character.id, -1)}
         onIncrease={() => updateHP(character.id, 1)}
       />
@@ -200,7 +202,7 @@ export function StatBar({ character, accentColor = goldAccent }: StatBarProps) {
         icon={Circle}
         current={character.stress.current}
         max={character.stress.max}
-        color="#1E1E1E"
+        color={STAT_COLORS.stress}
         onDecrease={() => updateStress(character.id, -1)}
         onIncrease={() => updateStress(character.id, 1)}
       />
@@ -208,7 +210,7 @@ export function StatBar({ character, accentColor = goldAccent }: StatBarProps) {
         label="Hope"
         icon={Star}
         current={character.hope}
-        color="#BEA228"
+        color={STAT_COLORS.hope}
         onDecrease={() => updateHope(character.id, -1)}
         onIncrease={() => updateHope(character.id, 1)}
         showMax={false}
