@@ -42,6 +42,8 @@ function AuraCard({
           position: 'relative',
           zIndex: 1,
         }}
+        loading="lazy"
+        decoding="async"
       />
       {children}
     </div>

@@ -299,6 +299,8 @@ export function FullBleedPicker({
                     position: 'relative',
                     zIndex: 1,
                   }}
+                  loading="lazy"
+                  decoding="async"
                 />
 
                 {/* Feathered inner border on focused item */}

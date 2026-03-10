@@ -133,6 +133,8 @@ export function FlatDomainCard({
               userSelect: 'none',
             }}
             draggable={false}
+            loading="lazy"
+            decoding="async"
           />
         )}
 
