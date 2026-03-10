@@ -93,6 +93,8 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
     }
   }
 
+  const [confirmError, setConfirmError] = useState<string | null>(null)
+
   const handleConfirm = () => {
     const selectedCards = availableDomainCards.filter(c => store.selectedNewCards.includes(c.name))
     if (selectedCards.length !== domainCardsToPick) return
@@ -103,9 +105,13 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
       newExperience: { text: store.newExperienceText },
     }
 
-    levelUp(character.id, choices)
-    store.reset()
-    onClose()
+    try {
+      levelUp(character.id, choices)
+      store.reset()
+      onClose()
+    } catch (err) {
+      setConfirmError(err instanceof Error ? err.message : 'Level up failed. Please try again.')
+    }
   }
 
   // Shared styles
@@ -204,6 +210,23 @@ export function LevelUpWizard({ character, onClose }: LevelUpWizardProps) {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Error banner */}
+      {confirmError && (
+        <div
+          role="alert"
+          className="mx-4 px-3 py-2 rounded-xl"
+          style={{
+            background: 'rgba(220, 80, 80, 0.15)',
+            border: '1px solid rgba(220, 80, 80, 0.3)',
+            ...typeBody,
+            fontSize: 13,
+            color: 'rgba(220, 80, 80, 0.9)',
+          }}
+        >
+          {confirmError}
+        </div>
+      )}
 
       {/* Navigation footer */}
       <div className="flex items-center justify-between px-4 py-4 gap-3">

@@ -115,12 +115,15 @@ function DotIndicators({
   if (count <= 1) return null
 
   return (
-    <div className="flex items-center justify-center gap-1 mt-2">
+    <div className="flex items-center justify-center gap-1 mt-2" role="tablist" aria-label="Card slides">
       {Array.from({ length: count }).map((_, i) => (
         <button
           key={i}
+          role="tab"
+          aria-selected={i === selectedIndex}
+          aria-label={`Slide ${i + 1} of ${count}`}
           className="flex items-center justify-center"
-          style={{ padding: '8px 4px', cursor: 'pointer' }}
+          style={{ padding: '10px 6px', cursor: 'pointer', background: 'none', border: 'none' }}
           onClick={() => emblaApi?.scrollTo(i)}
         >
           <span

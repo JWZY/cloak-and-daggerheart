@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useId } from 'react'
 import { typeSubtitle, typeBody, goldDarkAlpha } from './typography'
 import { RADIUS_OPTION } from '../design-system/tokens/surfaces'
 
@@ -10,10 +10,14 @@ export interface GameInputProps extends React.InputHTMLAttributes<HTMLInputEleme
 
 export const GameInput = forwardRef<HTMLInputElement, GameInputProps>(
   function GameInput({ label, style, ...props }, ref) {
+    const autoId = useId()
+    const inputId = props.id ?? autoId
+
     return (
       <div style={{ width: '100%' }}>
         {label && (
           <label
+            htmlFor={inputId}
             style={{
               display: 'block',
               ...typeSubtitle,
@@ -26,6 +30,7 @@ export const GameInput = forwardRef<HTMLInputElement, GameInputProps>(
         )}
         <input
           ref={ref}
+          id={inputId}
           {...props}
           style={{
             width: '100%',

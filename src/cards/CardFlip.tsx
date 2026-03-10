@@ -28,12 +28,17 @@ export function CardFlip({ front, back, flipped: controlledFlipped, onFlip, widt
   }, [isFlipped, isControlled, onFlip])
 
   return (
-    <div
+    <button
+      type="button"
+      aria-label={isFlipped ? 'Flip card to back' : 'Flip card to front'}
       style={{
         width,
         height,
         perspective: 1000,
         cursor: 'pointer',
+        background: 'none',
+        border: 'none',
+        padding: 0,
       }}
       onClick={handleTap}
     >
@@ -76,6 +81,6 @@ export function CardFlip({ front, back, flipped: controlledFlipped, onFlip, widt
           {back}
         </div>
       </motion.div>
-    </div>
+    </button>
   )
 }
