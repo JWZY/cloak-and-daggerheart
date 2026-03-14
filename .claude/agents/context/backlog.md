@@ -4,17 +4,73 @@ Prioritized list of features and improvements. Items at top are highest priority
 
 ---
 
-## MVP - Level 1 Wizard Experience
+## Up Next — Combat Features Sprint
 
-_Goal: A functional, well-crafted level 1 Wizard character creation and play experience._
+_Goal: Close the functional gap with Demiplane. Ship the features a player actually needs at the table._
+_Source: Demiplane competitive analysis (demiplane/CRITIQUE.md, demiplane/IMPLEMENTATION-PLAN.md)_
 
-### Item Cards
-**Size:** M | **Status:** Open
-**Description:** Card-based UI for equipped weapons and armor in the hand view
+### 1. Trait Bar Readability (Mobile)
+**Size:** S | **Status:** Open
+**Description:** Switch mobile trait bar from 6-col to 3x2 grid with larger values
 **Notes:**
-- Weapon/armor cards consistent with SRDCard/DomainCard visual language
-- Could appear in the hand view carousel alongside domain cards
-- Equipment data already loaded from SRD JSON
+- 6 cols at 375px = 55px/trait at 11px font — too small one-handed
+- Change to `grid-cols-3` with 2 rows, increase value to 20-24px
+- Keep spellcast highlight + action verbs. Desktop stays 6-col.
+- MobileLayout.tsx only
+
+### 2. Damage Threshold Reference Row
+**Size:** S | **Status:** Open
+**Description:** Clear Minor/Major/Severe reference in StatBar with "mark X HP" instructions
+**Notes:**
+- Replace existing inline Major/Severe GameBadges with a dedicated row
+- `Minor = 1 HP | Major [n] = 2 HP | Severe [n] = 3 HP`
+- Data already available: `parseThresholds()` + character.level
+- StatBar.tsx only, no type changes
+
+### 3. Weapon Stat Block
+**Size:** M | **Status:** Open
+**Description:** Structured weapon display: name, range, attack mod, damage dice, type, feat
+**Notes:**
+- New `WeaponPanel.tsx` component
+- Attack mod = `character.traits[weapon.trait.toLowerCase()]` + proficiency
+- Weapon type fully typed: `Weapon` interface has all SRD fields
+- Show primary + secondary weapons above Equipment section
+- No dice rolling in v1
+
+### 4. Conditions Tracker
+**Size:** M | **Status:** Open
+**Description:** Chip/tag system for Hidden, Restrained, Vulnerable + custom conditions
+**Notes:**
+- Type change: add `conditions: string[]` to Character
+- New `ConditionBar.tsx` — row of toggleable chips below StatBar
+- Core constants in `src/core/rules/conditions.ts` (3 standard conditions)
+- "+" for custom conditions (e.g., "Hexed" from class abilities)
+- Store migration needed
+
+### 5. Ability Usage Tracking
+**Size:** M | **Status:** Open
+**Description:** Toggle on FeaturePanel to mark limited-use abilities as used
+**Notes:**
+- Type change: add `usedFeatures: string[]` to Character
+- FeaturePanel gets `used?` + `onToggleUsed?` props
+- Used features dim slightly (opacity)
+- "Rest" action resets all usage
+- SRD doesn't tag per-rest features — let player toggle any feature manually
+- Store migration needed
+
+### 6. Character Portraits
+**Size:** M | **Status:** Open
+**Description:** Character portrait in header — upload or default to subclass art
+**Notes:**
+- Type change: add `portrait?: string` to Character (base64 data URL)
+- Tap portrait → file picker → canvas resize to 200x200 → store as base64
+- Default: subclass art in circular mask (art already exists)
+- Mobile: 44px circle in CharacterHeader. Desktop: 56px in identity banner
+- No fancy crop UI in v1
+
+---
+
+## MVP — Remaining Items
 
 ### Working Calculations — Post-Creation Editing
 **Size:** S | **Status:** Open
@@ -84,14 +140,6 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 - Share between devices
 - Migration considerations
 
-### Character Portraits
-**Size:** M
-**Description:** Upload or generate character images
-**Notes:**
-- Store as base64 or URL
-- Crop/resize tool
-- Optional feature
-
 ---
 
 ## Low Priority
@@ -158,6 +206,6 @@ _Goal: A functional, well-crafted level 1 Wizard character creation and play exp
 
 - Campaign/party management
 - Initiative tracker
-- Condition tracking
 - NPC quick reference
 - Combat log
+- Loadout/vault mechanics for domain cards (recall cost tracking)
