@@ -94,5 +94,19 @@ export function migrateCharacter(
     }
   }
 
+  // Add conditions and usage tracking (v4 migration)
+  if (!migrated.conditions) {
+    migrated = {
+      ...migrated,
+      conditions: [],
+    }
+  }
+  if (!migrated.usedFeatures) {
+    migrated = {
+      ...migrated,
+      usedFeatures: [],
+    }
+  }
+
   return migrated
 }

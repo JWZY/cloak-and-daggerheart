@@ -22,6 +22,11 @@ interface CharacterStore {
   updateBackground: (id: string, index: number, answer: string) => void
   updateConnections: (id: string, index: number, answer: string) => void
   levelUp: (id: string, choices: LevelUpChoices) => void
+  addCondition: (id: string, condition: string) => void
+  removeCondition: (id: string, condition: string) => void
+  toggleFeatureUsed: (id: string, featureName: string) => void
+  resetFeatureUsage: (id: string) => void
+  setPortrait: (id: string, dataUrl: string) => void
 }
 
 export const useCharacterStore = create<CharacterStore>()(
@@ -149,6 +154,52 @@ export const useCharacterStore = create<CharacterStore>()(
         set((state) => ({
           characters: state.characters.map((c) =>
             c.id === id ? applyLevelUp(c, choices) : c
+          ),
+        })),
+
+      addCondition: (id: string, condition: string) =>
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === id && !c.conditions.includes(condition)
+              ? { ...c, conditions: [...c.conditions, condition] }
+              : c
+          ),
+        })),
+
+      removeCondition: (id: string, condition: string) =>
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === id
+              ? { ...c, conditions: c.conditions.filter((cond) => cond !== condition) }
+              : c
+          ),
+        })),
+
+      toggleFeatureUsed: (id: string, featureName: string) =>
+        set((state) => ({
+          characters: state.characters.map((c) => {
+            if (c.id !== id) return c
+            const used = c.usedFeatures.includes(featureName)
+            return {
+              ...c,
+              usedFeatures: used
+                ? c.usedFeatures.filter((f) => f !== featureName)
+                : [...c.usedFeatures, featureName],
+            }
+          }),
+        })),
+
+      resetFeatureUsage: (id: string) =>
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === id ? { ...c, usedFeatures: [] } : c
+          ),
+        })),
+
+      setPortrait: (id: string, dataUrl: string) =>
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === id ? { ...c, portrait: dataUrl } : c
           ),
         })),
     }),

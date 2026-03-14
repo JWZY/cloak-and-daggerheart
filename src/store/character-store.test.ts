@@ -71,6 +71,8 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     backgroundAnswers: [],
     experiences: [],
     connectionAnswers: [],
+    conditions: [],
+    usedFeatures: [],
     createdAt: Date.now(),
     ...overrides,
   }

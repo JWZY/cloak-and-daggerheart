@@ -3,17 +3,19 @@ import { typeSubtitle, typeBody, typeMicro } from '../ui/typography'
 import { warmGlass, RADIUS_CARD } from '../design-system/tokens/surfaces'
 import { TRAIT_NAMES, formatTraitValue } from '../core/rules/traits'
 import { StatBar } from './StatBar'
+import { ConditionBar } from './ConditionBar'
 import { EquipmentPanel } from './panels/EquipmentPanel'
 import { NotesPanel } from './panels/NotesPanel'
 import { GoldPanel } from './panels/GoldPanel'
 import { InlineSection } from './InlineSection'
 import { CharacterHeader } from './CharacterHeader'
 import { DomainAbilityPanel } from './DomainAbilityPanel'
+import { WeaponPanel } from './WeaponPanel'
 import { FeaturePanel } from './FeaturePanel'
 import { getClassForSubclass, getSubclassByName } from '../data/srd'
 import { kebabCase } from '../data/card-mapper'
 import { useCharacterStore } from '../store/character-store'
-import type { Character } from '../types/character'
+import type { Character, TraitName } from '../types/character'
 
 const BASE_URL = import.meta.env.BASE_URL
 
@@ -78,10 +80,16 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
   const spellcastTrait = subclassData?.spellcast_trait ?? null
   const updateBackground = useCharacterStore((s) => s.updateBackground)
   const updateConnections = useCharacterStore((s) => s.updateConnections)
+  const toggleFeatureUsed = useCharacterStore((s) => s.toggleFeatureUsed)
 
   return (
     <div className="flex flex-col">
-      <CharacterHeader character={character} variant="mobile" onTap={onHeroTap} />
+      <CharacterHeader
+        character={character}
+        variant="mobile"
+        onTap={onHeroTap}
+        fallbackImage={subclassArtSrc(character.subclass)}
+      />
 
       {/* Stats + Panels */}
       <div className="px-4 pb-3 pt-1">
@@ -89,15 +97,18 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
           {/* StatBar — #1 most important interactive element */}
           <StatBar character={character} accentColor={accentColor} />
 
-          {/* ─── Trait Bar ─── 6 columns matching desktop */}
+          {/* Condition chips — between StatBar and Trait Bar */}
+          <ConditionBar character={character} />
+
+          {/* ─── Trait Bar ─── 3x2 grid for mobile readability */}
           <div
             style={{
               ...warmGlass,
               borderRadius: RADIUS_CARD,
-              padding: '12px 8px',
+              padding: '14px 12px',
             }}
           >
-            <div className="grid grid-cols-6 gap-1">
+            <div className="grid grid-cols-3 gap-2">
               {TRAIT_NAMES.map((trait) => {
                 const value = character.traits[trait]
                 const isSpellcast = spellcastTrait?.toLowerCase() === trait
@@ -105,22 +116,22 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
                 return (
                   <div
                     key={trait}
-                    className="flex flex-col items-center py-2 px-1 rounded-lg"
+                    className="flex flex-col items-center py-3 px-2 rounded-xl"
                     style={{
                       background: isSpellcast ? 'var(--gold-muted)' : 'transparent',
                       border: isSpellcast ? '1px solid var(--gold-muted)' : '1px solid transparent',
                     }}
                   >
                     <div className="flex flex-col items-center">
-                      <span style={{ ...typeSubtitle, fontSize: 11, color: 'var(--gold)' }}>
+                      <span style={{ ...typeSubtitle, fontSize: 13, color: 'var(--gold)' }}>
                         {traitLabels[trait]}
                       </span>
-                      <span style={{ ...typeSubtitle, fontVariantNumeric: 'tabular-nums', color: 'var(--gold)' }}>
+                      <span style={{ ...typeSubtitle, fontSize: 20, fontVariantNumeric: 'tabular-nums', color: 'var(--gold)' }}>
                         {formatTraitValue(value)}
                       </span>
                     </div>
                     {isSpellcast && (
-                      <span style={{ ...typeBody, fontSize: 10, color: 'var(--gold-secondary)' }}>Spellcast</span>
+                      <span style={{ ...typeBody, fontSize: 11, color: 'var(--gold-secondary)', marginTop: 2 }}>Spellcast</span>
                     )}
                     <div className="flex flex-col items-center mt-1 gap-0">
                       {traitActions[trait]?.map((action) => (
@@ -128,7 +139,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
                           key={action}
                           style={{
                             ...typeBody,
-                            fontSize: 10,
+                            fontSize: 11,
+                            lineHeight: 1.4,
                             color: 'var(--text-muted)',
                           }}
                         >
@@ -158,6 +170,29 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
             </div>
           )}
 
+          {/* Weapons — primary and secondary */}
+          {(character.equipment?.primaryWeapon || character.equipment?.secondaryWeapon) && (
+            <div className="flex flex-col gap-3">
+              <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+                Weapons
+              </span>
+              {character.equipment.primaryWeapon && (
+                <WeaponPanel
+                  weapon={character.equipment.primaryWeapon}
+                  attackMod={character.traits[character.equipment.primaryWeapon.trait.toLowerCase() as TraitName] ?? 0}
+                  proficiency={character.proficiency}
+                />
+              )}
+              {character.equipment.secondaryWeapon && (
+                <WeaponPanel
+                  weapon={character.equipment.secondaryWeapon}
+                  attackMod={character.traits[character.equipment.secondaryWeapon.trait.toLowerCase() as TraitName] ?? 0}
+                  proficiency={character.proficiency}
+                />
+              )}
+            </div>
+          )}
+
           {/* Subclass Features — foundations, specializations, masteries based on tier */}
           {subclassData?.foundations?.map((feat, i) => (
             <FeaturePanel
@@ -167,6 +202,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
               text={feat.text}
               imageSrc={subclassArtSrc(character.subclass)}
               onTap={() => onCardTap('hero-card')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
           {character.subclassTier !== 'foundation' && subclassData?.specializations?.map((feat, i) => (
@@ -177,6 +214,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
               text={feat.text}
               imageSrc={subclassArtSrc(character.subclass)}
               onTap={() => onCardTap('hero-card')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
           {character.subclassTier === 'mastery' && subclassData?.masteries?.map((feat, i) => (
@@ -187,6 +226,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
               text={feat.text}
               imageSrc={subclassArtSrc(character.subclass)}
               onTap={() => onCardTap('hero-card')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
 
@@ -197,6 +238,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
               source={`Hope \u00b7 ${character.class}`}
               text={classData.hope_feat_text}
               imageSrc={classArtSrc(character.class)}
+              used={character.usedFeatures.includes(classData.hope_feat_name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, classData.hope_feat_name)}
             />
           )}
 
@@ -208,6 +251,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
               source={`Class: ${character.class}`}
               text={feat.text}
               imageSrc={classArtSrc(character.class)}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
 
@@ -220,6 +265,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
               text={feat.text}
               imageSrc={ancestryArtSrc(character.ancestry.name)}
               onTap={() => onCardTap('ancestry')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
 
@@ -232,6 +279,8 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
               text={feat.text}
               imageSrc={communityArtSrc(character.community.name)}
               onTap={() => onCardTap('community')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
 

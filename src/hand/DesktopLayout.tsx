@@ -3,18 +3,20 @@ import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradientStyle } from 
 import { warmGlass, RADIUS_CARD } from '../design-system/tokens/surfaces'
 import { TRAIT_NAMES, formatTraitValue } from '../core/rules/traits'
 import { StatBar } from './StatBar'
+import { ConditionBar } from './ConditionBar'
 import { EquipmentPanel } from './panels/EquipmentPanel'
 import { NotesPanel } from './panels/NotesPanel'
 import { GoldPanel } from './panels/GoldPanel'
 import { InlineSection } from './InlineSection'
 import { DomainAbilityPanel } from './DomainAbilityPanel'
+import { WeaponPanel } from './WeaponPanel'
 import { FeaturePanel } from './FeaturePanel'
 import { DomainBanner } from '../cards/DomainBanner'
 import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from '../cards/domain-colors'
 import { getClassForSubclass, getSubclassByName } from '../data/srd'
 import { kebabCase } from '../data/card-mapper'
 import { useCharacterStore } from '../store/character-store'
-import type { Character } from '../types/character'
+import type { Character, TraitName } from '../types/character'
 
 const BASE_URL = import.meta.env.BASE_URL
 
@@ -91,6 +93,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
   const spellcastTrait = subclassData?.spellcast_trait ?? null
   const updateBackground = useCharacterStore((s) => s.updateBackground)
   const updateConnections = useCharacterStore((s) => s.updateConnections)
+  const toggleFeatureUsed = useCharacterStore((s) => s.toggleFeatureUsed)
+
+  const portraitSrc = character.portrait || subclassArtSrc(character.subclass)
 
   return (
     <div className="mx-auto px-6 py-6" style={{ maxWidth: 1400 }}>
@@ -116,6 +121,30 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
           className="flex items-center gap-6 mx-auto"
           style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
         >
+          {/* Portrait circle */}
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              border: '1px solid var(--gold-muted)',
+              overflow: 'hidden',
+              flexShrink: 0,
+              background: 'var(--bg-surface)',
+            }}
+          >
+            <img
+              src={portraitSrc}
+              alt=""
+              loading="lazy"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+          </div>
+
           {/* Domain pennant — both domains stacked */}
           <div className="relative" style={{ width: 44, height: 80, flexShrink: 0 }}>
             {classData && (
@@ -209,6 +238,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
         <div className="sticky top-0 self-start flex flex-col gap-4">
           <StatBar character={character} accentColor={accentColor} />
 
+          {/* Condition chips — between StatBar and Experiences */}
+          <ConditionBar character={character} />
+
           {/* Experiences — like "Experience" on the character sheet */}
           {character.experiences?.length > 0 && (
             <InlineSection title="Experiences" icon={Award}>
@@ -230,6 +262,26 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
 
         {/* ═══ CENTER COLUMN: Abilities & Features ═══ */}
         <div className="flex flex-col gap-3">
+          {/* Weapons — first thing you reach for in combat */}
+          {(character.equipment?.primaryWeapon || character.equipment?.secondaryWeapon) && (
+            <>
+              {character.equipment.primaryWeapon && (
+                <WeaponPanel
+                  weapon={character.equipment.primaryWeapon}
+                  attackMod={character.traits[character.equipment.primaryWeapon.trait.toLowerCase() as TraitName] ?? 0}
+                  proficiency={character.proficiency}
+                />
+              )}
+              {character.equipment.secondaryWeapon && (
+                <WeaponPanel
+                  weapon={character.equipment.secondaryWeapon}
+                  attackMod={character.traits[character.equipment.secondaryWeapon.trait.toLowerCase() as TraitName] ?? 0}
+                  proficiency={character.proficiency}
+                />
+              )}
+            </>
+          )}
+
           {/* Domain Abilities */}
           {character.domainCards.map((card) => (
             <DomainAbilityPanel
@@ -247,8 +299,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
               source={`${character.subclass}: Foundation`}
               text={feat.text}
               imageSrc={subclassArtSrc(character.subclass)}
-
               onTap={() => onCardTap('hero-card')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
           {character.subclassTier !== 'foundation' && subclassData?.specializations?.map((feat, i) => (
@@ -258,8 +311,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
               source={`${character.subclass}: Specialization`}
               text={feat.text}
               imageSrc={subclassArtSrc(character.subclass)}
-
               onTap={() => onCardTap('hero-card')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
           {character.subclassTier === 'mastery' && subclassData?.masteries?.map((feat, i) => (
@@ -269,8 +323,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
               source={`${character.subclass}: Mastery`}
               text={feat.text}
               imageSrc={subclassArtSrc(character.subclass)}
-
               onTap={() => onCardTap('hero-card')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
 
@@ -281,7 +336,8 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
               source={`Hope \u00b7 ${character.class}`}
               text={classData.hope_feat_text}
               imageSrc={classArtSrc(character.class)}
-
+              used={character.usedFeatures.includes(classData.hope_feat_name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, classData.hope_feat_name)}
             />
           )}
 
@@ -293,7 +349,8 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
               source={`Class: ${character.class}`}
               text={feat.text}
               imageSrc={classArtSrc(character.class)}
-
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
 
@@ -305,8 +362,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
               source={`Ancestry: ${character.ancestry.name}`}
               text={feat.text}
               imageSrc={ancestryArtSrc(character.ancestry.name)}
-
               onTap={() => onCardTap('ancestry')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
 
@@ -318,8 +376,9 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
               source={`Community: ${character.community.name}`}
               text={feat.text}
               imageSrc={communityArtSrc(character.community.name)}
-
               onTap={() => onCardTap('community')}
+              used={character.usedFeatures.includes(feat.name)}
+              onToggleUsed={() => toggleFeatureUsed(character.id, feat.name)}
             />
           ))}
         </div>

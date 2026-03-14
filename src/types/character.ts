@@ -161,6 +161,9 @@ export interface Character {
   backgroundAnswers: string[]
   experiences: { text: string; bonus: number }[]
   connectionAnswers: string[]
+  conditions: string[]
+  usedFeatures: string[]
+  portrait?: string
   createdAt: number
 }
 

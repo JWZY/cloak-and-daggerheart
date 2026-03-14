@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
-import { typeBody, goldAccent } from '../ui/typography'
+import { typeBody, typeMicro, goldAccent } from '../ui/typography'
 import { springs } from '../design-system/tokens/animations'
 import { STAT_COLORS } from '../cards/domain-colors'
 import { GameBadge } from '../ui/GameBadge'
@@ -150,6 +150,108 @@ function StatRow({
   )
 }
 
+function DamageThresholdSegment({
+  label,
+  threshold,
+  hpCost,
+}: {
+  label: string
+  threshold?: string
+  hpCost: string
+}) {
+  return (
+    <div
+      className="flex flex-col items-center flex-1"
+      style={{ gap: 1 }}
+    >
+      <span
+        style={{
+          ...typeMicro,
+          fontSize: 10,
+          color: 'var(--text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontFamily: "'EB Garamond', serif",
+          fontSize: 18,
+          fontWeight: 600,
+          color: 'var(--gold)',
+          lineHeight: 1,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {threshold ?? '<'}
+      </span>
+      <span
+        style={{
+          ...typeMicro,
+          fontSize: 10,
+          color: 'var(--text-muted)',
+        }}
+      >
+        {hpCost}
+      </span>
+    </div>
+  )
+}
+
+function DamageThresholdRow({
+  major,
+  severe,
+}: {
+  major: number
+  severe: number
+}) {
+  return (
+    <div
+      className="flex items-stretch"
+      style={{
+        background: 'rgba(255,255,255,0.03)',
+        borderRadius: 8,
+        border: '1px solid rgba(255,255,255,0.04)',
+        padding: '6px 0',
+      }}
+    >
+      <DamageThresholdSegment
+        label="Minor"
+        threshold={`1\u2013${major - 1}`}
+        hpCost="1 HP"
+      />
+      <div
+        style={{
+          width: 1,
+          alignSelf: 'stretch',
+          background: 'rgba(255,255,255,0.06)',
+          margin: '2px 0',
+        }}
+      />
+      <DamageThresholdSegment
+        label="Major"
+        threshold={`${major}\u2013${severe - 1}`}
+        hpCost="2 HP"
+      />
+      <div
+        style={{
+          width: 1,
+          alignSelf: 'stretch',
+          background: 'rgba(255,255,255,0.06)',
+          margin: '2px 0',
+        }}
+      />
+      <DamageThresholdSegment
+        label="Severe"
+        threshold={`${severe}+`}
+        hpCost="3 HP"
+      />
+    </div>
+  )
+}
+
 export function StatBar({ character, accentColor = goldAccent }: StatBarProps) {
   const updateHP = useCharacterStore((s) => s.updateHP)
   const updateArmor = useCharacterStore((s) => s.updateArmor)
@@ -177,16 +279,16 @@ export function StatBar({ character, accentColor = goldAccent }: StatBarProps) {
       />
       <div className="flex items-center gap-2 pl-[54px]">
         <GameBadge color={accentColor}>Evasion {character.evasion}</GameBadge>
-        {character.equipment?.armor && (() => {
-          const thresholds = parseThresholds(character.equipment.armor.base_thresholds)
-          return (
-            <>
-              <GameBadge color={accentColor}>Major {thresholds.major + character.level}</GameBadge>
-              <GameBadge color={accentColor}>Severe {thresholds.severe + character.level}</GameBadge>
-            </>
-          )
-        })()}
       </div>
+
+      {character.equipment?.armor && (() => {
+        const thresholds = parseThresholds(character.equipment.armor.base_thresholds)
+        const major = thresholds.major + character.level
+        const severe = thresholds.severe + character.level
+        return (
+          <DamageThresholdRow major={major} severe={severe} />
+        )
+      })()}
 
       <StatRow
         label="HP"

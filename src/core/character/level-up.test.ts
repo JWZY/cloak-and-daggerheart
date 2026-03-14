@@ -29,6 +29,8 @@ function makeTestCharacter(overrides: Partial<Character> = {}): Character {
       { text: 'Survived the wilderness', bonus: 2 },
     ],
     connectionAnswers: [],
+    conditions: [],
+    usedFeatures: [],
     createdAt: Date.now(),
     advancements: [],
     markedTraits: [],

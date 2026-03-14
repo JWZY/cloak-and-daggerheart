@@ -124,6 +124,8 @@ export function DeckBuilder({ onComplete, onExit }: DeckBuilderProps) {
       backgroundAnswers: [],
       experiences: [{ text: 'Survived the Siege of Ashvale', bonus: 0 }],
       connectionAnswers: [],
+      conditions: [],
+      usedFeatures: [],
       createdAt: Date.now(),
     }
     store.reset()
@@ -417,6 +419,8 @@ function assembleCharacter(
     backgroundAnswers: store.backgroundAnswers || [],
     experiences: (store.experiences || []).filter((e) => e?.text),
     connectionAnswers: store.connectionAnswers || [],
+    conditions: [],
+    usedFeatures: [],
     createdAt: Date.now(),
   }
 }
