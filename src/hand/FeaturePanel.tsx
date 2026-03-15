@@ -1,5 +1,5 @@
 import { FormatText } from '../ui/FormatText'
-import { typeSubtitle, typeBody, typeMicro, goldGradientStyle } from '../ui/typography'
+import { typeSubtitle, typeBody, goldGradientStyle } from '../ui/typography'
 import { warmGlass, RADIUS_CARD } from '../design-system/tokens/surfaces'
 
 export interface FeaturePanelProps {
@@ -93,10 +93,9 @@ export function FeaturePanel({ name, source, text, onTap, imageSrc, used, onTogg
               }}
             >
               {used ? (
-                /* Filled circle with check */
+                /* Filled solid circle */
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="9" fill="var(--gold-muted)" stroke="var(--gold)" strokeWidth="1" />
-                  <path d="M6 10l3 3 5-6" stroke="var(--gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  <circle cx="10" cy="10" r="9" fill="var(--gold)" stroke="var(--gold)" strokeWidth="1" />
                 </svg>
               ) : (
                 /* Empty circle outline */
@@ -107,13 +106,6 @@ export function FeaturePanel({ name, source, text, onTap, imageSrc, used, onTogg
             </button>
           )}
         </div>
-
-        {/* Used label */}
-        {used && onToggleUsed && (
-          <span style={{ ...typeMicro, color: 'var(--gold-muted)', marginTop: 4, display: 'block' }}>
-            Used
-          </span>
-        )}
 
         {/* Separator */}
         <div

@@ -4,6 +4,7 @@ import type { Character } from '../types/character'
 import { clampHP } from '../core/character/hp'
 import { applyLevelUp } from '../core/character/level-up'
 import type { LevelUpChoices } from '../core/character/level-up'
+import { migrateCharacter, getDefaultEquipment } from '../core/character/migration'
 
 interface CharacterStore {
   characters: Character[]
@@ -205,6 +206,14 @@ export const useCharacterStore = create<CharacterStore>()(
     }),
     {
       name: 'cloak-characters-v3',
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          const defaultEquip = getDefaultEquipment()
+          state.characters = state.characters.map((c) =>
+            migrateCharacter(c, defaultEquip)
+          )
+        }
+      },
     }
   )
 )

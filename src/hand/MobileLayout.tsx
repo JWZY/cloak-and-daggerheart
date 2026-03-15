@@ -12,6 +12,7 @@ import { CharacterHeader } from './CharacterHeader'
 import { DomainAbilityPanel } from './DomainAbilityPanel'
 import { WeaponPanel } from './WeaponPanel'
 import { FeaturePanel } from './FeaturePanel'
+import { ArmorEvasionBlock } from './ArmorEvasionBlock'
 import { getClassForSubclass, getSubclassByName } from '../data/srd'
 import { kebabCase } from '../data/card-mapper'
 import { useCharacterStore } from '../store/character-store'
@@ -77,7 +78,6 @@ const traitActions: Record<string, string[]> = {
 export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: MobileLayoutProps) {
   const classData = getClassForSubclass(character.subclass)
   const subclassData = getSubclassByName(character.subclass)
-  const spellcastTrait = subclassData?.spellcast_trait ?? null
   const updateBackground = useCharacterStore((s) => s.updateBackground)
   const updateConnections = useCharacterStore((s) => s.updateConnections)
   const toggleFeatureUsed = useCharacterStore((s) => s.toggleFeatureUsed)
@@ -100,58 +100,40 @@ export function MobileLayout({ character, accentColor, onHeroTap, onCardTap }: M
           {/* Condition chips — between StatBar and Trait Bar */}
           <ConditionBar character={character} />
 
-          {/* ─── Trait Bar ─── 3x2 grid for mobile readability */}
-          <div
-            style={{
-              ...warmGlass,
-              borderRadius: RADIUS_CARD,
-              padding: '14px 12px',
-            }}
-          >
-            <div className="grid grid-cols-3 gap-2">
+          {/* ─── Armor/Evasion + Trait Bar lockup ─── */}
+          <div className="flex flex-col gap-3">
+            <ArmorEvasionBlock character={character} />
+
+            {/* Trait Bar — 3x2 grid for mobile readability */}
+            <div
+              style={{
+                ...warmGlass,
+                borderRadius: RADIUS_CARD,
+                padding: '14px 12px',
+              }}
+            >
+              <div className="grid grid-cols-3 gap-2">
               {TRAIT_NAMES.map((trait) => {
                 const value = character.traits[trait]
-                const isSpellcast = spellcastTrait?.toLowerCase() === trait
-
                 return (
                   <div
                     key={trait}
-                    className="flex flex-col items-center py-3 px-2 rounded-xl"
-                    style={{
-                      background: isSpellcast ? 'var(--gold-muted)' : 'transparent',
-                      border: isSpellcast ? '1px solid var(--gold-muted)' : '1px solid transparent',
-                    }}
+                    className="flex flex-col items-center py-3 px-1 rounded-xl"
                   >
-                    <div className="flex flex-col items-center">
-                      <span style={{ ...typeSubtitle, fontSize: 13, color: 'var(--gold)' }}>
-                        {traitLabels[trait]}
-                      </span>
-                      <span style={{ ...typeSubtitle, fontSize: 20, fontVariantNumeric: 'tabular-nums', color: 'var(--gold)' }}>
-                        {formatTraitValue(value)}
-                      </span>
-                    </div>
-                    {isSpellcast && (
-                      <span style={{ ...typeBody, fontSize: 11, color: 'var(--gold-secondary)', marginTop: 2 }}>Spellcast</span>
-                    )}
-                    <div className="flex flex-col items-center mt-1 gap-0">
-                      {traitActions[trait]?.map((action) => (
-                        <span
-                          key={action}
-                          style={{
-                            ...typeBody,
-                            fontSize: 11,
-                            lineHeight: 1.4,
-                            color: 'var(--text-muted)',
-                          }}
-                        >
-                          {action}
-                        </span>
-                      ))}
-                    </div>
+                    <span style={{ ...typeMicro, color: 'var(--gold)' }}>
+                      {traitLabels[trait]}
+                    </span>
+                    <span style={{ ...typeSubtitle, fontSize: 24, fontVariantNumeric: 'tabular-nums', color: 'var(--gold)', lineHeight: 1.2 }}>
+                      {formatTraitValue(value)}
+                    </span>
+                    <span style={{ ...typeMicro, fontSize: 10, color: 'var(--text-muted)', marginTop: 2, whiteSpace: 'nowrap' as const }}>
+                      {traitActions[trait]?.join(' · ')}
+                    </span>
                   </div>
                 )
               })}
             </div>
+          </div>
           </div>
 
           {/* Domain Abilities */}

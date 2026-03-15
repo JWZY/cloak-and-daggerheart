@@ -1,6 +1,7 @@
+import { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Shield, Star, Circle, Minus, Plus } from 'lucide-react'
-import { typeBody, typeMicro, goldAccent } from '../ui/typography'
+import { typeBody, typeSubtitle, typeMicro, goldAccent } from '../ui/typography'
 import { springs } from '../design-system/tokens/animations'
 import { STAT_COLORS } from '../cards/domain-colors'
 import { GameBadge } from '../ui/GameBadge'
@@ -150,56 +151,6 @@ function StatRow({
   )
 }
 
-function DamageThresholdSegment({
-  label,
-  threshold,
-  hpCost,
-}: {
-  label: string
-  threshold?: string
-  hpCost: string
-}) {
-  return (
-    <div
-      className="flex flex-col items-center flex-1"
-      style={{ gap: 1 }}
-    >
-      <span
-        style={{
-          ...typeMicro,
-          fontSize: 10,
-          color: 'var(--text-muted)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          fontFamily: "'EB Garamond', serif",
-          fontSize: 18,
-          fontWeight: 600,
-          color: 'var(--gold)',
-          lineHeight: 1,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {threshold ?? '<'}
-      </span>
-      <span
-        style={{
-          ...typeMicro,
-          fontSize: 10,
-          color: 'var(--text-muted)',
-        }}
-      >
-        {hpCost}
-      </span>
-    </div>
-  )
-}
-
 function DamageThresholdRow({
   major,
   severe,
@@ -207,47 +158,222 @@ function DamageThresholdRow({
   major: number
   severe: number
 }) {
+  const barRef = useRef<HTMLDivElement>(null)
+  const [damage, setDamage] = useState(0)
+  const [isActive, setIsActive] = useState(false)
+
+  const maxValue = severe + Math.ceil(severe * 0.5)
+
+  const getThresholdZone = (val: number): 'minor' | 'major' | 'severe' => {
+    if (val >= severe) return 'severe'
+    if (val >= major) return 'major'
+    return 'minor'
+  }
+
+  const hpCostMap = { minor: 1, major: 2, severe: 3 } as const
+  const labelMap = { minor: 'Minor', major: 'Major', severe: 'Severe' } as const
+
+  const zone = getThresholdZone(damage)
+
+  const clampDamage = useCallback(
+    (clientX: number) => {
+      const bar = barRef.current
+      if (!bar) return
+      const rect = bar.getBoundingClientRect()
+      const x = clientX - rect.left
+      const ratio = Math.max(0, Math.min(1, x / rect.width))
+      setDamage(Math.round(ratio * maxValue))
+    },
+    [maxValue],
+  )
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      setIsActive(true)
+      clampDamage(e.clientX)
+      e.currentTarget.setPointerCapture(e.pointerId)
+    },
+    [clampDamage],
+  )
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isActive) return
+      clampDamage(e.clientX)
+    },
+    [isActive, clampDamage],
+  )
+
+  const handlePointerUp = useCallback(() => {
+    setIsActive(false)
+  }, [])
+
+  // Zone boundary percentages
+  const majorPct = (major / maxValue) * 100
+  const severePct = (severe / maxValue) * 100
+  const indicatorPct = (damage / maxValue) * 100
+
   return (
-    <div
-      className="flex items-stretch"
-      style={{
-        background: 'rgba(255,255,255,0.03)',
-        borderRadius: 8,
-        border: '1px solid rgba(255,255,255,0.04)',
-        padding: '6px 0',
-      }}
-    >
-      <DamageThresholdSegment
-        label="Minor"
-        threshold={`1\u2013${major - 1}`}
-        hpCost="1 HP"
-      />
+    <div style={{ position: 'relative' }}>
+      {/* Bar track */}
       <div
+        ref={barRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onPointerEnter={(e) => { if (e.buttons === 0) { setIsActive(true); clampDamage(e.clientX) } }}
+        onPointerLeave={(e) => { if (e.buttons === 0) setIsActive(false) }}
         style={{
-          width: 1,
-          alignSelf: 'stretch',
+          position: 'relative',
+          height: 14,
+          borderRadius: 7,
           background: 'rgba(255,255,255,0.06)',
-          margin: '2px 0',
+          cursor: 'pointer',
+          touchAction: 'none',
+          userSelect: 'none',
         }}
-      />
-      <DamageThresholdSegment
-        label="Major"
-        threshold={`${major}\u2013${severe - 1}`}
-        hpCost="2 HP"
-      />
-      <div
-        style={{
-          width: 1,
-          alignSelf: 'stretch',
-          background: 'rgba(255,255,255,0.06)',
-          margin: '2px 0',
-        }}
-      />
-      <DamageThresholdSegment
-        label="Severe"
-        threshold={`${severe}+`}
-        hpCost="3 HP"
-      />
+      >
+        {/* Major zone (gold fill) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: `${majorPct}%`,
+            width: `${severePct - majorPct}%`,
+            background: 'rgba(212,175,55,0.25)',
+          }}
+        />
+        {/* Severe zone (red accent) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: `${severePct}%`,
+            right: 0,
+            background: 'rgba(220,80,80,0.3)',
+            borderRadius: '0 7px 7px 0',
+          }}
+        />
+
+        {/* Threshold boundary lines */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 2,
+            bottom: 2,
+            left: `${majorPct}%`,
+            width: 1,
+            background: 'rgba(212,175,55,0.4)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: 2,
+            bottom: 2,
+            left: `${severePct}%`,
+            width: 1,
+            background: 'rgba(220,80,80,0.4)',
+          }}
+        />
+
+        {/* Threshold labels on the bar */}
+        <span style={{ ...typeMicro, fontSize: 9, position: 'absolute', left: `${majorPct / 2}%`, top: '50%', transform: 'translate(-50%,-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }}>
+          {major > 1 && `1–${major - 1}`}
+        </span>
+        <span style={{ ...typeMicro, fontSize: 9, position: 'absolute', left: `${majorPct + (severePct - majorPct) / 2}%`, top: '50%', transform: 'translate(-50%,-50%)', color: 'var(--gold-muted)', pointerEvents: 'none' }}>
+          {major}–{severe - 1}
+        </span>
+        <span style={{ ...typeMicro, fontSize: 9, position: 'absolute', left: `${severePct + (100 - severePct) / 2}%`, top: '50%', transform: 'translate(-50%,-50%)', color: 'rgba(220,80,80,0.7)', pointerEvents: 'none' }}>
+          {severe}+
+        </span>
+
+        {/* Indicator circle — only visible on hover/drag */}
+        {isActive && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ left: `${indicatorPct}%`, scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', ...springs.snappy }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              width: 20,
+              height: 20,
+              marginTop: -10,
+              marginLeft: -10,
+              borderRadius: '50%',
+              background: '#fff',
+              boxShadow: '0 0 8px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.3)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+      </div>
+
+      {/* Tooltip — appears above the indicator on hover/drag */}
+      <AnimatePresence>
+        {isActive && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.1 }}
+            style={{
+              position: 'absolute',
+              bottom: '100%',
+              left: `${indicatorPct}%`,
+              transform: 'translateX(-50%)',
+              marginBottom: 8,
+              pointerEvents: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              background: 'var(--bg-surface)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 10,
+              padding: '6px 12px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span
+              style={{
+                ...typeMicro,
+                fontSize: 10,
+                color:
+                  zone === 'severe'
+                    ? 'rgba(220,80,80,0.85)'
+                    : zone === 'major'
+                      ? 'var(--gold)'
+                      : 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+              }}
+            >
+              {labelMap[zone]}
+            </span>
+            <span
+              style={{
+                ...typeSubtitle,
+                fontSize: 28,
+                fontVariantNumeric: 'tabular-nums',
+                color: 'var(--text-secondary)',
+                lineHeight: 1,
+              }}
+            >
+              {String(damage).padStart(2, '0')}
+            </span>
+            <span style={{ ...typeBody, fontSize: 12, color: 'var(--text-muted)' }}>
+              Mark {hpCostMap[zone]} HP
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -11,6 +11,7 @@ import { InlineSection } from './InlineSection'
 import { DomainAbilityPanel } from './DomainAbilityPanel'
 import { WeaponPanel } from './WeaponPanel'
 import { FeaturePanel } from './FeaturePanel'
+import { ArmorEvasionBlock } from './ArmorEvasionBlock'
 import { DomainBanner } from '../cards/DomainBanner'
 import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from '../cards/domain-colors'
 import { getClassForSubclass, getSubclassByName } from '../data/srd'
@@ -90,7 +91,6 @@ const traitActions: Record<string, string[]> = {
 export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: DesktopLayoutProps) {
   const classData = getClassForSubclass(character.subclass)
   const subclassData = getSubclassByName(character.subclass)
-  const spellcastTrait = subclassData?.spellcast_trait ?? null
   const updateBackground = useCharacterStore((s) => s.updateBackground)
   const updateConnections = useCharacterStore((s) => s.updateConnections)
   const toggleFeatureUsed = useCharacterStore((s) => s.toggleFeatureUsed)
@@ -172,59 +172,44 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
         </button>
       </div>
 
-      {/* ─── Trait Bar ─── full width, 6 columns like the character sheet */}
-      <div
-        style={{
-          ...warmGlass,
-          borderRadius: RADIUS_CARD,
-          padding: '12px 16px',
-          marginBottom: 20,
-        }}
-      >
-        <div className="grid grid-cols-6 gap-1">
-          {TRAIT_NAMES.map((trait) => {
-            const value = character.traits[trait]
-            const isSpellcast = spellcastTrait?.toLowerCase() === trait
+      {/* ─── Armor/Evasion + Trait Bar ─── */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20, alignItems: 'stretch' }}>
+        {/* Armor & Evasion block — fixed width on the left */}
+        <div style={{ flexShrink: 0, width: 170 }}>
+          <ArmorEvasionBlock character={character} />
+        </div>
 
-            return (
-              <div
-                key={trait}
-                className="flex flex-col items-center py-2 px-2 rounded-lg"
-                style={{
-                  background: isSpellcast ? 'var(--gold-muted)' : 'transparent',
-                  border: isSpellcast ? '1px solid var(--gold-muted)' : '1px solid transparent',
-                }}
-              >
-                {/* Trait name + value — same type treatment */}
-                <div className="flex items-baseline gap-2">
-                  <span style={{ ...typeSubtitle, color: 'var(--gold)' }}>
+        {/* Trait cells fill the rest */}
+        <div
+          style={{
+            ...warmGlass,
+            borderRadius: RADIUS_CARD,
+            padding: '12px 16px',
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <div className="grid grid-cols-6 gap-1">
+            {TRAIT_NAMES.map((trait) => {
+              const value = character.traits[trait]
+              return (
+                <div
+                  key={trait}
+                  className="flex flex-col items-center py-2 px-2 rounded-lg"
+                >
+                  <span style={{ ...typeMicro, color: 'var(--gold)' }}>
                     {traitLabels[trait]}
                   </span>
-                  <span style={{ ...typeSubtitle, fontVariantNumeric: 'tabular-nums', color: 'var(--gold)' }}>
+                  <span style={{ ...typeSubtitle, fontSize: 26, fontVariantNumeric: 'tabular-nums', color: 'var(--gold)', lineHeight: 1.2 }}>
                     {formatTraitValue(value)}
                   </span>
+                  <span style={{ ...typeMicro, color: 'var(--text-muted)', marginTop: 2, whiteSpace: 'nowrap' as const }}>
+                    {traitActions[trait]?.join(' · ')}
+                  </span>
                 </div>
-                {isSpellcast && (
-                  <span style={{ ...typeBody, color: 'var(--gold-secondary)' }}>Spellcast</span>
-                )}
-
-                {/* Action verbs — like the character sheet */}
-                <div className="flex flex-col items-center mt-1 gap-0">
-                  {traitActions[trait]?.map((action) => (
-                    <span
-                      key={action}
-                      style={{
-                        ...typeBody,
-                        color: 'var(--text-muted)',
-                      }}
-                    >
-                      {action}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
 
