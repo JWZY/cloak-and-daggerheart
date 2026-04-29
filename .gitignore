@@ -29,3 +29,9 @@ test-results/
 
 # Large binary files
 *.pdf
+
+# Demiplane reference images (local-only)
+demiplane/*.PNG
+demiplane/*.png
+demiplane/*.jpg
+demiplane/*.jpeg

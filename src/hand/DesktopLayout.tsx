@@ -1,5 +1,5 @@
 import { Sword, StickyNote, BookOpen, Users, Award, Coins } from 'lucide-react'
-import { typeTitle, typeSubtitle, typeBody, typeMicro, goldGradientStyle } from '../ui/typography'
+import { typeSubtitle, typeBody, typeMicro } from '../ui/typography'
 import { warmGlass, RADIUS_CARD } from '../design-system/tokens/surfaces'
 import { TRAIT_NAMES, formatTraitValue } from '../core/rules/traits'
 import { StatBar } from './StatBar'
@@ -12,8 +12,7 @@ import { DomainAbilityPanel } from './DomainAbilityPanel'
 import { WeaponPanel } from './WeaponPanel'
 import { FeaturePanel } from './FeaturePanel'
 import { ArmorEvasionBlock } from './ArmorEvasionBlock'
-import { DomainBanner } from '../cards/DomainBanner'
-import { DOMAIN_COLORS, DOMAIN_COLORS_MUTED } from '../cards/domain-colors'
+import { CharacterHeader } from './CharacterHeader'
 import { getClassForSubclass, getSubclassByName } from '../data/srd'
 import { kebabCase } from '../data/card-mapper'
 import { useCharacterStore } from '../store/character-store'
@@ -95,82 +94,16 @@ export function DesktopLayout({ character, accentColor, onHeroTap, onCardTap }: 
   const updateConnections = useCharacterStore((s) => s.updateConnections)
   const toggleFeatureUsed = useCharacterStore((s) => s.toggleFeatureUsed)
 
-  const portraitSrc = character.portrait || subclassArtSrc(character.subclass)
-
   return (
     <div className="mx-auto px-6 py-6" style={{ maxWidth: 1400 }}>
 
       {/* ─── Identity Banner ─── */}
-      <div className="relative mb-5">
-        {/* Gold gradient line — flush with top of pennant */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 1,
-            background: 'linear-gradient(90deg, transparent, var(--gold-muted), transparent)',
-          }}
-        />
-
-        <button
-          type="button"
-          aria-label={`${character.name}, level ${character.level} ${character.subclass} ${character.class}`}
-          onClick={onHeroTap}
-          className="flex items-center gap-6 mx-auto"
-          style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
-        >
-          {/* Portrait circle */}
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              border: '1px solid var(--gold-muted)',
-              overflow: 'hidden',
-              flexShrink: 0,
-              background: 'var(--bg-surface)',
-            }}
-          >
-            <img
-              src={portraitSrc}
-              alt=""
-              loading="lazy"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-            />
-          </div>
-
-          {/* Domain pennant — both domains stacked */}
-          <div className="relative" style={{ width: 44, height: 80, flexShrink: 0 }}>
-            {classData && (
-              <DomainBanner
-                outerColor={DOMAIN_COLORS_MUTED[classData.domain_2] ?? '#626565'}
-                innerColor={DOMAIN_COLORS[classData.domain_1] ?? DOMAIN_COLORS.Blade}
-                uid="desktop-header"
-                domain={classData.domain_1}
-                domain2={classData.domain_2}
-                basePath={import.meta.env.BASE_URL}
-                scale={1}
-              />
-            )}
-          </div>
-
-          {/* Name + L# subclass class — both left-aligned */}
-          <div className="flex flex-col items-start">
-            <span style={{ ...typeTitle, fontSize: 28, ...goldGradientStyle }}>
-              {character.name}
-            </span>
-            <span style={{ ...typeSubtitle, color: 'var(--gold-secondary)' }}>
-              L{character.level} {character.subclass} {character.class}
-            </span>
-          </div>
-        </button>
-      </div>
+      <CharacterHeader
+        character={character}
+        variant="desktop"
+        onTap={onHeroTap}
+        fallbackImage={subclassArtSrc(character.subclass)}
+      />
 
       {/* ─── Armor/Evasion + Trait Bar ─── */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, alignItems: 'stretch' }}>
