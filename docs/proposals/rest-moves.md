@@ -4,27 +4,38 @@
 
 ## Problem
 
-`GearMenu` lists Short Rest and Long Rest with stub handlers. SRD has rich downtime mechanics that span at least 5 other PRs.
+`GearMenu` lists Short Rest and Long Rest with stub handlers. SRD has rich downtime mechanics that span several other PRs.
 
 This is the most coupled PR in the batch. Predecessors must land first.
 
+## SRD-verified rules
+
+All cited from `daggerheart-srd-main/contents/Downtime.md`.
+
+**Three-shorts hard rule** (verbatim):
+> If a party takes three short rests in a row, their next rest must be a long rest.
+
+Unambiguous. Hard disable, not confirm-override.
+
+**Long-rest interruption** (verbatim):
+> If a long rest is interrupted, the characters only gain the benefits of a short rest.
+
+Deferred from this PR (one-line note in acceptance).
+
 ## Decision A: dependency graph
 
-State the predecessor PRs explicitly.
+State the predecessor PRs explicitly. **Updated from round-2 draft based on Claude's verification of `updateArmor`.**
 
 | Predecessor | Why |
 |---|---|
 | **PR #2** (stress overflow + typed conditions) | Clear Stress uses `updateStress`. Typed conditions help with Vulnerable removal. |
 | **PR #3** (Hope cap) | Prepare's "gain 1 Hope (2 if shared)" must respect cap. |
-| **PR #4** (damage threshold + armor model) | Repair Armor uses `updateArmor`. (Note: PR #4 covers damage flow, not directly armor; check the scope; armor slots already exist. Confirm before merge.) |
+| ~~PR #4~~ | **Removed.** `updateArmor(id, delta)` already exists in `src/store/character-store.ts`, used in `StatBar.tsx` and `ArmorEvasionBlock.tsx`, tested in `character-store.test.ts`. Repair Armor calls it directly on `main` today. |
 | **PR #9** (dice roller with generic mode) | "1d4 + Tier" rolls for Tend/Clear/Repair. |
 | **PR #10** (loadout/vault) | "Free swap during rest" calls `swapDuringRest`. |
-
-This PR lands **last** in this group.
+| **PR #13** (death moves) | Long rest must auto-wake `pendingAvoid` characters. |
 
 ## Decision B: rest-tracking state
-
-"Three short rests in a row → next must be long" needs persistent state.
 
 ```ts
 interface Character {
@@ -33,33 +44,27 @@ interface Character {
 }
 ```
 
-Increment on short rest. Reset on long rest. At 3, disable Short Rest in the rest sheet (or surface a warning).
+Increment on short rest. Reset on long rest. At 3, **disable Short Rest** (greyed button + tooltip "Take a long rest first.").
 
 Migration: existing characters get `shortRestsSinceLongRest: 0`.
 
 ## Decision C: surface — Vaul vs full-screen
 
-### Options considered
-
 | Surface | Short Rest | Long Rest |
 |---|---|---|
-| **C1. Vaul bottom sheet for both** | Two-pick flow. | Same. | Consistent. May feel cramped for long rest with project tracking. |
-| **C2. Vaul for short, full-screen for long** | Quick. | Roomy. | Reflects rest gravitas. Two surface idioms. |
-| **C3. Full-screen for both** | Heavy. | Heavy. | Overkill for short rest. |
+| **C1. Vaul both** | Quick; cramped for project tracking. |
+| **C2. Vaul short, full-screen long** | Reflects SRD gravitas difference. |
+| **C3. Full-screen both** | Overkill for short. |
 
-**Recommendation: C2.** Short rest is a lightweight in-session interaction. Long rest is a between-session ceremony. Different surfaces fit.
+**Recommendation: C2.**
 
 ## Decision D: move-pick UI
 
-"Pick 2 downtime moves; can be the same one twice."
-
-### Options considered
-
 | Option | UI |
 |---|---|
-| **D1. Two-step picker** | Tap move 1, tap move 2. Stateful flow. |
-| **D2. Stepper per move (0/1/2)** | All four moves visible; +/- to allocate. Cap at 2 total. | One screen. Disable +others when sum hits 2. **Right.** |
-| **D3. Drag-and-drop tokens** | Two tokens to place on moves. | Cute. Touch-fiddly. |
+| **D1. Two-step picker** | Tap move 1, tap move 2. Stateful. |
+| **D2. Stepper per move (0/1/2)** | All four moves visible; +/- to allocate. Cap at 2 total. Disable + when sum hits 2. |
+| **D3. Drag-and-drop tokens** | Cute. Touch-fiddly. |
 
 **Recommendation: D2.**
 
@@ -67,35 +72,41 @@ Migration: existing characters get `shortRestsSinceLongRest: 0`.
 
 "GM gains 1d4 Fear on short rest, 1d4 + #PCs on long rest."
 
-### Options considered
-
 | Option | Approach |
 |---|---|
-| **E1. Player counts party size** | Friction. **Reject.** |
-| **E2. "Tell GM: +1d4 Fear + 1 per PC"** | Static copy; GM computes. | Honest. Solo-friendly. |
-| **E3. Centralized `<GMNote>` component** | Reused across PR #9 (roll fear notification) and this PR. Standard "Tell GM: X" copy-able pattern. | Coordinates with PR #9. |
+| **E1. Player counts party size** | Friction. |
+| **E2. "Tell GM: +1d4 Fear + 1 per PC"** | Static copy; GM computes. |
+| **E3. `<GMNote>` shared component** | Reused across PR #9 + this PR. |
 
-**Recommendation: E3.** Single component. Reused.
+**Recommendation: E3.**
 
 ## Decision F: "Work on a Project" scope
 
-"Long-term countdown" is a whole feature.
-
-### Options considered
-
 | Option | Scope |
 |---|---|
-| **F1. Out of scope for this PR; defer** | Project tracking is its own proposal. |
-| **F2. Minimal in this PR** | `projects: { name; notes; ticks }[]` field on Character; long rest can increment. Renders in NotesPanel. |
-| **F3. Full project lifecycle** | Start, abandon, complete states; rendering UI. | Too much. |
+| **F1. Out of scope; defer** | Project tracking is its own proposal. |
+| **F2. Minimal in this PR** | `projects: { name; notes; ticks }[]` field. |
+| **F3. Full lifecycle** | Too much. |
 
-**Recommendation: F1.** "Work on a Project" appears as a long-rest move option, but its effect is a free-text "describe progress" prompt that appends to Notes. No persistent project entity. File a separate proposal for project tracking.
+**Recommendation: F1.** "Work on a Project" appears as a long-rest move, but its effect is a free-text "describe progress" prompt that appends to Notes. No persistent project entity.
 
-## Decision G: Hope cap on Prepare
+## Decision G: long-rest auto-wake (per PR #13)
 
-"Gain 1 Hope (2 if shared with party)" via PR #3's `addHope`. Caps at `maxHope`. Test: at maxHope, Prepare is a no-op visually but the player still gets credit (no overflow concept for Hope).
+PR #13's `pendingAvoid` state can be cleared by long rest (SRD-verified third wake path).
 
-## Decision H: tier helper
+**Recommendation:** long-rest action checks the active character's `deathState`. If `'pendingAvoid'`, transitions to `'alive'` and removes the Unconscious condition (source: 'death'). State this in acceptance.
+
+## Decision H: long-rest interruption
+
+`Downtime.md`: "If a long rest is interrupted, the characters only gain the benefits of a short rest."
+
+**Recommendation:** out of scope for v1. Interruption is GM-controlled with no dedicated UI affordance. One-line note in acceptance: "interruption handling deferred — players manually pick a short rest's benefits if their long rest is interrupted."
+
+## Decision I: Hope cap on Prepare
+
+"Gain 1 Hope (2 if shared)" via PR #3's `addHope`. Caps at `maxHope`. At maxHope, Prepare is a no-op visually (no overflow concept for Hope).
+
+## Decision J: tier helper
 
 ```ts
 // core/character/tier.ts
@@ -108,13 +119,11 @@ export function getTier(level: number): Tier {
 }
 ```
 
-Used here ("1d4 + Tier") and by PR #8 (`applyTierAchievements`). Shared module.
+Shared with PR #4 (`tierThresholdBonus`) and PR #8 (`applyTierAchievements`).
 
-## Decision I: condition interaction during rest
+## Decision K: condition interaction during rest
 
-Restrained or Vulnerable: doesn't block rest. Unconscious / pendingAvoid (PR #13): blocks (PR #13's banner already disables affordances).
-
-State no special checks needed in this PR; PR #13's lock handles it.
+Restrained or Vulnerable: doesn't block rest. Unconscious / `pendingAvoid`: PR #13's banner already disables affordances; rest sheet not openable via the disabled GearMenu.
 
 ## Acceptance
 
@@ -122,25 +131,23 @@ State no special checks needed in this PR; PR #13's lock handles it.
 - [ ] Move-pick uses stepper-per-move (D2); cap at 2 total picks; disable + when sum=2.
 - [ ] Tend to Wounds (short) clears 1d4 + Tier HP via `updateHP` (and PR #9 generic roller).
 - [ ] Clear Stress (short) clears 1d4 + Tier Stress.
-- [ ] Repair Armor (short) clears 1d4 + Tier Armor Slots via `updateArmor`.
+- [ ] **Repair Armor (short) clears 1d4 + Tier Armor Slots via `updateArmor`** (already exists on `main`).
 - [ ] Prepare (short) gains 1 Hope (2 with checkbox) via PR #3's `addHope`; respects cap.
 - [ ] Long Rest "Tend to All Wounds" / "Clear All Stress" / "Repair All Armor" zero out current values.
 - [ ] Long Rest "Prepare" (1 or 2 Hope, capped).
 - [ ] Long Rest "Work on a Project" appends a free-text entry to Notes; no separate entity.
+- [ ] **Long-rest auto-wake**: when a character with `deathState === 'pendingAvoid'` long-rests, state → `'alive'`; Unconscious condition removed.
 - [ ] `shortRestsSinceLongRest` increments on short rest, resets on long rest.
-- [ ] At `shortRestsSinceLongRest === 3`, Short Rest is disabled with a warning.
+- [ ] **Three-shorts hard rule**: at `shortRestsSinceLongRest === 3`, Short Rest button is greyed with tooltip "Take a long rest first." Hard disable, not confirm-override (verified SRD).
 - [ ] Free loadout/vault swap during rest via PR #10's `swapDuringRest`.
-- [ ] `<GMNote>` component renders "Tell your GM: +1d4 Fear" (short) or "+1d4 + 1 per PC Fear" (long), with copy button.
-- [ ] `getTier(level)` lives in `core/character/tier.ts`; consumed by this PR and PR #8.
+- [ ] `<GMNote>` component renders "Tell your GM: +1d4 Fear" (short) or "+1d4 + 1 per PC Fear" (long), with copy button. Shared with PR #9.
+- [ ] `getTier(level)` lives in `core/character/tier.ts`; consumed by this PR, PR #4, PR #8.
 - [ ] Migration: existing characters get `shortRestsSinceLongRest: 0`.
-
-## Dependency graph
-
-- Lands after PRs #2, #3, #4, #9, #10. State that.
+- [ ] **Long-rest interruption**: deferred. One-line note in spec; players manually pick short-rest benefits if interrupted.
 
 ## Out of scope
 
-- Project tracking as a persistent entity (separate proposal).
+- Project tracking as a persistent entity.
 - GM rest moves / GM-shared rest sheet.
-- Custom rest moves (homebrew).
-- Rest-blocked-by-condition rules (deferred unless SRD specifies).
+- Custom homebrew rest moves.
+- Long-rest interruption UI.
