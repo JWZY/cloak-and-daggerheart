@@ -4,156 +4,204 @@
 
 ## Problem
 
-`DamageThresholdRow` in [`hand/StatBar.tsx`](../../src/hand/StatBar.tsx) is a beautiful interaction: drag a slider over the threshold zones, see "Mark 2 HP" preview. But:
+`DamageThresholdRow` in [`hand/StatBar.tsx`](../../src/hand/StatBar.tsx):
 
 1. `onPointerUp` clears `isActive`. Nothing ever calls `updateHP`. **The control is a calculator, not a control.**
-2. The Armor Slot decision is missing entirely. From `daggerheart-srd-main/contents/Armor.md`:
+2. The Armor Slot decision is missing entirely. From `daggerheart-srd-main/contents/Armor.md`: *"When you take damage, you can mark one Armor Slot to reduce the number of Hit Points you would mark by one."*
+3. Component is gated behind `character.equipment?.armor &&`. Unarmored characters get no threshold UI.
+4. Massive Damage rule (4 HP at 2× Severe) is missing.
+5. Tier-achievement +1 to all thresholds is missing.
 
-   > When you take damage, you can mark one Armor Slot to reduce the number of Hit Points you would mark by one.
+## SRD-verified formulas
 
-   The slider takes the player from "GM called damage" straight to "HP marked" with no decision surface. That skipped step is *the* combat decision in Daggerheart.
+Verified against the SRD content checked into this repo. **Do not refactor these away.**
 
-3. The component is gated behind `character.equipment?.armor &&` ([StatBar.tsx](../../src/hand/StatBar.tsx)). Unarmored characters get no threshold UI even though SRD gives them thresholds (Major = level, Severe = 2 × level).
+**Unarmored thresholds** (`Armor.md` line 9, verbatim):
 
-4. Special armor features (`Resilient`, `Reinforced`, `Full Fortified`) change the math. None are handled.
+> While unarmored, your character's base Armor Score is 0, their Major threshold is equal to their level, and their Severe threshold is equal to twice their level.
 
-This proposal reframes the work: define a damage-resolution model, then ship the slider as a UI on top of it.
+**Armored thresholds** (`Combat.md` line 21):
+
+> A PC's damage thresholds are calculated by adding their level to the listed damage thresholds of their equipped armor.
+
+**Damage-to-HP marking** (`Combat.md` thresholds + line 31 Massive Damage):
+
+| Damage | HP marked |
+|---|---|
+| `damage < major` | 1 |
+| `major ≤ damage < severe` | 2 |
+| `severe ≤ damage < 2 × severe` | 3 |
+| `2 × severe ≤ damage` | **4 (Massive Damage)** |
+
+**Tier-achievement threshold bump** (`Leveling Up.md` line 38):
+
+> Increase all damage thresholds by 1.
+
+Per-tier-crossing (T1→T2 at L2, T2→T3 at L5, T3→T4 at L8). Cumulative +3 by L8.
 
 ## Decision A: data model for damage resolution
 
-### Options considered
+| Option | Approach |
+|---|---|
+| **A1. Inline in component** | `hpCostMap` stays in `StatBar.tsx`, `updateHP` called on pointerup. | Locks armor decision out. Future armor features tear it apart. |
+| **A2. Pure `resolveDamage()`** | `(character, input) → DamageResolution`. Slider renders the result. Unit-testable. |
 
-| Option | Approach | Tradeoffs |
-|---|---|---|
-| **A1. Inline in component** | Original draft. `hpCostMap` stays in `StatBar.tsx`, `updateHP` called on pointerup. | Cheapest. Locks armor decision out. Any new armor feature requires touching the slider. |
-| **A2. Pure `resolveDamage()`** | `(damage, character, options) → { hpToMark, armorPrompts, modifiers, badges }`. Slider renders the result. Unit-testable. | One pure function. Slider becomes a thin renderer. Generalizes for special armor features. ~1.5× the work of A1. |
-
-**Recommendation: A2.** Anything else means tearing out the slider when special armor features land in a follow-up.
+**Recommendation: A2.**
 
 ```ts
 // core/character/damage.ts
 interface DamageInput {
   damage: number
-  optionalRules?: { massiveDamage?: boolean }  // campaign-level toggle
 }
+
 interface DamageResolution {
   zone: 'minor' | 'major' | 'severe' | 'massive'
   hpBeforeArmor: 1 | 2 | 3 | 4
-  hpAfterArmor: number          // == hpBeforeArmor minus armor spend
-  armorAvailable: number         // current armor slots
-  armorSpendSuggested: number    // 0..1 typically; depends on features
-  features: { name: string; effect: string }[]  // 'Resilient', 'Full Fortified', etc., for badges
+  hpAfterArmor: number
+  armorAvailable: number
+  armorSpendSuggested: number
+  features: { name: string; effect: string }[]  // Resilient, Reinforced, Full Fortified
 }
+
 export function resolveDamage(c: Character, input: DamageInput): DamageResolution
 ```
 
-This shape lets the slider tooltip show "Mark 2 HP, or spend 1 Armor Slot to mark 1." It also lets future PRs add Resilient (display "Roll d6 to skip") without slider changes.
+This shape lets the slider tooltip show "Mark 2 HP, or spend 1 Armor Slot to mark 1." It also lets future PRs add Resilient ("Roll d6 to skip") without slider changes.
 
-## Decision B: where the armor-spend decision lives in the UI
+## Decision B: tier-threshold bonus
 
-### Options considered
+`Leveling Up.md` line 38 mandates +1 to all damage thresholds at each tier crossing. PR #8's `applyTierAchievements` handles trait clearing and now must handle this too. Two storage options:
 
-| Option | Approach | Tradeoffs |
-|---|---|---|
-| **B1. None — just commit HP** | Original draft. Player tracks armor manually. | Trivial. Skips the rule. **Reject.** |
-| **B2. Tooltip with two buttons** | Tooltip shows "Mark 2 HP" *and* "Spend 1 Armor → Mark 1." Tap to commit either. | Discoverable. Two-tap interaction. Touch ergonomics: tooltip moves with the slider, buttons need to stay reachable. |
-| **B3. Pinch-to-step-down** | One slider. Pinch (or second-finger drop) reduces HP by 1 per Armor Slot. | Cute. Nondiscoverable. Bad on desktop. |
-| **B4. Two-stage commit** | First `pointerup` shows a confirm sheet with HP cost + armor toggle + commit button. | Discoverable. Three-step interaction: drag → release → confirm. Slower for the common case. |
-| **B5. Button row in tooltip + tap-to-commit shortcut** | Drag positions. Release shows a small action row anchored above the slider with two pill buttons: "Mark X HP" / "Mark X-1 HP, spend 1 Armor (Y left)." Click anywhere else dismisses. | Discoverable. One extra tap vs B1, but the tap *is* the rules choice. Anchored row is touch-friendly. |
+| Option | Approach |
+|---|---|
+| **B1. `tierThresholdBonus: number` field** | Increments by 1 at each tier crossing. `applyTierAchievements` mutates. Damage formula reads it. | Explicit. Auditable. |
+| **B2. Derive from level** | At L1: +0. L2-4: +1. L5-7: +2. L8-10: +3. Pure function. | No state. Mechanical: `max(0, getTier(level) - 1)`. |
 
-**Recommendation: B5.** It surfaces the decision exactly when it matters and matches the existing tooltip pattern.
-
-Edge cases:
-- 0 armor slots → only the "Mark X HP" button renders. Visually identical to B1 in the common case.
-- HP cost is 1 → "spend 1 Armor" button reads "Spend 1 Armor → no HP marked."
-- Armor feature `Full Fortified` reduces by **two** thresholds → button reads "Spend 1 Armor → mark X-2 HP" (X-2 floored at 0).
-
-## Decision C: unarmored characters
-
-`DamageThresholdRow` is currently gated behind `character.equipment?.armor`. SRD gives unarmored characters thresholds anyway. Two options:
-
-- **C1. Compute thresholds for unarmored too**: Major = `level`, Severe = `2 × level`. Render the bar.
-- **C2. Defer**: continue showing nothing for unarmored, document the limitation.
-
-**Recommendation: C1.** A naked-fighter build is legal at every tier. The bar is the entire damage UI. Skipping it for unarmored is a silent failure.
-
-The threshold derivation moves into `resolveDamage()` and a tiny helper:
+**Recommendation: B2.** No new field; tier bonus is a pure function of level. Coordinates with PR #8's `getTier` helper.
 
 ```ts
-function getThresholds(c: Character): { major: number; severe: number } {
-  if (c.equipment?.armor) {
-    const t = parseThresholds(c.equipment.armor.base_thresholds)
-    return { major: t.major + c.level, severe: t.severe + c.level }
-  }
-  return { major: c.level, severe: 2 * c.level }
+function tierThresholdBonus(level: number): number {
+  return Math.max(0, getTier(level) - 1)  // L1→0, L2-4→1, L5-7→2, L8-10→3
 }
 ```
 
-## Decision D: Massive Damage placement
+This means PR #8's `applyTierAchievements` doesn't need to mutate a field; the threshold formula reads from level directly.
 
-Spec originally proposed an "opt-in checkbox in the tooltip." Combat.md confirms this is an *Optional Rule*. **Per-drag toggle is the wrong surface for a per-table house rule.**
-
-**Recommendation:** campaign-level (or character-level) flag in settings:
+## Decision C: full threshold formula
 
 ```ts
-// stored on Character or in a future Campaign object
-optionalRules: { massiveDamage: boolean }
+export function getThresholds(c: Character): { major: number; severe: number } {
+  const tierBonus = tierThresholdBonus(c.level)
+  if (c.equipment?.armor) {
+    const t = parseThresholds(c.equipment.armor.base_thresholds)
+    return {
+      major: t.major + c.level + tierBonus,
+      severe: t.severe + c.level + tierBonus,
+    }
+  }
+  // Unarmored (Armor.md L9)
+  return {
+    major: c.level + tierBonus,
+    severe: c.level * 2 + tierBonus,
+  }
+}
 ```
 
-`resolveDamage()` reads it. UI renders a "Massive" badge in the tooltip when triggered, no toggle in the heat of combat.
+## Decision D: armor-spend UI
 
-If campaign-level state doesn't exist yet (it doesn't), per-character is fine for v1; promote to campaign-level when other rules toggles need it.
+| Option | Approach |
+|---|---|
+| **D1. None — just commit HP** | Skips the rule. **Reject.** |
+| **D2. Tooltip with two buttons** | "Mark 2 HP" *and* "Spend 1 Armor → Mark 1." | Discoverable. |
+| **D3. Pinch-to-step-down** | Cute. Nondiscoverable. |
+| **D4. Two-stage commit** | Drag → release → confirm sheet. | Slower. |
+| **D5. Button row in tooltip + tap-to-commit** | Drag positions; release shows action row anchored above slider with two pill buttons. Click elsewhere dismisses. | One extra tap, but the tap *is* the rules choice. |
 
-## Decision E: undo and direct numeric entry
+**Recommendation: D5.** Edge cases:
+- 0 armor slots → only "Mark X HP" renders. Visually identical to D1 in the common case.
+- HP cost is 1 → "Spend 1 Armor → no HP marked."
+- `Full Fortified` reduces by **two** thresholds → "Spend 1 Armor → mark X-2 HP" (floored at 0).
+- Massive Damage zone → "Mark 4 HP" with prominent Massive badge.
 
-### E1. Undo
+## Decision E: Massive Damage placement
 
-A drag-to-commit interaction where the GM said "8" and the player heard "18" is a 3-HP commit with no escape hatch.
+`Combat.md` calls Massive Damage a baseline rule, not optional (despite the round-2 draft framing). Verify against the SRD content directly: `Combat.md` line 31 reads as a normal threshold rule, not flagged as optional.
 
-**Recommendation:** "Last damage: -3 HP. Undo" toast for ~5s, anchored to the threshold bar. Toasts are a tiny addition; the alternative (an undo button somewhere persistent) clutters the bar.
+**Recommendation:** ship Massive Damage as the 4-HP branch unconditionally. No toggle. If a future SRD errata changes its status to optional, add a flag then.
 
-Implementation: `updateHP` returns a transaction id; the toast holds it; tap → `undoTransaction(id)`.
+## Decision F: undo and direct numeric entry
 
-### E2. Direct numeric entry
+### F1. Undo
 
-When GM says "12," typing 12 is faster than dragging.
+Drag-to-commit where the GM said "8" and the player heard "18" is a 3-HP commit with no escape.
 
-**Recommendation:** long-press on the bar (mobile) / right-click (desktop) → numeric pad bottom sheet. Small affordance, big payoff for the "exact number" case.
+**Recommendation:** "Last damage: -3 HP. Undo" toast for ~5s, anchored to the threshold bar. `updateHP` returns a transaction id; toast holds it; tap → `undoTransaction(id)`.
 
-Both can be deferred from this PR but are worth designing in. **Concrete decision: ship Undo with this PR; defer numeric entry to a follow-up labeled "damage entry: numeric pad".**
+`undoTransaction` lives in `useCharacterStore` as a transient log of last-N=20 transactions. State explicitly: 5s window; transactions older than 5s are discarded.
 
-## Decision F: touch race in the existing component
+### F2. Direct numeric entry
 
-`onPointerLeave` (StatBar.tsx) currently clears `isActive` when buttons are 0. But `setPointerCapture` is already called on `pointerdown`. **The leave handler is dead code from a desktop hover affordance** that conflicts with the touch path.
+Round-2 draft proposed long-press → numeric pad. **That conflicts with drag.** Touch sequence:
 
-**Recommendation:** remove `onPointerLeave` and `onPointerEnter`. Keep only `pointerdown`/`pointermove`/`pointerup`/`pointercancel`. Hover preview becomes a separate `onMouseMove` for desktop only, no commit, no `isActive`.
+- Player drags from 0 to 8. Holds at 8 for 600ms while reading. Long-press fires. Numeric pad opens. Player loses drag value.
+- Or: player wants the numeric pad. Taps and holds without dragging. Drag handler reads pointermove with no `delta`; ambiguous.
+
+**Recommendation:** drop long-press. Add a separate **🔢 affordance** next to the slider (or tap on the threshold-zone label "Major: 8" to type it). Slider for drag, icon for direct entry. No gesture overload.
+
+Numeric entry deferred to a follow-up labeled "damage entry: numeric pad."
+
+## Decision G: touch race in existing component
+
+`onPointerLeave` (StatBar.tsx) currently clears `isActive` when buttons are 0. `setPointerCapture` is already called on `pointerdown`. **The leave handler is dead code from a desktop hover affordance** that conflicts with the touch path.
+
+**Recommendation:**
+- Remove `onPointerLeave` and `onPointerEnter` from the bar.
+- Keep only `pointerdown` / `pointermove` / `pointerup` / `pointercancel`.
+- Hover preview (desktop only) becomes a separate `onMouseMove` handler **gated by `(hover: hover)` media query** so synthetic mouse events on touch devices don't fire it.
+
+```ts
+const isHoverDevice = window.matchMedia('(hover: hover)').matches
+// Only attach onMouseMove if isHoverDevice
+```
+
+## Decision H: tap-without-drag
+
+"Tap (down + immediate up at the same x)" — define "same x." 
+
+**Recommendation:** within ±5 px of `pointerdown` x. Pointerdown registers the start position; pointerup within 5 px is treated as a tap (opens action row at that position). Larger movement is a drag.
 
 ## Suggested implementation, end-to-end
 
-1. **`core/character/damage.ts`**: `resolveDamage()`, `getThresholds()`. Pure. Unit-tested.
+1. **`core/character/damage.ts`**: `resolveDamage()`, `getThresholds()`, `tierThresholdBonus()`. Pure. Unit-tested.
 2. **Replace `DamageThresholdRow`**:
    - Drag positions an indicator.
-   - Pointer-up *opens an action row*, doesn't commit.
+   - Pointer-up opens an action row, doesn't commit.
    - Action row: "Mark X HP" / "Spend 1 Armor → mark X-1 HP" (when armor available).
    - Tap a button → commit via `updateHP` and/or `updateArmor`. Show undo toast.
-3. **Settings flag**: `optionalRules.massiveDamage` on Character. UI in Settings drawer when that lands; default `false`.
-4. **Render the bar for unarmored characters** with derived thresholds.
+3. **Render the bar for unarmored characters** with derived thresholds from `getThresholds`.
+4. **🔢 icon affordance** next to the slider opens a small numeric input.
 
 ## Acceptance
 
-- [ ] `resolveDamage()` and `getThresholds()` exist; unit tests cover armored/unarmored, Major/Severe boundaries (`damage = major - 1` is minor, `damage = major` is major), Massive Damage on/off, and special armor features as data-driven cases.
-- [ ] Boundary unit tests specifically: `getThresholdZone(major-1)='minor'`, `getThresholdZone(major)='major'`, `getThresholdZone(severe-1)='major'`, `getThresholdZone(severe)='severe'`.
-- [ ] Tap (down + immediate up at the same x) opens the action row.
-- [ ] Pointer leaving the bar mid-drag does not commit.
+- [ ] `tierThresholdBonus(level)` returns 0/1/1/1/2/2/2/3/3/3 for L1-L10. Pure function.
+- [ ] `getThresholds(c)` for unarmored L1: `{ major: 1, severe: 2 }`.
+- [ ] `getThresholds(c)` for unarmored L5: `{ major: 7, severe: 12 }` (5 + 2 tier bonus, 10 + 2).
+- [ ] `getThresholds(c)` for armored L5 with armor base `major=8/severe=15`: `{ major: 15, severe: 22 }`.
+- [ ] `resolveDamage()` boundary tests: `damage = major - 1` → minor zone, 1 HP. `damage = major` → major zone, 2 HP.
+- [ ] `damage = 2 * severe` → massive zone, 4 HP. **Easy to silently miss.**
+- [ ] Tap (down + immediate up within ±5 px) opens the action row.
+- [ ] Pointer leaving the bar mid-drag does NOT commit.
 - [ ] Action row commit calls `updateHP` / `updateArmor` correctly.
-- [ ] Damage resolved while armor available offers the spend-armor option.
-- [ ] Undo toast restores HP/Armor on tap within 5s; auto-dismisses.
-- [ ] Unarmored character renders the threshold bar with `major=level`, `severe=2*level`.
+- [ ] Damage resolved while armor available offers the spend-armor option; commit reduces HP by the right amount and decrements armor.
+- [ ] Undo toast restores HP/Armor on tap within 5s; auto-dismisses after.
+- [ ] Unarmored character renders the threshold bar.
 - [ ] Damage = 0 (drag back to start) is a no-op.
+- [ ] Hover preview only fires on devices matching `(hover: hover)`.
+- [ ] 🔢 icon opens numeric entry; deferred to follow-up if scope grows.
 - [ ] Playwright: drag → release → tap "Mark 3 HP" → assert HP delta. Repeat with armor button.
 
 ## Out of scope (explicit)
 
-- Numeric entry (long-press → number pad). Tracked in a follow-up.
-- Special armor feature mechanics beyond reading them through `resolveDamage()` features field. Resilient (d6 skip) and Reinforced (post-armor threshold boost) ship as feature-flag follow-ups, but the data shape supports them.
-- Campaign-level rules toggles. Character-level for v1.
+- Numeric entry full implementation (follow-up).
+- Special armor feature mechanics beyond data-driven `features` field. Resilient (d6 skip), Reinforced (post-armor threshold boost) ship as feature follow-ups; data shape supports them.
+- Campaign-level rules toggles. (Massive Damage is unconditional per SRD.)
